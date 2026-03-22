@@ -8,7 +8,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, isAdmin }: AppLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-white">
+    <div className="min-h-screen bg-[#09090b] text-white">
       <MobileNav isAdmin={isAdmin} />
       <div className="flex">
         <AppSidebar isAdmin={isAdmin} className="hidden lg:flex" />

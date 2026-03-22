@@ -37,7 +37,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center px-4 relative">
+    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4 relative">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
 
       <div className="w-full max-w-[360px] relative">
@@ -48,19 +48,19 @@ export default function LoginPage() {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
-          <p className="text-[13px] text-neutral-500 mt-1.5">Sign in to your account</p>
+          <p className="text-[13px] text-zinc-500 mt-1.5">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-[13px] text-neutral-400">Email</Label>
-            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" placeholder="you@example.com" />
+            <Label htmlFor="email" className="text-[13px] text-zinc-400">Email</Label>
+            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-zinc-600" placeholder="you@example.com" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-[13px] text-neutral-400">Password</Label>
-            <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" placeholder="Your password" />
+            <Label htmlFor="password" className="text-[13px] text-zinc-400">Password</Label>
+            <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-zinc-600" placeholder="Your password" />
           </div>
-          {error && <p className="text-[13px] text-red-400">{error}</p>}
+          {error && <p className="text-[13px] text-orange-500">{error}</p>}
           <button type="submit" disabled={loading} className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-white h-10 text-[13px] font-semibold rounded-xl transition-colors">
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -68,14 +68,14 @@ export default function LoginPage() {
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/[0.06]" /></div>
-          <div className="relative flex justify-center text-[11px]"><span className="bg-[#0a0a0c] px-3 text-neutral-600">or</span></div>
+          <div className="relative flex justify-center text-[11px]"><span className="bg-[#09090b] px-3 text-zinc-600">or</span></div>
         </div>
 
-        <button onClick={handleDemo} className="w-full border border-white/[0.08] text-neutral-400 hover:text-white hover:bg-white/[0.04] h-10 text-[13px] rounded-xl transition-colors flex items-center justify-center gap-1.5">
+        <button onClick={handleDemo} className="w-full border border-white/[0.08] text-zinc-400 hover:text-white hover:bg-white/[0.04] h-10 text-[13px] rounded-xl transition-colors flex items-center justify-center gap-1.5">
           Enter Demo Mode <ArrowRight className="w-3.5 h-3.5" />
         </button>
 
-        <p className="text-center text-[13px] text-neutral-600 mt-8">
+        <p className="text-center text-[13px] text-zinc-600 mt-8">
           Don&apos;t have an account?{' '}
           <Link href="/signup" className="text-blue-400 hover:text-blue-300 transition-colors">Sign up</Link>
         </p>

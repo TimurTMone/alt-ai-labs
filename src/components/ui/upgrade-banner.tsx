@@ -11,7 +11,7 @@ export function UpgradeBanner() {
         </div>
         <div className="flex-1">
           <h3 className="text-[13px] font-semibold text-white mb-1">Upgrade to Pro</h3>
-          <p className="text-[12px] text-neutral-500 mb-3">
+          <p className="text-[12px] text-zinc-500 mb-3">
             Unlock all drops, paid challenges, prizes, and exclusive builder groups.
           </p>
           <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-600 text-black font-semibold text-[12px] h-8 rounded-xl">

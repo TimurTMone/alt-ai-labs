@@ -18,7 +18,7 @@ export const DIFFICULTY_COLORS: Record<string, string> = {
 export const DROP_STATUS_COLORS: Record<string, string> = {
   upcoming: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
   live: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  completed: 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20',
+  completed: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
 }
 
 export const POST_CATEGORIES = [
@@ -39,7 +39,7 @@ export const POINTS_CONFIG = {
 } as const
 
 export const BUILDER_LEVELS = [
-  { level: 1, name: 'Freshman', minPoints: 0, color: 'text-neutral-400', bg: 'bg-neutral-500/10 border-neutral-500/20', emoji: '🌱' },
+  { level: 1, name: 'Freshman', minPoints: 0, color: 'text-zinc-400', bg: 'bg-zinc-500/10 border-zinc-500/20', emoji: '🌱' },
   { level: 2, name: 'Junior', minPoints: 50, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', emoji: '⚡' },
   { level: 3, name: 'Senior', minPoints: 120, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20', emoji: '🔷' },
   { level: 4, name: 'Pro', minPoints: 200, color: 'text-sky-400', bg: 'bg-sky-500/10 border-sky-500/20', emoji: '✅' },

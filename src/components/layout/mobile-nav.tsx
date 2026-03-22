@@ -39,7 +39,7 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
   }
 
   return (
-    <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/[0.06] bg-[#0a0a0c] sticky top-0 z-50">
+    <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/[0.06] bg-[#09090b] sticky top-0 z-50">
       <Link href={community ? `${base}/dashboard` : '/'} className="flex items-center gap-2">
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
           <span className="text-xs font-bold text-white">{community ? community.name[0] : 'A'}</span>
@@ -49,29 +49,29 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-neutral-400">
+          <Button variant="ghost" size="icon" className="text-zinc-400">
             <Menu className="w-5 h-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="bg-[#0a0a0c] border-white/[0.06] w-72 p-0">
+        <SheetContent side="right" className="bg-[#09090b] border-white/[0.06] w-72 p-0">
           <nav className="p-4 space-y-1 mt-8">
-            <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 text-[12px] text-neutral-600 hover:text-neutral-400 transition-colors mb-2">
+            <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 text-[12px] text-zinc-600 hover:text-zinc-400 transition-colors mb-2">
               <ChevronLeft className="w-3 h-3" /> All Communities
             </Link>
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href)
               return (
-                <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors', isActive ? 'bg-white/[0.08] text-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.04]')}>
+                <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={cn('flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors', isActive ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]')}>
                   <item.icon className="w-4 h-4" /> {item.label}
                 </Link>
               )
             })}
             {isAdmin && community && (
-              <Link href={`${base}/admin`} onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-neutral-400 hover:text-white hover:bg-white/[0.04]">
+              <Link href={`${base}/admin`} onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04]">
                 <Shield className="w-4 h-4" /> Admin
               </Link>
             )}
-            <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-neutral-400 hover:text-white hover:bg-white/[0.04] w-full">
+            <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] w-full">
               <LogOut className="w-4 h-4" /> Sign Out
             </button>
           </nav>

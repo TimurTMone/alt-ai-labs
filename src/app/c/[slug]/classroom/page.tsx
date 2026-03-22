@@ -63,19 +63,19 @@ function ModuleCard({ module }: { module: Module }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-[15px] text-white">{module.title}</h3>
-            <span className="text-[11px] text-neutral-600">{totalCount} items</span>
+            <span className="text-[11px] text-zinc-600">{totalCount} items</span>
           </div>
-          <p className="text-[12px] text-neutral-500 mt-0.5">{module.description}</p>
+          <p className="text-[12px] text-zinc-500 mt-0.5">{module.description}</p>
           {completedCount > 0 && (
             <div className="flex items-center gap-2 mt-2">
               <div className="flex-1 h-1 rounded-full bg-white/[0.06] overflow-hidden max-w-[160px]">
                 <div className="h-full rounded-full bg-blue-500 transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
-              <span className="text-[10px] text-neutral-600">{completedCount}/{totalCount}</span>
+              <span className="text-[10px] text-zinc-600">{completedCount}/{totalCount}</span>
             </div>
           )}
         </div>
-        <div className="shrink-0 text-neutral-600 group-hover:text-neutral-400 transition-colors">
+        <div className="shrink-0 text-zinc-600 group-hover:text-zinc-400 transition-colors">
           {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </div>
       </button>
@@ -96,7 +96,7 @@ function ModuleCard({ module }: { module: Module }) {
                   {lesson.completed ? (
                     <CheckCircle2 className="w-4 h-4 text-blue-400" />
                   ) : lesson.locked ? (
-                    <Lock className="w-3.5 h-3.5 text-neutral-600" />
+                    <Lock className="w-3.5 h-3.5 text-zinc-600" />
                   ) : (
                     <div className="w-4 h-4 rounded-full border border-white/[0.15]" />
                   )}
@@ -107,25 +107,25 @@ function ModuleCard({ module }: { module: Module }) {
                   lesson.type === 'video' ? 'text-blue-400' :
                   lesson.type === 'template' ? 'text-amber-400' :
                   lesson.type === 'link' ? 'text-violet-400' :
-                  'text-neutral-400'
+                  'text-zinc-400'
                 }`}>
                   <Icon className="w-3.5 h-3.5" />
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-[13px] font-medium truncate ${lesson.completed ? 'text-neutral-500' : 'text-white'}`}>
+                  <p className={`text-[13px] font-medium truncate ${lesson.completed ? 'text-zinc-500' : 'text-white'}`}>
                     {lesson.title}
                   </p>
                   {lesson.description && (
-                    <p className="text-[11px] text-neutral-600 mt-0.5 truncate">{lesson.description}</p>
+                    <p className="text-[11px] text-zinc-600 mt-0.5 truncate">{lesson.description}</p>
                   )}
                 </div>
 
                 {/* Meta */}
                 <div className="flex items-center gap-2 shrink-0">
                   {lesson.duration && (
-                    <span className="text-[10px] text-neutral-600 flex items-center gap-1">
+                    <span className="text-[10px] text-zinc-600 flex items-center gap-1">
                       <Clock className="w-3 h-3" /> {lesson.duration}
                     </span>
                   )}
@@ -133,7 +133,7 @@ function ModuleCard({ module }: { module: Module }) {
                     lesson.type === 'video' ? 'bg-blue-500/10 text-blue-400 border-blue-500/15' :
                     lesson.type === 'template' ? 'bg-amber-500/10 text-amber-400 border-amber-500/15' :
                     lesson.type === 'link' ? 'bg-violet-500/10 text-violet-400 border-violet-500/15' :
-                    'bg-white/[0.04] text-neutral-500 border-white/[0.06]'
+                    'bg-white/[0.04] text-zinc-500 border-white/[0.06]'
                   }`}>
                     {TYPE_LABELS[lesson.type]}
                   </span>
@@ -244,17 +244,17 @@ export default function ClassroomPage() {
             <h1 className="text-2xl font-bold tracking-tight">Classroom</h1>
             <p className="text-[13px] text-zinc-500 mt-1">Guides, templates, and everything you need to build.</p>
           </div>
-          <div className="hidden sm:flex items-center gap-3 text-[12px] text-neutral-600">
+          <div className="hidden sm:flex items-center gap-3 text-[12px] text-zinc-600">
             <span className="flex items-center gap-1.5">
               <FolderOpen className="w-3.5 h-3.5" /> {modules.length} modules
             </span>
-            <span className="text-neutral-700">·</span>
+            <span className="text-zinc-700">·</span>
             <span className="flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5" /> {totalLessons} items
             </span>
             {completedLessons > 0 && (
               <>
-                <span className="text-neutral-700">·</span>
+                <span className="text-zinc-700">·</span>
                 <span className="flex items-center gap-1.5 text-blue-500">
                   <CheckCircle2 className="w-3.5 h-3.5" /> {completedLessons} done
                 </span>
@@ -269,7 +269,7 @@ export default function ClassroomPage() {
             <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden max-w-xs">
               <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-sky-400 transition-all duration-500" style={{ width: `${(completedLessons / totalLessons) * 100}%` }} />
             </div>
-            <span className="text-[11px] text-neutral-500">{Math.round((completedLessons / totalLessons) * 100)}% complete</span>
+            <span className="text-[11px] text-zinc-500">{Math.round((completedLessons / totalLessons) * 100)}% complete</span>
           </div>
         )}
       </div>

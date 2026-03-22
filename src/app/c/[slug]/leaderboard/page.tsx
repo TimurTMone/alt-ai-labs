@@ -9,7 +9,7 @@ import { BUILDER_LEVELS, getBuilderLevel } from '@/lib/constants'
 
 const PODIUM_COLORS = [
   { ring: 'ring-amber-400/30', glow: 'shadow-[0_0_24px_rgba(251,191,36,0.12)]', icon: Crown, iconColor: 'text-amber-400', bg: 'bg-amber-400/5' },
-  { ring: 'ring-neutral-300/20', glow: '', icon: Trophy, iconColor: 'text-neutral-300', bg: 'bg-white/[0.02]' },
+  { ring: 'ring-zinc-300/20', glow: '', icon: Trophy, iconColor: 'text-zinc-300', bg: 'bg-white/[0.02]' },
   { ring: 'ring-amber-600/20', glow: '', icon: Medal, iconColor: 'text-amber-600', bg: 'bg-amber-600/5' },
 ]
 
@@ -28,7 +28,7 @@ export default function LeaderboardPage() {
       {/* Level legend */}
       <div className="mb-8 max-w-3xl">
         <button
-          className="text-[11px] text-neutral-600 uppercase tracking-wider font-medium mb-3 flex items-center gap-1.5 hover:text-neutral-400 transition-colors cursor-default"
+          className="text-[11px] text-zinc-600 uppercase tracking-wider font-medium mb-3 flex items-center gap-1.5 hover:text-zinc-400 transition-colors cursor-default"
         >
           <TrendingUp className="w-3 h-3" /> Level System
         </button>
@@ -61,14 +61,14 @@ export default function LeaderboardPage() {
                   <RankIcon className={`w-5 h-5 ${style.iconColor}`} />
                 </div>
                 <div className="w-14 h-14 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center mx-auto mb-2.5">
-                  <span className="text-[16px] font-semibold text-neutral-200">{entry.profile.full_name[0]}</span>
+                  <span className="text-[16px] font-semibold text-zinc-200">{entry.profile.full_name[0]}</span>
                 </div>
                 <p className="text-[14px] font-semibold truncate mb-1">{entry.profile.full_name}</p>
                 <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-medium ${level.bg} ${level.color} mb-2`}>
                   <span>{level.emoji}</span> {level.name}
                 </div>
                 <p className="text-[18px] font-bold text-white">{entry.points}</p>
-                <p className="text-[10px] text-neutral-600 mt-0.5">points</p>
+                <p className="text-[10px] text-zinc-600 mt-0.5">points</p>
               </div>
             )
           })}
@@ -76,7 +76,7 @@ export default function LeaderboardPage() {
 
         {/* Full list */}
         <div className="rounded-2xl overflow-hidden bg-white/[0.02] border border-white/[0.06]">
-          <div className="grid grid-cols-[2.5rem_1fr_auto_4.5rem] md:grid-cols-[3rem_1fr_auto_5rem] gap-3 px-4 md:px-5 py-3 text-[11px] text-neutral-600 uppercase tracking-wider font-medium border-b border-white/[0.06]">
+          <div className="grid grid-cols-[2.5rem_1fr_auto_4.5rem] md:grid-cols-[3rem_1fr_auto_5rem] gap-3 px-4 md:px-5 py-3 text-[11px] text-zinc-600 uppercase tracking-wider font-medium border-b border-white/[0.06]">
             <span>#</span>
             <span>Builder</span>
             <span className="hidden sm:block">Level</span>
@@ -88,14 +88,14 @@ export default function LeaderboardPage() {
             return (
               <div key={entry.id} className={`grid grid-cols-[2.5rem_1fr_auto_4.5rem] md:grid-cols-[3rem_1fr_auto_5rem] gap-3 px-4 md:px-5 py-3.5 items-center border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors ${isTop3 ? 'bg-white/[0.01]' : ''}`}>
                 {/* Rank */}
-                <span className={`text-[13px] font-bold ${isTop3 ? PODIUM_COLORS[entry.rank - 1].iconColor : 'text-neutral-600'}`}>
+                <span className={`text-[13px] font-bold ${isTop3 ? PODIUM_COLORS[entry.rank - 1].iconColor : 'text-zinc-600'}`}>
                   {entry.rank}
                 </span>
 
                 {/* Avatar + Name + Level progress */}
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center shrink-0 ${isTop3 ? `ring-1 ${PODIUM_COLORS[entry.rank - 1].ring}` : ''}`}>
-                    <span className="text-[12px] font-medium text-neutral-300">{entry.profile.full_name[0]}</span>
+                    <span className="text-[12px] font-medium text-zinc-300">{entry.profile.full_name[0]}</span>
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -117,7 +117,7 @@ export default function LeaderboardPage() {
                         />
                       </div>
                       {level.nextLevel && (
-                        <span className="text-[9px] text-neutral-700">{level.nextLevel.minPoints - entry.points} to next</span>
+                        <span className="text-[9px] text-zinc-700">{level.nextLevel.minPoints - entry.points} to next</span>
                       )}
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export default function LeaderboardPage() {
 
         {/* How to earn points */}
         <div className="mt-8 rounded-2xl p-6 bg-white/[0.02] border border-white/[0.06]">
-          <h3 className="text-[13px] font-semibold mb-4 flex items-center gap-2 text-neutral-400">
+          <h3 className="text-[13px] font-semibold mb-4 flex items-center gap-2 text-zinc-400">
             <Flame className="w-4 h-4 text-amber-400" /> How to earn points
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -156,7 +156,7 @@ export default function LeaderboardPage() {
               <div key={item.action} className="flex items-center gap-2.5 py-2">
                 <span className="text-[16px]">{item.icon}</span>
                 <div>
-                  <p className="text-[12px] text-neutral-300 font-medium">{item.action}</p>
+                  <p className="text-[12px] text-zinc-300 font-medium">{item.action}</p>
                   <p className="text-[11px] text-blue-400 font-semibold">+{item.pts} pts</p>
                 </div>
               </div>
@@ -177,14 +177,14 @@ export default function LeaderboardPage() {
                   <span className="inline-flex items-center gap-1 text-[11px] text-blue-400 font-medium">
                     ✅ Pro
                   </span>
-                  <ChevronUp className="w-3 h-3 text-neutral-600" />
-                  <span className="text-[10px] text-neutral-600">115 pts to Expert</span>
+                  <ChevronUp className="w-3 h-3 text-zinc-600" />
+                  <span className="text-[10px] text-zinc-600">115 pts to Expert</span>
                 </div>
               </div>
             </div>
             <div className="text-right">
               <p className="text-[20px] font-bold text-white">185</p>
-              <p className="text-[10px] text-neutral-600">total pts</p>
+              <p className="text-[10px] text-zinc-600">total pts</p>
             </div>
           </div>
           <div className="mt-3 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
