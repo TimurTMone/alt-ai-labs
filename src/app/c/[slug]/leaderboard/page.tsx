@@ -173,10 +173,10 @@ export default function LeaderboardPage() {
                 <p className="text-[13px] font-semibold">Your Progress</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
-                    🤖 Agent Builder
+                    ✅ Pro
                   </span>
                   <ChevronUp className="w-3 h-3 text-neutral-600" />
-                  <span className="text-[10px] text-neutral-600">115 pts to Full-Stack AI</span>
+                  <span className="text-[10px] text-neutral-600">115 pts to Expert</span>
                 </div>
               </div>
             </div>

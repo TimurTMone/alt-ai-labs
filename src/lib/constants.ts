@@ -39,15 +39,15 @@ export const POINTS_CONFIG = {
 } as const
 
 export const BUILDER_LEVELS = [
-  { level: 1, name: 'Prompt Rookie', minPoints: 0, color: 'text-neutral-400', bg: 'bg-neutral-500/10 border-neutral-500/20', emoji: '🔰' },
-  { level: 2, name: 'Script Kiddie', minPoints: 50, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', emoji: '⌨️' },
-  { level: 3, name: 'API Wrangler', minPoints: 120, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20', emoji: '🔗' },
-  { level: 4, name: 'Agent Builder', minPoints: 200, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', emoji: '🤖' },
-  { level: 5, name: 'Full-Stack AI', minPoints: 300, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20', emoji: '🧠' },
-  { level: 6, name: 'Ship Machine', minPoints: 450, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20', emoji: '🚀' },
-  { level: 7, name: 'AI Architect', minPoints: 650, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20', emoji: '🏗️' },
-  { level: 8, name: 'Open Source Legend', minPoints: 900, color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/20', emoji: '🔥' },
-  { level: 9, name: 'Founding Builder', minPoints: 1200, color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20', emoji: '💎' },
+  { level: 1, name: 'Freshman', minPoints: 0, color: 'text-neutral-400', bg: 'bg-neutral-500/10 border-neutral-500/20', emoji: '🌱' },
+  { level: 2, name: 'Junior', minPoints: 50, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', emoji: '⚡' },
+  { level: 3, name: 'Senior', minPoints: 120, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20', emoji: '🔷' },
+  { level: 4, name: 'Pro', minPoints: 200, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', emoji: '✅' },
+  { level: 5, name: 'Expert', minPoints: 300, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20', emoji: '🎯' },
+  { level: 6, name: 'Master', minPoints: 450, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20', emoji: '🏆' },
+  { level: 7, name: 'Grandmaster', minPoints: 650, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20', emoji: '👑' },
+  { level: 8, name: 'Legend', minPoints: 900, color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/20', emoji: '🔥' },
+  { level: 9, name: 'Boss', minPoints: 1200, color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20', emoji: '💎' },
 ] as const
 
 export function getBuilderLevel(points: number) {
