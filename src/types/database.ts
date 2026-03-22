@@ -1,3 +1,15 @@
+export interface Community {
+  id: string
+  name: string
+  slug: string
+  description: string
+  logo_url: string | null
+  accent_color: string
+  owner_id: string
+  member_count: number
+  created_at: string
+}
+
 export type MembershipTier = 'free' | 'paid'
 export type DropStatus = 'live' | 'upcoming' | 'completed'
 export type SubmissionStatus = 'submitted' | 'reviewed' | 'winner'
@@ -22,6 +34,7 @@ export interface Profile {
 // The core unit: you drop a video + challenge together each week
 export interface WeeklyDrop {
   id: string
+  community_id: string
   week_number: number
   title: string
   slug: string
@@ -75,6 +88,7 @@ export interface ChallengeSubmission {
 
 export interface Post {
   id: string
+  community_id: string
   user_id: string
   title: string
   body: string
@@ -99,6 +113,7 @@ export interface Comment {
 
 export interface LeaderboardEntry {
   id: string
+  community_id: string
   user_id: string
   points: number
   reason: string
@@ -108,6 +123,7 @@ export interface LeaderboardEntry {
 
 export interface Group {
   id: string
+  community_id: string
   name: string
   slug: string
   description: string
