@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { AppLayout } from '@/components/layout/app-layout'
 import { useCommunityRequired } from "@/lib/community-context"
-import { DIFFICULTY_COLORS, DROP_STATUS_COLORS } from '@/lib/constants'
+import { DIFFICULTY_COLORS, DROP_STATUS_COLORS, calculatePrizePool } from '@/lib/constants'
 import { getDropsForCommunity, mockProgress } from '@/lib/mock-data'
 import { formatDistanceToNow } from 'date-fns'
 import { useParams } from 'next/navigation'
@@ -33,6 +33,7 @@ export default function DropDetailPage() {
   const [description, setDescription] = useState('')
   const [attachments, setAttachments] = useState<string[]>([])
   const [attachInput, setAttachInput] = useState('')
+  const pool = calculatePrizePool(drop.submissions_count, drop.prize_per_entrant, drop.min_entrants_for_prize)
   const isUpcoming = drop.status === 'upcoming'
   const challengeUnlocked = watched
 
@@ -63,7 +64,11 @@ export default function DropDetailPage() {
             <p className="text-[14px] text-zinc-400 leading-relaxed max-w-xl">{drop.description}</p>
             <div className="flex flex-wrap items-center gap-4 mt-4">
               <span className="flex items-center gap-1.5 text-[12px] text-zinc-500"><Clock className="w-3.5 h-3.5" /> {drop.duration_minutes} min</span>
-              {drop.prize_amount > 0 && <span className="flex items-center gap-1.5 text-[12px] text-amber-400 font-medium"><Trophy className="w-3.5 h-3.5" /> ${drop.prize_amount} prize</span>}
+              {drop.prize_per_entrant > 0 && (
+                <span className={`flex items-center gap-1.5 text-[12px] font-medium ${pool.isActive ? 'text-amber-400' : 'text-zinc-500'}`}>
+                  <Trophy className="w-3.5 h-3.5" /> {pool.isActive ? `$${pool.currentPool} pool` : `$${pool.currentPool}/$${pool.targetPool} to unlock`}
+                </span>
+              )}
               {drop.status === 'live' && <span className="flex items-center gap-1.5 text-[12px] text-blue-400"><Zap className="w-3.5 h-3.5" /> {formatDistanceToNow(new Date(drop.challenge_deadline))} left</span>}
               <span className="flex items-center gap-1.5 text-[12px] text-zinc-600">{drop.submissions_count} builds submitted</span>
             </div>
@@ -240,20 +245,57 @@ export default function DropDetailPage() {
           )}
         </div>
 
-        {/* ── Prize Card ───────────────────────────────────────────── */}
-        {drop.prize_amount > 0 && drop.prize_description && (
-          <div className="rounded-2xl p-5 glass glow-amber">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5 text-amber-400" />
+        {/* ── Prize Pool Tracker ─────────────────────────────────── */}
+        {drop.prize_per_entrant > 0 && (
+          <div className={`rounded-2xl p-5 glass ${pool.isActive ? 'glow-amber' : ''}`}>
+            <div className="flex items-start gap-3 mb-4">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${pool.isActive ? 'bg-amber-500/10' : 'bg-white/[0.04]'}`}>
+                <Award className={`w-5 h-5 ${pool.isActive ? 'text-amber-400' : 'text-zinc-600'}`} />
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-[13px] text-amber-400">Prize — ${drop.prize_amount}</span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className={`font-semibold text-[14px] ${pool.isActive ? 'text-amber-400' : 'text-white'}`}>
+                    {pool.isActive ? `$${pool.currentPool} Prize Pool` : 'Prize Pool'}
+                  </span>
+                  <span className="text-[12px] text-zinc-500">{pool.entrants}/{pool.minEntrants} builders</span>
                 </div>
-                <p className="text-[13px] text-zinc-400">{drop.prize_description}</p>
+                <p className="text-[12px] text-zinc-500 mb-3">
+                  {pool.isActive
+                    ? 'Pool is active! Every new Pro entrant adds more.'
+                    : `${pool.remainingToActivate} more Pro builder${pool.remainingToActivate === 1 ? '' : 's'} needed to activate the pool`}
+                </p>
+                {/* Progress bar */}
+                <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden mb-1">
+                  <div className={`h-full rounded-full transition-all duration-500 ${pool.isActive ? 'bg-amber-500' : 'bg-zinc-600'}`} style={{ width: `${pool.progress}%` }} />
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-zinc-600">
+                  <span>${pool.currentPool} raised</span>
+                  <span>+${drop.prize_per_entrant} per entrant</span>
+                </div>
               </div>
             </div>
+
+            {/* Prize split */}
+            {pool.isActive && pool.split && (
+              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/[0.06]">
+                {pool.split.map(s => (
+                  <div key={s.place} className="text-center rounded-xl p-3 bg-white/[0.02]">
+                    <span className="text-[16px] block mb-1">{s.emoji}</span>
+                    <span className="text-[14px] font-bold text-white block">${s.amount}</span>
+                    <span className="text-[11px] text-zinc-500">{s.label} · {s.pct}%</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* How it works — only show when pool is inactive */}
+            {!pool.isActive && (
+              <div className="pt-3 border-t border-white/[0.06]">
+                <p className="text-[11px] text-zinc-600">
+                  Prize pool is funded by Pro subscriptions — the creator never pays out of pocket. Each Pro participant who enters adds ${drop.prize_per_entrant} to the pool. Once {pool.minEntrants} builders join, the pool activates and prizes are split: 60% / 25% / 15%.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

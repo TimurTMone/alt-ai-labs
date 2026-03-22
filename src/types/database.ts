@@ -52,6 +52,9 @@ export interface WeeklyDrop {
   challenge_deadline: string
   prize_description: string | null
   prize_amount: number
+  // Prize pool mechanics — funded by Pro subscriptions, never out of pocket
+  prize_per_entrant: number        // $ added to pool per Pro participant
+  min_entrants_for_prize: number   // minimum Pro participants to activate pool
   // State
   status: DropStatus
   submissions_count: number

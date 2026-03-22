@@ -90,3 +90,37 @@ export const PRICING = {
     ],
   },
 } as const
+
+// ── Prize Pool ──────────────────────────────────────────────────
+// Pool is funded by Pro subscription revenue — creator never pays out of pocket.
+// Each Pro participant entering a challenge adds to the pool.
+// Pool only activates once minimum entrants threshold is met.
+// Split: 1st = 60%, 2nd = 25%, 3rd = 15%
+
+export const PRIZE_SPLIT = [
+  { place: 1, label: '1st', pct: 60, emoji: '🥇' },
+  { place: 2, label: '2nd', pct: 25, emoji: '🥈' },
+  { place: 3, label: '3rd', pct: 15, emoji: '🥉' },
+] as const
+
+export function calculatePrizePool(entrants: number, perEntrant: number, minEntrants: number) {
+  const currentPool = entrants * perEntrant
+  const isActive = entrants >= minEntrants
+  const targetPool = minEntrants * perEntrant
+  const progress = Math.min((entrants / minEntrants) * 100, 100)
+  const remainingToActivate = Math.max(minEntrants - entrants, 0)
+
+  return {
+    currentPool,
+    targetPool,
+    isActive,
+    progress,
+    entrants,
+    minEntrants,
+    remainingToActivate,
+    split: isActive ? PRIZE_SPLIT.map(s => ({
+      ...s,
+      amount: Math.round(currentPool * s.pct / 100),
+    })) : null,
+  }
+}

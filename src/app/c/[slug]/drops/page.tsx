@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { AppLayout } from '@/components/layout/app-layout'
 import { useCommunityRequired } from "@/lib/community-context"
 import { getDropsForCommunity, mockProgress } from '@/lib/mock-data'
-import { DIFFICULTY_COLORS, DROP_STATUS_COLORS } from '@/lib/constants'
+import { DIFFICULTY_COLORS, DROP_STATUS_COLORS, calculatePrizePool } from '@/lib/constants'
 
 export default function DropsPage() {
   const community = useCommunityRequired()
@@ -33,7 +33,10 @@ export default function DropsPage() {
         <div className="flex items-center gap-3 text-[11px] text-zinc-500">
           <span className="flex items-center gap-1"><Play className="w-3 h-3" /> {drop.duration_minutes} min</span>
           <Badge variant="outline" className={`text-[10px] px-1.5 py-0 rounded-md ${DIFFICULTY_COLORS[drop.difficulty]}`}>{drop.difficulty}</Badge>
-          {drop.prize_amount > 0 && <span className="flex items-center gap-1 text-amber-400"><Trophy className="w-3 h-3" /> ${drop.prize_amount}</span>}
+          {drop.prize_per_entrant > 0 && (() => {
+            const p = calculatePrizePool(drop.submissions_count, drop.prize_per_entrant, drop.min_entrants_for_prize)
+            return <span className={`flex items-center gap-1 ${p.isActive ? 'text-amber-400' : 'text-zinc-500'}`}><Trophy className="w-3 h-3" /> {p.isActive ? `$${p.currentPool}` : `$${p.currentPool}/$${p.targetPool}`}</span>
+          })()}
           {drop.status !== 'upcoming' && <span className="ml-auto">{drop.submissions_count} builds</span>}
         </div>
         {progress && (

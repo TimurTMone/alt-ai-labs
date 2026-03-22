@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { AppLayout } from '@/components/layout/app-layout'
 import { useCommunityRequired } from "@/lib/community-context"
 import { getDropsForCommunity, getLeaderboardForCommunity, getPostsForCommunity, mockProfile, mockProgress } from '@/lib/mock-data'
-import { DIFFICULTY_COLORS } from '@/lib/constants'
+import { DIFFICULTY_COLORS, calculatePrizePool } from '@/lib/constants'
 import { getBuilderLevel } from '@/lib/constants'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -82,7 +82,10 @@ export default function DashboardPage() {
               <div className="flex flex-wrap items-center gap-3 mb-5">
                 <Badge variant="outline" className={`text-[11px] px-2 py-0.5 rounded-md ${DIFFICULTY_COLORS[currentDrop.difficulty]}`}>{currentDrop.difficulty}</Badge>
                 <span className="flex items-center gap-1 text-[12px] text-zinc-500"><Play className="w-3 h-3" /> {currentDrop.duration_minutes} min</span>
-                {currentDrop.prize_amount > 0 && <span className="flex items-center gap-1 text-[12px] text-amber-400 font-medium"><Trophy className="w-3 h-3" /> ${currentDrop.prize_amount}</span>}
+                {currentDrop.prize_per_entrant > 0 && (() => {
+                  const p = calculatePrizePool(currentDrop.submissions_count, currentDrop.prize_per_entrant, currentDrop.min_entrants_for_prize)
+                  return <span className={`flex items-center gap-1 text-[12px] font-medium ${p.isActive ? 'text-amber-400' : 'text-zinc-500'}`}><Trophy className="w-3 h-3" /> {p.isActive ? `$${p.currentPool} pool` : `$${p.currentPool}/$${p.targetPool}`}</span>
+                })()}
               </div>
               <div className="flex items-center gap-3 mb-5 text-[12px]">
                 <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${currentProgress?.watched ? 'bg-blue-500/10 text-blue-400' : 'bg-white/[0.04] text-zinc-500'}`}>
