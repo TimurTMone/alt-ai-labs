@@ -1,8 +1,76 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Play, Trophy, Medal, CheckCircle2, ChevronRight, Zap } from 'lucide-react'
+import { ArrowRight, Play, Trophy, Medal, CheckCircle2, ChevronRight, Zap, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { weeklyDrops } from '@/lib/mock-data'
 import { PRICING } from '@/lib/constants'
+
+function WaitlistForm({ className = '' }: { className?: string }) {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [message, setMessage] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email) return
+    setStatus('loading')
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setStatus('success')
+        setMessage(data.message || "You're in!")
+        setEmail('')
+      } else {
+        setStatus('error')
+        setMessage(data.error || 'Something went wrong')
+      }
+    } catch {
+      setStatus('error')
+      setMessage('Something went wrong')
+    }
+  }
+
+  if (status === 'success') {
+    return (
+      <div className={`flex items-center gap-2 justify-center text-green-400 text-[14px] font-medium ${className}`}>
+        <CheckCircle2 className="w-4 h-4" />
+        {message}
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className={`flex items-center gap-2 max-w-md mx-auto ${className}`}>
+      <input
+        type="email"
+        placeholder="your@email.com"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        required
+        className="flex-1 h-11 px-4 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white text-[14px] placeholder:text-neutral-600 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-colors"
+      />
+      <Button
+        type="submit"
+        disabled={status === 'loading'}
+        className="bg-white text-black hover:bg-neutral-100 h-11 px-6 text-[13px] font-semibold rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] shrink-0"
+      >
+        {status === 'loading' ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <>Join Waitlist <ArrowRight className="w-3.5 h-3.5 ml-1.5" /></>
+        )}
+      </Button>
+      {status === 'error' && <p className="text-red-400 text-[12px] absolute mt-14">{message}</p>}
+    </form>
+  )
+}
 
 export default function HomePage() {
   const liveDrop = weeklyDrops.find(d => d.status === 'live')
@@ -31,8 +99,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-        {/* Subtle grid bg */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear_gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-to-b from-white/[0.03] to-transparent rounded-full blur-3xl" />
 
         <div className="max-w-3xl mx-auto text-center relative">
@@ -50,14 +117,10 @@ export default function HomePage() {
           <p className="text-base md:text-lg text-neutral-400 mb-10 max-w-lg mx-auto leading-relaxed">
             I drop a video lesson + build challenge every week. You watch, you build, you submit. Top builders win cash.
           </p>
-          <div className="flex items-center justify-center gap-3">
-            <Button size="lg" asChild className="bg-white text-black hover:bg-neutral-100 h-11 px-7 text-sm font-semibold rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-              <Link href="/signup">Join Free <ArrowRight className="w-4 h-4 ml-1.5" /></Link>
-            </Button>
-            <Button variant="outline" size="lg" asChild className="border-white/10 text-neutral-300 hover:bg-white/[0.04] hover:text-white h-11 px-7 text-sm rounded-xl">
-              <Link href="/pricing">See Plans</Link>
-            </Button>
-          </div>
+
+          <WaitlistForm />
+
+          <p className="text-[12px] text-neutral-600 mt-3">Join 127+ builders. Free to start.</p>
 
           {/* Social proof */}
           <div className="flex items-center justify-center gap-6 mt-12 pt-8 border-t border-white/[0.06]">
@@ -127,9 +190,7 @@ export default function HomePage() {
                 </>
               )}
             </div>
-            <Button asChild className="bg-white text-black hover:bg-neutral-100 h-10 px-6 text-sm font-semibold rounded-xl">
-              <Link href="/signup">Join to Watch & Compete <ChevronRight className="w-4 h-4 ml-1" /></Link>
-            </Button>
+            <WaitlistForm />
           </div>
         </section>
       )}
@@ -185,9 +246,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto text-center relative">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight gradient-text">Ready to build?</h2>
           <p className="text-neutral-400 mb-8 text-sm">New drop every week. Watch. Build. Ship.</p>
-          <Button size="lg" asChild className="bg-white text-black hover:bg-neutral-100 h-11 px-8 text-sm font-semibold rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-            <Link href="/signup">Join Alt AI Labs <ArrowRight className="w-4 h-4 ml-1.5" /></Link>
-          </Button>
+          <WaitlistForm />
         </div>
       </section>
 
