@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Lock, Send } from 'lucide-react'
+import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Lock, Send, Github, Globe, Video, Paperclip, X, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,8 +28,12 @@ export default function DropDetailPage() {
   const existingProgress = mockProgress.find(p => p.drop_id === drop.id)
   const [watched, setWatched] = useState(existingProgress?.watched ?? false)
   const [submitted, setSubmitted] = useState(existingProgress?.submitted ?? false)
-  const [projectUrl, setProjectUrl] = useState('')
-  const [notes, setNotes] = useState('')
+  const [githubUrl, setGithubUrl] = useState('')
+  const [liveUrl, setLiveUrl] = useState('')
+  const [demoVideoUrl, setDemoVideoUrl] = useState('')
+  const [description, setDescription] = useState('')
+  const [attachments, setAttachments] = useState<string[]>([])
+  const [attachInput, setAttachInput] = useState('')
   const isUpcoming = drop.status === 'upcoming'
   const challengeUnlocked = watched
 
@@ -123,26 +127,94 @@ export default function DropDetailPage() {
         {/* Submit */}
         {challengeUnlocked && !submitted && drop.status === 'live' && (
           <div className="mb-10">
-            <h2 className="text-[13px] font-semibold mb-4 flex items-center gap-2 uppercase tracking-wider text-neutral-400"><Send className="w-4 h-4 text-green-400" /> Submit Your Build</h2>
-            <form onSubmit={handleSubmit} className="rounded-2xl p-6 glass space-y-4">
+            <h2 className="text-[13px] font-semibold mb-4 flex items-center gap-2 uppercase tracking-wider text-neutral-400"><Send className="w-4 h-4 text-emerald-400" /> Submit Your Build</h2>
+            <form onSubmit={handleSubmit} className="rounded-2xl p-6 bg-white/[0.02] border border-white/[0.06] space-y-5">
+
+              {/* GitHub repo */}
               <div className="space-y-1.5">
-                <Label htmlFor="url" className="text-[13px] text-neutral-400">Project URL *</Label>
-                <Input id="url" placeholder="https://github.com/you/project" value={projectUrl} onChange={e => setProjectUrl(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" />
+                <Label htmlFor="github" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
+                  <Github className="w-3.5 h-3.5" /> GitHub Repository *
+                </Label>
+                <Input id="github" placeholder="https://github.com/you/project" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                <p className="text-[11px] text-neutral-600">Public repo with your source code</p>
               </div>
+
+              {/* Live URL */}
               <div className="space-y-1.5">
-                <Label htmlFor="notes" className="text-[13px] text-neutral-400">Notes (optional)</Label>
-                <Textarea id="notes" placeholder="What you built, how it works..." value={notes} onChange={e => setNotes(e.target.value)} rows={4} className="bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" />
+                <Label htmlFor="live" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5" /> Live URL
+                </Label>
+                <Input id="live" placeholder="https://your-app.vercel.app" value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                <p className="text-[11px] text-neutral-600">Deployed app on Vercel, Netlify, or any host</p>
               </div>
-              <Button type="submit" disabled={!projectUrl} className="w-full bg-white text-black hover:bg-neutral-100 h-10 text-[13px] font-semibold rounded-xl">Submit Build</Button>
+
+              {/* Demo video */}
+              <div className="space-y-1.5">
+                <Label htmlFor="demo" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
+                  <Video className="w-3.5 h-3.5" /> Demo Video
+                </Label>
+                <Input id="demo" placeholder="https://youtube.com/watch?v=... or https://loom.com/..." value={demoVideoUrl} onChange={e => setDemoVideoUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                <p className="text-[11px] text-neutral-600">YouTube, Loom, or any video link showing your build in action</p>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <Label htmlFor="desc" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" /> What you built *
+                </Label>
+                <Textarea id="desc" placeholder="Describe your build: what it does, how it works, what stack you used, any challenges you faced..." value={description} onChange={e => setDescription(e.target.value)} required rows={5} className="bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+              </div>
+
+              {/* Attachments */}
+              <div className="space-y-1.5">
+                <Label className="text-[13px] text-neutral-400 flex items-center gap-1.5">
+                  <Paperclip className="w-3.5 h-3.5" /> Attachments
+                </Label>
+                <p className="text-[11px] text-neutral-600 mb-2">Add links to PRDs, Figma files, docs, slides, or anything else</p>
+                <div className="flex gap-2">
+                  <Input placeholder="https://docs.google.com/..." value={attachInput} onChange={e => setAttachInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (attachInput.trim()) { setAttachments([...attachments, attachInput.trim()]); setAttachInput('') } } }} className="h-9 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                  <button type="button" onClick={() => { if (attachInput.trim()) { setAttachments([...attachments, attachInput.trim()]); setAttachInput('') } }} className="h-9 px-3 rounded-xl bg-white/[0.06] border border-white/[0.08] text-[12px] text-neutral-400 hover:text-white hover:bg-white/[0.1] transition-colors shrink-0">Add</button>
+                </div>
+                {attachments.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {attachments.map((url, i) => (
+                      <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-[11px] text-neutral-400 max-w-[280px]">
+                        <Paperclip className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{url}</span>
+                        <button type="button" onClick={() => setAttachments(attachments.filter((_, j) => j !== i))} className="shrink-0 text-neutral-600 hover:text-red-400 transition-colors">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-white/[0.06]" />
+
+              {/* Submit */}
+              <div>
+                <button type="submit" disabled={!githubUrl || !description} className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-white h-11 text-[13px] font-semibold rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_28px_rgba(16,185,129,0.25)] flex items-center justify-center gap-2">
+                  <Send className="w-4 h-4" /> Submit Build
+                </button>
+                <p className="text-[11px] text-neutral-600 text-center mt-2">You can edit your submission until the deadline</p>
+              </div>
             </form>
           </div>
         )}
 
         {submitted && (
-          <div className="rounded-2xl p-8 text-center glass-strong glow-green">
-            <CheckCircle2 className="w-10 h-10 text-green-400 mx-auto mb-3" />
+          <div className="rounded-2xl p-8 text-center bg-white/[0.02] border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.08)]">
+            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
             <h3 className="font-bold text-lg mb-1">Build Submitted!</h3>
-            <p className="text-[13px] text-neutral-400">Your submission is in. Good luck!</p>
+            <p className="text-[13px] text-neutral-400 mb-4">Your submission is in. Good luck!</p>
+            <div className="inline-flex flex-col sm:flex-row items-center gap-2 text-[12px] text-neutral-500">
+              {githubUrl && <span className="flex items-center gap-1"><Github className="w-3 h-3" /> Repo linked</span>}
+              {liveUrl && <><span className="hidden sm:block">·</span><span className="flex items-center gap-1"><Globe className="w-3 h-3" /> Live demo linked</span></>}
+              {demoVideoUrl && <><span className="hidden sm:block">·</span><span className="flex items-center gap-1"><Video className="w-3 h-3" /> Video linked</span></>}
+              {attachments.length > 0 && <><span className="hidden sm:block">·</span><span className="flex items-center gap-1"><Paperclip className="w-3 h-3" /> {attachments.length} attachment{attachments.length > 1 ? 's' : ''}</span></>}
+            </div>
           </div>
         )}
 
