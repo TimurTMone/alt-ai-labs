@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, LayoutDashboard, Play, MessageSquare, Medal, Users, User, Shield, LogOut, ChevronLeft } from 'lucide-react'
+import { Menu, LayoutDashboard, Play, MessageSquare, Medal, Users, User, Shield, LogOut, ChevronLeft, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,7 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
     ...(community ? [
       { label: 'Dashboard', href: `${base}/dashboard`, icon: LayoutDashboard },
       { label: 'Weekly Drops', href: `${base}/drops`, icon: Play },
+      { label: 'Classroom', href: `${base}/classroom`, icon: BookOpen },
       { label: 'Community', href: `${base}/community`, icon: MessageSquare },
       { label: 'Leaderboard', href: `${base}/leaderboard`, icon: Medal },
       { label: 'Groups', href: `${base}/groups`, icon: Users },
