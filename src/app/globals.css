@@ -178,3 +178,7 @@
 .glow-amber {
   box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 60px rgba(245, 158, 11, 0.05);
 }
+
+.h-13 {
+  height: 3.25rem;
+}
