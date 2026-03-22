@@ -21,7 +21,7 @@ export default async function Image() {
           position: 'relative',
         }}
       >
-        {/* Gradient glow */}
+        {/* Gradient glow — blue */}
         <div
           style={{
             position: 'absolute',
@@ -30,7 +30,7 @@ export default async function Image() {
             transform: 'translateX(-50%)',
             width: 800,
             height: 400,
-            background: 'radial-gradient(ellipse, rgba(16,185,129,0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(59,130,246,0.15) 0%, transparent 70%)',
           }}
         />
 
@@ -48,7 +48,7 @@ export default async function Image() {
               width: 56,
               height: 56,
               borderRadius: 14,
-              background: 'linear-gradient(135deg, #34d399, #059669)',
+              background: 'linear-gradient(135deg, #60a5fa, #2563eb)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -82,7 +82,7 @@ export default async function Image() {
               fontWeight: 800,
               letterSpacing: -2,
               lineHeight: 1.1,
-              background: 'linear-gradient(90deg, #34d399, #6ee7b7, #2dd4bf)',
+              background: 'linear-gradient(90deg, #60a5fa, #93c5fd, #38bdf8)',
               backgroundClip: 'text',
               color: 'transparent',
             }}

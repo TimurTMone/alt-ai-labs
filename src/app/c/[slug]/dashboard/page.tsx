@@ -30,7 +30,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Points', value: mockProfile.total_points, icon: Sparkles, color: 'text-amber-400' },
-            { label: 'Completed', value: `${completedDrops.length}/${drops.length}`, icon: CheckCircle2, color: 'text-emerald-400' },
+            { label: 'Completed', value: `${completedDrops.length}/${drops.length}`, icon: CheckCircle2, color: 'text-blue-400' },
             { label: 'Rank', value: '#5', icon: TrendingUp, color: 'text-violet-400' },
           ].map(s => (
             <div key={s.label} className="rounded-2xl p-4 glass">
@@ -44,12 +44,12 @@ export default function DashboardPage() {
         </div>
 
         {currentDrop && (
-          <div className="rounded-2xl p-6 relative overflow-hidden glass-strong glow-green">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="rounded-2xl p-6 relative overflow-hidden glass-strong glow-blue">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
             <div className="relative">
               <div className="flex items-center gap-2.5 mb-4">
-                <span className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="flex items-center gap-1.5 text-[12px] font-semibold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                   Week {currentDrop.week_number} — LIVE
                 </span>
                 <span className="text-[12px] text-neutral-500 ml-auto">{formatDistanceToNow(new Date(currentDrop.challenge_deadline))} left</span>
@@ -62,17 +62,17 @@ export default function DashboardPage() {
                 {currentDrop.prize_amount > 0 && <span className="flex items-center gap-1 text-[12px] text-amber-400"><Trophy className="w-3 h-3" /> ${currentDrop.prize_amount}</span>}
               </div>
               <div className="flex items-center gap-3 mb-5 text-[12px]">
-                <span className={`flex items-center gap-1.5 ${currentProgress?.watched ? 'text-emerald-400' : 'text-neutral-500'}`}>
+                <span className={`flex items-center gap-1.5 ${currentProgress?.watched ? 'text-blue-400' : 'text-neutral-500'}`}>
                   {currentProgress?.watched ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                   {currentProgress?.watched ? 'Watched' : 'Watch video'}
                 </span>
                 <div className="w-6 h-px bg-neutral-700" />
-                <span className={`flex items-center gap-1.5 ${currentProgress?.submitted ? 'text-emerald-400' : 'text-neutral-500'}`}>
+                <span className={`flex items-center gap-1.5 ${currentProgress?.submitted ? 'text-blue-400' : 'text-neutral-500'}`}>
                   {currentProgress?.submitted ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Trophy className="w-3.5 h-3.5" />}
                   {currentProgress?.submitted ? 'Submitted' : 'Do challenge'}
                 </span>
               </div>
-              <Link href={`${base}/drops/${currentDrop.slug}`} className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors">
+              <Link href={`${base}/drops/${currentDrop.slug}`} className="inline-flex items-center gap-1.5 bg-blue-500 hover:bg-blue-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors">
                   {currentProgress?.watched ? 'View Challenge' : 'Watch Video'} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

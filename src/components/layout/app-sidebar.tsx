@@ -40,7 +40,7 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
     <aside className={cn('flex flex-col w-[260px] border-r border-white/[0.06] bg-[#0a0a0c] h-screen sticky top-0', className)}>
       <div className="px-5 h-16 flex items-center border-b border-white/[0.06]">
         <Link href={community ? `${base}/dashboard` : '/'} className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
             <span className="text-sm font-bold text-white">{community ? community.name[0] : 'A'}</span>
           </div>
           <span className="font-semibold text-[15px] text-white tracking-tight truncate">{community ? community.name : 'Alt AI Labs'}</span>

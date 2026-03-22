@@ -61,15 +61,15 @@ export default function DropDetailPage() {
 
         {/* Progress bar */}
         <div className="flex items-center gap-3 mb-10 p-4 rounded-2xl glass">
-          <div className={`flex items-center gap-2 text-[13px] font-medium ${watched ? 'text-emerald-400' : 'text-white'}`}>
+          <div className={`flex items-center gap-2 text-[13px] font-medium ${watched ? 'text-blue-400' : 'text-white'}`}>
             {watched ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">1</div>} Watch
           </div>
-          <div className={`flex-1 h-px ${watched ? 'bg-emerald-500/30' : 'bg-white/[0.06]'}`} />
-          <div className={`flex items-center gap-2 text-[13px] font-medium ${challengeUnlocked ? (submitted ? 'text-emerald-400' : 'text-white') : 'text-neutral-600'}`}>
+          <div className={`flex-1 h-px ${watched ? 'bg-blue-500/30' : 'bg-white/[0.06]'}`} />
+          <div className={`flex items-center gap-2 text-[13px] font-medium ${challengeUnlocked ? (submitted ? 'text-blue-400' : 'text-white') : 'text-neutral-600'}`}>
             {submitted ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">2</div>} Build
           </div>
-          <div className={`flex-1 h-px ${submitted ? 'bg-emerald-500/30' : 'bg-white/[0.06]'}`} />
-          <div className={`flex items-center gap-2 text-[13px] font-medium ${submitted ? 'text-emerald-400' : 'text-neutral-600'}`}>
+          <div className={`flex-1 h-px ${submitted ? 'bg-blue-500/30' : 'bg-white/[0.06]'}`} />
+          <div className={`flex items-center gap-2 text-[13px] font-medium ${submitted ? 'text-blue-400' : 'text-neutral-600'}`}>
             {submitted ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">3</div>} Submit
           </div>
         </div>
@@ -87,9 +87,9 @@ export default function DropDetailPage() {
                 <iframe src={drop.video_url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
               </div>
               {!watched ? (
-                <button onClick={() => setWatched(true)} className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors"><CheckCircle2 className="w-4 h-4" /> Mark as Watched</button>
+                <button onClick={() => setWatched(true)} className="inline-flex items-center gap-1.5 bg-blue-500 hover:bg-blue-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors"><CheckCircle2 className="w-4 h-4" /> Mark as Watched</button>
               ) : (
-                <p className="text-[12px] text-emerald-400 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Video completed</p>
+                <p className="text-[12px] text-blue-400 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Video completed</p>
               )}
             </>
           ) : null}
@@ -113,7 +113,7 @@ export default function DropDetailPage() {
           <div className="grid md:grid-cols-2 gap-3 mb-4">
             <div className="rounded-2xl p-5 glass">
               <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider mb-3">What to Submit</h3>
-              <ul className="space-y-2">{drop.challenge_deliverables.map((d, i) => <li key={i} className="flex items-start gap-2 text-[13px] text-neutral-400"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400/60 shrink-0 mt-0.5" /> {d}</li>)}</ul>
+              <ul className="space-y-2">{drop.challenge_deliverables.map((d, i) => <li key={i} className="flex items-start gap-2 text-[13px] text-neutral-400"><CheckCircle2 className="w-3.5 h-3.5 text-blue-400/60 shrink-0 mt-0.5" /> {d}</li>)}</ul>
             </div>
             <div className="rounded-2xl p-5 glass">
               <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider mb-3">Rules</h3>
@@ -126,7 +126,7 @@ export default function DropDetailPage() {
         {/* Submit */}
         {challengeUnlocked && !submitted && drop.status === 'live' && (
           <div className="mb-10">
-            <h2 className="text-[13px] font-semibold mb-4 flex items-center gap-2 uppercase tracking-wider text-neutral-400"><Send className="w-4 h-4 text-emerald-400" /> Submit Your Build</h2>
+            <h2 className="text-[13px] font-semibold mb-4 flex items-center gap-2 uppercase tracking-wider text-neutral-400"><Send className="w-4 h-4 text-blue-400" /> Submit Your Build</h2>
             <form onSubmit={handleSubmit} className="rounded-2xl p-6 bg-white/[0.02] border border-white/[0.06] space-y-5">
 
               {/* GitHub repo */}
@@ -134,7 +134,7 @@ export default function DropDetailPage() {
                 <Label htmlFor="github" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
                   <Github className="w-3.5 h-3.5" /> GitHub Repository *
                 </Label>
-                <Input id="github" placeholder="https://github.com/you/project" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                <Input id="github" placeholder="https://github.com/you/project" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-blue-500/30 focus:ring-blue-500/10" />
                 <p className="text-[11px] text-neutral-600">Public repo with your source code</p>
               </div>
 
@@ -143,7 +143,7 @@ export default function DropDetailPage() {
                 <Label htmlFor="live" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
                   <Globe className="w-3.5 h-3.5" /> Live URL
                 </Label>
-                <Input id="live" placeholder="https://your-app.vercel.app" value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                <Input id="live" placeholder="https://your-app.vercel.app" value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-blue-500/30 focus:ring-blue-500/10" />
                 <p className="text-[11px] text-neutral-600">Deployed app on Vercel, Netlify, or any host</p>
               </div>
 
@@ -152,7 +152,7 @@ export default function DropDetailPage() {
                 <Label htmlFor="demo" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
                   <Video className="w-3.5 h-3.5" /> Demo Video
                 </Label>
-                <Input id="demo" placeholder="https://youtube.com/watch?v=... or https://loom.com/..." value={demoVideoUrl} onChange={e => setDemoVideoUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                <Input id="demo" placeholder="https://youtube.com/watch?v=... or https://loom.com/..." value={demoVideoUrl} onChange={e => setDemoVideoUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-blue-500/30 focus:ring-blue-500/10" />
                 <p className="text-[11px] text-neutral-600">YouTube, Loom, or any video link showing your build in action</p>
               </div>
 
@@ -161,7 +161,7 @@ export default function DropDetailPage() {
                 <Label htmlFor="desc" className="text-[13px] text-neutral-400 flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5" /> What you built *
                 </Label>
-                <Textarea id="desc" placeholder="Describe your build: what it does, how it works, what stack you used, any challenges you faced..." value={description} onChange={e => setDescription(e.target.value)} required rows={5} className="bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                <Textarea id="desc" placeholder="Describe your build: what it does, how it works, what stack you used, any challenges you faced..." value={description} onChange={e => setDescription(e.target.value)} required rows={5} className="bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-blue-500/30 focus:ring-blue-500/10" />
               </div>
 
               {/* Attachments */}
@@ -171,7 +171,7 @@ export default function DropDetailPage() {
                 </Label>
                 <p className="text-[11px] text-neutral-600 mb-2">Add links to PRDs, Figma files, docs, slides, or anything else</p>
                 <div className="flex gap-2">
-                  <Input placeholder="https://docs.google.com/..." value={attachInput} onChange={e => setAttachInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (attachInput.trim()) { setAttachments([...attachments, attachInput.trim()]); setAttachInput('') } } }} className="h-9 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-emerald-500/30 focus:ring-emerald-500/10" />
+                  <Input placeholder="https://docs.google.com/..." value={attachInput} onChange={e => setAttachInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (attachInput.trim()) { setAttachments([...attachments, attachInput.trim()]); setAttachInput('') } } }} className="h-9 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600 focus:border-blue-500/30 focus:ring-blue-500/10" />
                   <button type="button" onClick={() => { if (attachInput.trim()) { setAttachments([...attachments, attachInput.trim()]); setAttachInput('') } }} className="h-9 px-3 rounded-xl bg-white/[0.06] border border-white/[0.08] text-[12px] text-neutral-400 hover:text-white hover:bg-white/[0.1] transition-colors shrink-0">Add</button>
                 </div>
                 {attachments.length > 0 && (
@@ -194,7 +194,7 @@ export default function DropDetailPage() {
 
               {/* Submit */}
               <div>
-                <button type="submit" disabled={!githubUrl || !description} className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-white h-11 text-[13px] font-semibold rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_28px_rgba(16,185,129,0.25)] flex items-center justify-center gap-2">
+                <button type="submit" disabled={!githubUrl || !description} className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed text-white h-11 text-[13px] font-semibold rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:shadow-[0_0_28px_rgba(59,130,246,0.25)] flex items-center justify-center gap-2">
                   <Send className="w-4 h-4" /> Submit Build
                 </button>
                 <p className="text-[11px] text-neutral-600 text-center mt-2">You can edit your submission until the deadline</p>
@@ -204,8 +204,8 @@ export default function DropDetailPage() {
         )}
 
         {submitted && (
-          <div className="rounded-2xl p-8 text-center bg-white/[0.02] border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.08)]">
-            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+          <div className="rounded-2xl p-8 text-center bg-white/[0.02] border border-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.08)]">
+            <CheckCircle2 className="w-12 h-12 text-blue-400 mx-auto mb-3" />
             <h3 className="font-bold text-lg mb-1">Build Submitted!</h3>
             <p className="text-[13px] text-neutral-400 mb-4">Your submission is in. Good luck!</p>
             <div className="inline-flex flex-col sm:flex-row items-center gap-2 text-[12px] text-neutral-500">

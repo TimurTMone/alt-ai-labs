@@ -26,16 +26,16 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access', accent = 'em
 
   if (status === 'success') return (
     <div className="flex items-center gap-2 justify-center py-3">
-      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-        <span className="text-emerald-400 text-[14px] font-medium">{message}</span>
+      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+        <CheckCircle2 className="w-4 h-4 text-blue-400" />
+        <span className="text-blue-400 text-[14px] font-medium">{message}</span>
       </div>
     </div>
   )
 
   const h = size === 'large' ? 'h-[52px]' : 'h-11'
   const btnColors = {
-    emerald: 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-[0_0_24px_rgba(16,185,129,0.25)] hover:shadow-[0_0_32px_rgba(16,185,129,0.35)]',
+    emerald: 'bg-blue-500 hover:bg-blue-400 text-white shadow-[0_0_24px_rgba(59,130,246,0.25)] hover:shadow-[0_0_32px_rgba(59,130,246,0.35)]',
     amber: 'bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_24px_rgba(245,158,11,0.25)] hover:shadow-[0_0_32px_rgba(245,158,11,0.35)]',
     violet: 'bg-violet-500 hover:bg-violet-400 text-white shadow-[0_0_24px_rgba(139,92,246,0.25)] hover:shadow-[0_0_32px_rgba(139,92,246,0.35)]',
   }
@@ -43,7 +43,7 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access', accent = 'em
   return (
     <div className="relative max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-        <input type="email" placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} required className={`flex-1 ${h} px-4 rounded-xl bg-white/[0.07] border border-white/[0.12] text-white text-[14px] placeholder:text-neutral-500 focus:outline-none focus:border-emerald-500/40 focus:ring-2 focus:ring-emerald-500/15 transition-all duration-200`} />
+        <input type="email" placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} required className={`flex-1 ${h} px-4 rounded-xl bg-white/[0.07] border border-white/[0.12] text-white text-[14px] placeholder:text-neutral-500 focus:outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/15 transition-all duration-200`} />
         <button type="submit" disabled={status === 'loading'} className={`${h} px-6 text-[13px] font-semibold rounded-xl shrink-0 ${btnColors[accent]} transition-all duration-300 inline-flex items-center justify-center gap-1.5 disabled:opacity-50`}>
           {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{cta} <ArrowRight className="w-3.5 h-3.5" /></>}
         </button>
@@ -70,8 +70,8 @@ function AnimatedCounter({ target }: { target: number }) {
 function Logo({ size = 'default' }: { size?: 'default' | 'small' }) {
   const s = size === 'small' ? 'w-7 h-7' : 'w-8 h-8'
   return (
-    <div className={`${s} rounded-lg bg-emerald-500 flex items-center justify-center relative overflow-hidden`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-emerald-600" />
+    <div className={`${s} rounded-lg bg-blue-500 flex items-center justify-center relative overflow-hidden`}>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600" />
       <div className="absolute top-0 left-0 w-full h-1/2 bg-white/[0.15]" />
       <span className="relative text-xs font-black text-white tracking-tight" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>AI</span>
     </div>
@@ -101,7 +101,7 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-[13px] text-neutral-400 hover:text-white transition-colors hidden sm:block">Sign In</Link>
-            <Link href="/signup" className="text-[13px] font-semibold h-8 px-4 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white inline-flex items-center transition-all duration-200 shadow-[0_0_16px_rgba(16,185,129,0.2)]">
+            <Link href="/signup" className="text-[13px] font-semibold h-8 px-4 rounded-lg bg-blue-500 hover:bg-blue-400 text-white inline-flex items-center transition-all duration-200 shadow-[0_0_16px_rgba(59,130,246,0.2)]">
               Get Started
             </Link>
           </div>
@@ -111,26 +111,26 @@ export default function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="pt-28 pb-20 md:pt-40 md:pb-32 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.012)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.012)_1px,transparent_1px)] bg-[size:72px_72px] pointer-events-none" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-emerald-500/[0.07] via-emerald-500/[0.02] to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-blue-500/[0.07] via-blue-500/[0.02] to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-40 left-1/4 w-[300px] h-[300px] bg-blue-500/[0.03] rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-40 right-1/4 w-[300px] h-[300px] bg-violet-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center relative">
           {liveDrop && (
-            <Link href={`/c/alt-ai-labs/drops/${liveDrop.slug}`} className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] text-[12px] text-emerald-400 mb-8 hover:bg-emerald-500/[0.1] hover:border-emerald-500/30 transition-all duration-300 group max-w-full">
+            <Link href={`/c/alt-ai-labs/drops/${liveDrop.slug}`} className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-blue-500/20 bg-blue-500/[0.06] text-[12px] text-blue-400 mb-8 hover:bg-blue-500/[0.1] hover:border-blue-500/30 transition-all duration-300 group max-w-full">
               <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-400" />
               </span>
               <span className="font-medium shrink-0">Week {liveDrop.week_number} is live</span>
-              <span className="text-emerald-300/80 truncate hidden sm:inline">{liveDrop.title}</span>
+              <span className="text-blue-300/80 truncate hidden sm:inline">{liveDrop.title}</span>
               <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform shrink-0" />
             </Link>
           )}
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight mb-6 leading-[1.05]">
             <span className="text-white">Stop learning AI.</span><br />
-            <span className="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">Start shipping it.</span>
+            <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-sky-400 bg-clip-text text-transparent">Start shipping it.</span>
           </h1>
 
           <p className="text-[17px] md:text-[20px] text-neutral-400 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
@@ -143,12 +143,12 @@ export default function HomePage() {
           {/* Social proof */}
           <div className="flex flex-wrap items-center justify-center gap-5 md:gap-8 mt-8 text-[13px] text-neutral-500">
             <div className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-emerald-500/50" />
+              <Users className="w-3.5 h-3.5 text-blue-500/50" />
               <span><span className="text-white font-medium"><AnimatedCounter target={127} />+</span> builders</span>
             </div>
             <div className="w-px h-3 bg-white/[0.08] hidden md:block" />
             <div className="flex items-center gap-1.5">
-              <Rocket className="w-3.5 h-3.5 text-emerald-500/50" />
+              <Rocket className="w-3.5 h-3.5 text-blue-500/50" />
               <span><span className="text-white font-medium"><AnimatedCounter target={totalSubmissions} />+</span> builds shipped</span>
             </div>
             <div className="w-px h-3 bg-white/[0.08] hidden md:block" />
@@ -163,7 +163,7 @@ export default function HomePage() {
       {/* ── Terminal Preview ──────────────────────────────────── */}
       <section className="px-6 pb-28">
         <div className="max-w-2xl mx-auto relative">
-          <div className="absolute -inset-6 bg-gradient-to-b from-emerald-500/[0.05] via-transparent to-transparent rounded-3xl blur-2xl pointer-events-none" />
+          <div className="absolute -inset-6 bg-gradient-to-b from-blue-500/[0.05] via-transparent to-transparent rounded-3xl blur-2xl pointer-events-none" />
           <div className="rounded-2xl overflow-hidden border border-white/[0.08] relative shadow-2xl shadow-black/60">
             <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.03] border-b border-white/[0.06]">
               <div className="flex gap-1.5">
@@ -174,7 +174,7 @@ export default function HomePage() {
               <span className="text-[11px] text-neutral-500 ml-2 font-mono">~/alt-ai-labs</span>
             </div>
             <div className="p-6 bg-[#0c0c0e] font-mono text-[13px] leading-loose space-y-0.5">
-              <p><span className="text-emerald-400">$</span> <span className="text-white/80">cat this-week.md</span></p>
+              <p><span className="text-blue-400">$</span> <span className="text-white/80">cat this-week.md</span></p>
               <p className="text-neutral-500 mt-2"># {liveDrop?.title || 'AI Executive Assistant in Claude Code + VS Code'}</p>
               <p className="text-neutral-600 mt-1">{liveDrop?.description || 'Build a full AI executive assistant — email triage, calendar management, daily briefings.'}</p>
               <p className="text-neutral-500 mt-3">## Stack</p>
@@ -182,8 +182,8 @@ export default function HomePage() {
               <p className="text-neutral-500 mt-3">## Prize</p>
               <p className="text-amber-400/90">${liveDrop?.prize_amount || 500} to the best build</p>
               <p className="text-neutral-500 mt-3">## Status</p>
-              <p className="text-emerald-400/90">LIVE — 6 days remaining</p>
-              <p className="mt-3"><span className="text-emerald-400">$</span> <span className="text-white/40 animate-pulse">▌</span></p>
+              <p className="text-blue-400/90">LIVE — 6 days remaining</p>
+              <p className="mt-3"><span className="text-blue-400">$</span> <span className="text-white/40 animate-pulse">▌</span></p>
             </div>
           </div>
         </div>
@@ -213,7 +213,7 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              { icon: <Bot className="w-5 h-5" />, title: 'AI Assistants', desc: 'Custom chatbots with tool use, memory, and real integrations.', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/15' },
+              { icon: <Bot className="w-5 h-5" />, title: 'AI Assistants', desc: 'Custom chatbots with tool use, memory, and real integrations.', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/15' },
               { icon: <Cpu className="w-5 h-5" />, title: 'Autonomous Agents', desc: 'Agents that qualify leads, triage inboxes, and automate workflows.', color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/15' },
               { icon: <Code2 className="w-5 h-5" />, title: 'Full-Stack AI Apps', desc: 'Production apps with Next.js, auth, payments, and deployment.', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/15' },
               { icon: <GitBranch className="w-5 h-5" />, title: 'AI Automations', desc: 'Systems that connect APIs, process data, and run on autopilot.', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/15' },
@@ -234,10 +234,10 @@ export default function HomePage() {
 
       {/* ── How It Works ──────────────────────────────────────── */}
       <section id="how-it-works" className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/[0.015] via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.015] via-transparent to-transparent pointer-events-none" />
         <div className="max-w-5xl mx-auto relative">
           <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/[0.08] border border-emerald-500/15 text-[11px] text-emerald-400 font-medium uppercase tracking-widest mb-5">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/[0.08] border border-blue-500/15 text-[11px] text-blue-400 font-medium uppercase tracking-widest mb-5">
               <Zap className="w-3 h-3" /> Every week
             </span>
             <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Watch. Build. Ship.</h2>
@@ -246,7 +246,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-5">
             {[
               { icon: <Play className="w-6 h-6" />, num: '01', title: 'Watch the drop', desc: 'A new video lesson every week. I build something real from scratch — you follow along or riff on it.', color: 'text-blue-400', accent: 'border-blue-500/15 bg-blue-500/[0.06]' },
-              { icon: <Terminal className="w-6 h-6" />, num: '02', title: 'Build the challenge', desc: 'The challenge unlocks after watching. Build your own version. Any stack, any spin. 7 days.', color: 'text-emerald-400', accent: 'border-emerald-500/15 bg-emerald-500/[0.06]' },
+              { icon: <Terminal className="w-6 h-6" />, num: '02', title: 'Build the challenge', desc: 'The challenge unlocks after watching. Build your own version. Any stack, any spin. 7 days.', color: 'text-blue-400', accent: 'border-blue-500/15 bg-blue-500/[0.06]' },
               { icon: <Trophy className="w-6 h-6" />, num: '03', title: 'Ship & win', desc: 'Submit your build. Top submissions win cash prizes. Every project goes in your portfolio.', color: 'text-amber-400', accent: 'border-amber-500/15 bg-amber-500/[0.06]' },
             ].map((step, i) => (
               <div key={i} className="rounded-2xl p-7 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] relative group transition-all duration-300">
@@ -272,16 +272,16 @@ export default function HomePage() {
           </div>
           <div className="space-y-3">
             {drops.map(drop => (
-              <Link key={drop.id} href={`/c/alt-ai-labs/drops/${drop.slug}`} className={`rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06] flex items-center gap-4 group hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300 block ${drop.status === 'live' ? 'border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.08)]' : ''}`}>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${drop.status === 'live' ? 'bg-emerald-500/10 border border-emerald-500/20' : drop.status === 'upcoming' ? 'bg-blue-500/10 border border-blue-500/15' : 'bg-white/[0.04] border border-white/[0.06]'}`}>
-                  <span className={`text-[14px] font-bold ${drop.status === 'live' ? 'text-emerald-400' : drop.status === 'upcoming' ? 'text-blue-400' : 'text-neutral-600'}`}>W{drop.week_number}</span>
+              <Link key={drop.id} href={`/c/alt-ai-labs/drops/${drop.slug}`} className={`rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06] flex items-center gap-4 group hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300 block ${drop.status === 'live' ? 'border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.08)]' : ''}`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${drop.status === 'live' ? 'bg-blue-500/10 border border-blue-500/20' : drop.status === 'upcoming' ? 'bg-blue-500/10 border border-blue-500/15' : 'bg-white/[0.04] border border-white/[0.06]'}`}>
+                  <span className={`text-[14px] font-bold ${drop.status === 'live' ? 'text-blue-400' : drop.status === 'upcoming' ? 'text-blue-400' : 'text-neutral-600'}`}>W{drop.week_number}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <h3 className="font-semibold text-[14px] text-white truncate group-hover:text-emerald-300 transition-colors">{drop.title}</h3>
+                    <h3 className="font-semibold text-[14px] text-white truncate group-hover:text-blue-300 transition-colors">{drop.title}</h3>
                     {drop.status === 'live' && (
-                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold shrink-0">
-                        <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" /></span>
+                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold shrink-0">
+                        <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-400" /></span>
                         LIVE
                       </span>
                     )}
@@ -302,7 +302,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <Link href="/c/alt-ai-labs/drops" className="inline-flex items-center gap-2 text-[13px] text-neutral-500 hover:text-emerald-400 transition-colors group">
+            <Link href="/c/alt-ai-labs/drops" className="inline-flex items-center gap-2 text-[13px] text-neutral-500 hover:text-blue-400 transition-colors group">
               View all drops <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>
@@ -319,7 +319,7 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { icon: <Clock className="w-5 h-5" />, title: 'Ship weekly', desc: 'No 40-hour courses. One focused project per week.', color: 'text-emerald-400' },
+              { icon: <Clock className="w-5 h-5" />, title: 'Ship weekly', desc: 'No 40-hour courses. One focused project per week.', color: 'text-blue-400' },
               { icon: <Trophy className="w-5 h-5" />, title: 'Win real money', desc: 'Cash prizes for the best builds every single week.', color: 'text-amber-400' },
               { icon: <Star className="w-5 h-5" />, title: 'Build a portfolio', desc: 'Every submission is a real project you can show off.', color: 'text-blue-400' },
               { icon: <Shield className="w-5 h-5" />, title: 'Production-grade', desc: 'Real APIs, real auth, real deploys. No toy apps.', color: 'text-violet-400' },
@@ -344,7 +344,7 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { title: 'Developers', desc: 'You can code. You want real AI experience — not another theory course. You want to ship.', icon: <Code2 className="w-6 h-6" />, tag: 'Most popular', color: 'text-emerald-400', tagBg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/15' },
+              { title: 'Developers', desc: 'You can code. You want real AI experience — not another theory course. You want to ship.', icon: <Code2 className="w-6 h-6" />, tag: 'Most popular', color: 'text-blue-400', tagBg: 'bg-blue-500/10 text-blue-400 border-blue-500/15' },
               { title: 'Founders', desc: 'You need to prototype AI features fast and understand the tech well enough to lead your team.', icon: <Rocket className="w-6 h-6" />, tag: 'Fast track', color: 'text-blue-400', tagBg: 'bg-blue-500/10 text-blue-400 border-blue-500/15' },
               { title: 'Career Switchers', desc: 'You\'ve used ChatGPT. Now you want to build with AI — and have the portfolio to prove it.', icon: <Bot className="w-6 h-6" />, tag: 'Start here', color: 'text-violet-400', tagBg: 'bg-violet-500/10 text-violet-400 border-violet-500/15' },
             ].map((item, i) => (
@@ -449,19 +449,19 @@ export default function HomePage() {
 
       {/* ── Final CTA ─────────────────────────────────────────── */}
       <section className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/[0.04] via-emerald-500/[0.01] to-transparent pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-500/[0.04] via-blue-500/[0.01] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/[0.04] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-3xl mx-auto text-center relative">
           <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-[1.05]">
             <span className="text-white">Stop watching tutorials.</span><br />
-            <span className="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">Start shipping AI.</span>
+            <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-sky-400 bg-clip-text text-transparent">Start shipping AI.</span>
           </h2>
           <p className="text-neutral-500 mb-10 text-[16px] max-w-lg mx-auto">Join a community of builders who ship a new AI project every week.</p>
           <WaitlistForm size="large" cta="Join Free — $0 Forever" accent="emerald" />
           <div className="flex flex-wrap items-center justify-center gap-5 mt-6 text-[12px] text-neutral-600">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-600" /> No credit card</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-600" /> Cancel anytime</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-600" /> New drops weekly</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-blue-600" /> No credit card</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-blue-600" /> Cancel anytime</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-blue-600" /> New drops weekly</span>
           </div>
         </div>
       </section>

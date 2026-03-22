@@ -1,6 +1,7 @@
 'use client'
 
 import { AppLayout } from '@/components/layout/app-layout'
+import { PreviewBanner } from '@/components/ui/preview-banner'
 import { Trophy, Crown, Medal, TrendingUp, Flame, ChevronUp } from 'lucide-react'
 import { useCommunityRequired } from "@/lib/community-context"
 import { getLeaderboardForCommunity } from '@/lib/mock-data'
@@ -18,9 +19,10 @@ export default function LeaderboardPage() {
 
   return (
     <AppLayout>
+      <PreviewBanner feature="Leaderboard" />
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Leaderboard</h1>
-        <p className="text-[13px] text-neutral-500 mt-1">Top builders ranked by total points. Level up by shipping.</p>
+        <p className="text-[13px] text-zinc-500 mt-1">Top builders ranked by total points. Level up by shipping.</p>
       </div>
 
       {/* Level legend */}
@@ -108,7 +110,7 @@ export default function LeaderboardPage() {
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
                             level.level >= 6 ? 'bg-gradient-to-r from-amber-500 to-orange-500' :
-                            level.level >= 4 ? 'bg-emerald-500' :
+                            level.level >= 4 ? 'bg-blue-500' :
                             'bg-blue-500'
                           }`}
                           style={{ width: `${level.progressToNext}%` }}
@@ -155,7 +157,7 @@ export default function LeaderboardPage() {
                 <span className="text-[16px]">{item.icon}</span>
                 <div>
                   <p className="text-[12px] text-neutral-300 font-medium">{item.action}</p>
-                  <p className="text-[11px] text-emerald-400 font-semibold">+{item.pts} pts</p>
+                  <p className="text-[11px] text-blue-400 font-semibold">+{item.pts} pts</p>
                 </div>
               </div>
             ))}
@@ -163,16 +165,16 @@ export default function LeaderboardPage() {
         </div>
 
         {/* Your level card (mockup for current user) */}
-        <div className="mt-4 rounded-2xl p-5 bg-white/[0.02] border border-emerald-500/15 shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+        <div className="mt-4 rounded-2xl p-5 bg-white/[0.02] border border-blue-500/15 shadow-[0_0_20px_rgba(59,130,246,0.05)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <span className="text-[13px] font-medium text-emerald-300">A</span>
+              <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                <span className="text-[13px] font-medium text-blue-300">A</span>
               </div>
               <div>
                 <p className="text-[13px] font-semibold">Your Progress</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+                  <span className="inline-flex items-center gap-1 text-[11px] text-blue-400 font-medium">
                     ✅ Pro
                   </span>
                   <ChevronUp className="w-3 h-3 text-neutral-600" />
@@ -186,7 +188,7 @@ export default function LeaderboardPage() {
             </div>
           </div>
           <div className="mt-3 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style={{ width: '67%' }} />
+            <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-sky-400 transition-all duration-500" style={{ width: '67%' }} />
           </div>
         </div>
       </div>

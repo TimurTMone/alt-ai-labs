@@ -48,7 +48,7 @@ export default function SignupPage() {
       <div className="w-full max-w-[360px] relative">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-8">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
               <span className="text-sm font-bold text-white">A</span>
             </div>
           </Link>
@@ -70,7 +70,7 @@ export default function SignupPage() {
             <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" placeholder="Min 6 characters" />
           </div>
           {error && <p className="text-[13px] text-red-400">{error}</p>}
-          <button type="submit" disabled={loading} className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white h-10 text-[13px] font-semibold rounded-xl transition-colors">
+          <button type="submit" disabled={loading} className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-white h-10 text-[13px] font-semibold rounded-xl transition-colors">
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
@@ -86,7 +86,7 @@ export default function SignupPage() {
 
         <p className="text-center text-[13px] text-neutral-600 mt-8">
           Already have an account?{' '}
-          <Link href="/login" className="text-emerald-400 hover:text-emerald-300 transition-colors">Sign in</Link>
+          <Link href="/login" className="text-blue-400 hover:text-blue-300 transition-colors">Sign in</Link>
         </p>
       </div>
     </div>

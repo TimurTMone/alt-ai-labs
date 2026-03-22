@@ -76,7 +76,7 @@ export default function ProfilePage() {
             <Label htmlFor="bio" className="text-[13px] text-neutral-400">Bio</Label>
             <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Tell us about yourself..." className="bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" />
           </div>
-          <button type="submit" className="bg-emerald-500 hover:bg-emerald-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors">
+          <button type="submit" className="bg-blue-500 hover:bg-blue-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors">
             {saved ? 'Saved!' : 'Save Changes'}
           </button>
         </form>

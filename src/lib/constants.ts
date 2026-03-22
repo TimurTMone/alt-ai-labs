@@ -10,14 +10,14 @@ export const NAV_ITEMS = [
 ] as const
 
 export const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+  beginner: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
   intermediate: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
   advanced: 'bg-red-500/10 text-red-500 border-red-500/20',
 }
 
 export const DROP_STATUS_COLORS: Record<string, string> = {
   upcoming: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  live: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  live: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
   completed: 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20',
 }
 
@@ -42,7 +42,7 @@ export const BUILDER_LEVELS = [
   { level: 1, name: 'Freshman', minPoints: 0, color: 'text-neutral-400', bg: 'bg-neutral-500/10 border-neutral-500/20', emoji: '🌱' },
   { level: 2, name: 'Junior', minPoints: 50, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', emoji: '⚡' },
   { level: 3, name: 'Senior', minPoints: 120, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20', emoji: '🔷' },
-  { level: 4, name: 'Pro', minPoints: 200, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', emoji: '✅' },
+  { level: 4, name: 'Pro', minPoints: 200, color: 'text-sky-400', bg: 'bg-sky-500/10 border-sky-500/20', emoji: '✅' },
   { level: 5, name: 'Expert', minPoints: 300, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20', emoji: '🎯' },
   { level: 6, name: 'Master', minPoints: 450, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20', emoji: '🏆' },
   { level: 7, name: 'Grandmaster', minPoints: 650, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20', emoji: '👑' },

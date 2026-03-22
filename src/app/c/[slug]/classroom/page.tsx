@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { AppLayout } from '@/components/layout/app-layout'
+import { PreviewBanner } from '@/components/ui/preview-banner'
 import { useCommunityRequired } from "@/lib/community-context"
 import {
   BookOpen, ChevronDown, ChevronRight, Play, FileText, Download, Lock,
@@ -68,7 +69,7 @@ function ModuleCard({ module }: { module: Module }) {
           {completedCount > 0 && (
             <div className="flex items-center gap-2 mt-2">
               <div className="flex-1 h-1 rounded-full bg-white/[0.06] overflow-hidden max-w-[160px]">
-                <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${progress}%` }} />
+                <div className="h-full rounded-full bg-blue-500 transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
               <span className="text-[10px] text-neutral-600">{completedCount}/{totalCount}</span>
             </div>
@@ -93,7 +94,7 @@ function ModuleCard({ module }: { module: Module }) {
                 {/* Status */}
                 <div className="w-6 flex items-center justify-center shrink-0">
                   {lesson.completed ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <CheckCircle2 className="w-4 h-4 text-blue-400" />
                   ) : lesson.locked ? (
                     <Lock className="w-3.5 h-3.5 text-neutral-600" />
                   ) : (
@@ -158,7 +159,7 @@ export default function ClassroomPage() {
       title: 'Getting Started',
       icon: <Rocket className="w-5 h-5" />,
       description: 'Everything you need to start building with AI',
-      color: 'text-emerald-400',
+      color: 'text-blue-400',
       defaultOpen: true,
       lessons: [
         { id: 'ob-1', title: 'Welcome to Alt AI Labs', type: 'video', duration: '3 min', completed: true, description: 'Quick intro — how everything works' },
@@ -236,11 +237,12 @@ export default function ClassroomPage() {
 
   return (
     <AppLayout>
+      <PreviewBanner feature="Classroom" />
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Classroom</h1>
-            <p className="text-[13px] text-neutral-500 mt-1">Guides, templates, and everything you need to build.</p>
+            <p className="text-[13px] text-zinc-500 mt-1">Guides, templates, and everything you need to build.</p>
           </div>
           <div className="hidden sm:flex items-center gap-3 text-[12px] text-neutral-600">
             <span className="flex items-center gap-1.5">
@@ -253,7 +255,7 @@ export default function ClassroomPage() {
             {completedLessons > 0 && (
               <>
                 <span className="text-neutral-700">·</span>
-                <span className="flex items-center gap-1.5 text-emerald-500">
+                <span className="flex items-center gap-1.5 text-blue-500">
                   <CheckCircle2 className="w-3.5 h-3.5" /> {completedLessons} done
                 </span>
               </>
@@ -265,7 +267,7 @@ export default function ClassroomPage() {
         {completedLessons > 0 && (
           <div className="mt-4 flex items-center gap-3">
             <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden max-w-xs">
-              <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style={{ width: `${(completedLessons / totalLessons) * 100}%` }} />
+              <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-sky-400 transition-all duration-500" style={{ width: `${(completedLessons / totalLessons) * 100}%` }} />
             </div>
             <span className="text-[11px] text-neutral-500">{Math.round((completedLessons / totalLessons) * 100)}% complete</span>
           </div>

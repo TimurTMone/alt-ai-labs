@@ -1,6 +1,7 @@
 'use client'
 
 import { AppLayout } from '@/components/layout/app-layout'
+import { PreviewBanner } from '@/components/ui/preview-banner'
 import { PostCard } from '@/components/cards/post-card'
 import { useCommunityRequired } from "@/lib/community-context"
 import { getPostsForCommunity } from '@/lib/mock-data'
@@ -14,14 +15,15 @@ export default function CommunityPage() {
 
   return (
     <AppLayout>
+      <PreviewBanner feature="Community feed" />
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Community</h1>
-        <p className="text-[13px] text-neutral-500 mt-1">Share your wins, ask questions, and connect with other builders.</p>
+        <p className="text-[13px] text-zinc-500 mt-1">Share your wins, ask questions, and connect with other builders.</p>
       </div>
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-        <button className="text-[12px] px-3.5 py-1.5 rounded-full bg-emerald-500 text-white font-medium shrink-0">All</button>
+        <button className="text-[12px] px-3.5 py-1.5 rounded-full bg-blue-500 text-white font-medium shrink-0">All</button>
         {POST_CATEGORIES.map(cat => (
-          <button key={cat.value} className="text-[12px] px-3.5 py-1.5 rounded-full border border-white/[0.08] text-neutral-500 hover:text-white hover:border-white/[0.15] transition-colors shrink-0">{cat.label}</button>
+          <button key={cat.value} className="text-[12px] px-3.5 py-1.5 rounded-full border border-white/[0.08] text-zinc-500 hover:text-white hover:border-white/[0.15] transition-colors shrink-0">{cat.label}</button>
         ))}
       </div>
       {pinned.length > 0 && (

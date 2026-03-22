@@ -48,7 +48,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ─── We are a dark-only app. Override :root to dark values ───── */
+/* ─── Dark-only app. Primary = blue-500 ────────────────────────── */
 :root {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -56,7 +56,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.696 0.17 162.48);  /* emerald-500 */
+  --primary: oklch(0.623 0.214 259.815);   /* blue-500 */
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -64,10 +64,10 @@
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: oklch(0.646 0.222 41.116);  /* orange-600 — color-blind safe */
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.696 0.17 162.48);  /* emerald-500 */
+  --ring: oklch(0.623 0.214 259.815);   /* blue-500 */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -76,7 +76,7 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.696 0.17 162.48);
+  --sidebar-primary: oklch(0.623 0.214 259.815);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
@@ -84,7 +84,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Keep .dark for compatibility but same values */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -92,7 +91,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.696 0.17 162.48);
+  --primary: oklch(0.623 0.214 259.815);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -100,10 +99,10 @@
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: oklch(0.646 0.222 41.116);
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.696 0.17 162.48);
+  --ring: oklch(0.623 0.214 259.815);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -111,7 +110,7 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.696 0.17 162.48);
+  --sidebar-primary: oklch(0.623 0.214 259.815);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
@@ -140,24 +139,17 @@
 /*
  * ─── DESIGN SYSTEM ──────────────────────────────────────────────
  *
- * Background:     #0a0a0c  (use on body/page bg)
- * Surface:        .card     — standard card/panel
- * Surface hover:  .card:hover → bg-white/[0.05]
- * Primary:        emerald-500
- * Accent:         amber-500 (prizes), violet-500 (creator)
+ * Background:     zinc-950 (#09090b)
+ * Surface:        .card / .glass
+ * Primary:        blue-500  (accessible to all color vision types)
+ * Achievement:    amber-500 (prizes, gold)
+ * Creator:        violet-500 (premium, creator)
+ * Info:           sky-400   (learning, tips)
+ * Destructive:    orange-600 (color-blind safe, not red)
  *
- * Text hierarchy:
- *   Heading:      text-white
- *   Body:         text-neutral-400
- *   Muted:        text-neutral-600
- *
- * Borders:        border-white/[0.06]  (standard)
- *                 border-white/[0.08]  (emphasized)
- *
- * Radius:         rounded-xl  (buttons, inputs)
- *                 rounded-2xl (cards)
- *
- * Spacing:        p-5 (card default), gap-4 (grid default)
+ * Text:  Heading → text-white | Body → text-zinc-400 | Muted → text-zinc-600
+ * Border: border-white/[0.06] standard | border-white/[0.08] emphasis
+ * Radius: rounded-xl (buttons) | rounded-2xl (cards)
  * ────────────────────────────────────────────────────────────────
  */
 
@@ -168,7 +160,6 @@
   border-radius: 1rem;
 }
 
-/* Kept for backward compat — identical to .card */
 .glass {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -180,18 +171,18 @@
 }
 
 /* Glows */
-.glow-green {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.12), 0 0 60px rgba(16, 185, 129, 0.04);
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.12), 0 0 60px rgba(59, 130, 246, 0.04);
 }
 
 .glow-amber {
   box-shadow: 0 0 20px rgba(245, 158, 11, 0.12), 0 0 60px rgba(245, 158, 11, 0.04);
 }
 
-/* Inputs — consistent focus ring */
+/* Inputs — blue focus ring (accessible) */
 input:focus, textarea:focus, select:focus {
-  border-color: rgba(16, 185, 129, 0.3) !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08) !important;
   outline: none !important;
 }
 
