@@ -41,10 +41,10 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access', accent = 'em
   }
 
   return (
-    <div className="relative">
-      <form onSubmit={handleSubmit} className="flex items-center gap-2.5 max-w-md mx-auto">
+    <div className="relative max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
         <input type="email" placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} required className={`flex-1 ${h} px-4 rounded-xl bg-white/[0.07] border border-white/[0.12] text-white text-[14px] placeholder:text-neutral-500 focus:outline-none focus:border-emerald-500/40 focus:ring-2 focus:ring-emerald-500/15 transition-all duration-200`} />
-        <button type="submit" disabled={status === 'loading'} className={`${h} px-6 text-[13px] font-semibold rounded-xl shrink-0 ${btnColors[accent]} transition-all duration-300 inline-flex items-center gap-1.5 disabled:opacity-50`}>
+        <button type="submit" disabled={status === 'loading'} className={`${h} px-6 text-[13px] font-semibold rounded-xl shrink-0 ${btnColors[accent]} transition-all duration-300 inline-flex items-center justify-center gap-1.5 disabled:opacity-50`}>
           {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{cta} <ArrowRight className="w-3.5 h-3.5" /></>}
         </button>
       </form>
@@ -117,19 +117,18 @@ export default function HomePage() {
 
         <div className="max-w-4xl mx-auto text-center relative">
           {liveDrop && (
-            <Link href={`/c/alt-ai-labs/drops/${liveDrop.slug}`} className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] text-[12px] text-emerald-400 mb-8 hover:bg-emerald-500/[0.1] hover:border-emerald-500/30 transition-all duration-300 group">
-              <span className="relative flex h-2 w-2">
+            <Link href={`/c/alt-ai-labs/drops/${liveDrop.slug}`} className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] text-[12px] text-emerald-400 mb-8 hover:bg-emerald-500/[0.1] hover:border-emerald-500/30 transition-all duration-300 group max-w-full">
+              <span className="relative flex h-2 w-2 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
               </span>
-              <span className="font-medium">Week {liveDrop.week_number} is live</span>
-              <span className="text-emerald-500/40">|</span>
-              <span className="text-emerald-300/80">{liveDrop.title}</span>
-              <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+              <span className="font-medium shrink-0">Week {liveDrop.week_number} is live</span>
+              <span className="text-emerald-300/80 truncate hidden sm:inline">{liveDrop.title}</span>
+              <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform shrink-0" />
             </Link>
           )}
 
-          <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight mb-6 leading-[1.05]">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight mb-6 leading-[1.05]">
             <span className="text-white">Stop learning AI.</span><br />
             <span className="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">Start shipping it.</span>
           </h1>
@@ -209,7 +208,7 @@ export default function HomePage() {
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/[0.08] border border-blue-500/15 text-[11px] text-blue-400 font-medium uppercase tracking-widest mb-5">
               <Sparkles className="w-3 h-3" /> Real projects
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Not tutorials.<br /><span className="text-neutral-400">Production-grade AI.</span></h2>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Not tutorials.<br /><span className="text-neutral-400">Production-grade AI.</span></h2>
             <p className="text-neutral-500 mt-4 text-[15px] max-w-lg mx-auto">Each week you build something you&apos;d actually use — or sell.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
@@ -241,7 +240,7 @@ export default function HomePage() {
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/[0.08] border border-emerald-500/15 text-[11px] text-emerald-400 font-medium uppercase tracking-widest mb-5">
               <Zap className="w-3 h-3" /> Every week
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Watch. Build. Ship.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Watch. Build. Ship.</h2>
             <p className="text-neutral-500 mt-4 text-[15px]">Three steps. Repeat weekly. Get dangerously good at AI.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
@@ -268,7 +267,7 @@ export default function HomePage() {
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/[0.08] border border-amber-500/15 text-[11px] text-amber-400 font-medium uppercase tracking-widest mb-5">
               <Crown className="w-3 h-3" /> Track record
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Real builds. Real prizes.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Real builds. Real prizes.</h2>
             <p className="text-neutral-500 mt-4 text-[15px]">Here&apos;s what&apos;s been dropped so far.</p>
           </div>
           <div className="space-y-3">
@@ -315,7 +314,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.008] to-transparent" />
         <div className="max-w-5xl mx-auto relative">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Why builders choose us</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Why builders choose us</h2>
             <p className="text-neutral-500 mt-4 text-[15px] max-w-lg mx-auto">This isn&apos;t a course. It&apos;s a weekly build gym for people who ship.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -341,7 +340,7 @@ export default function HomePage() {
       <section className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Who this is for</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Who this is for</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -370,7 +369,7 @@ export default function HomePage() {
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[11px] text-neutral-400 font-medium uppercase tracking-widest mb-5">
               Simple pricing
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Start free. Upgrade when<br className="hidden md:block" /> you&apos;re ready to compete.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Start free. Upgrade when<br className="hidden md:block" /> you&apos;re ready to compete.</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {/* Free */}
@@ -453,7 +452,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/[0.04] via-emerald-500/[0.01] to-transparent" />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/[0.04] rounded-full blur-3xl" />
         <div className="max-w-3xl mx-auto text-center relative">
-          <h2 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-[1.05]">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-[1.05]">
             <span className="text-white">Stop watching tutorials.</span><br />
             <span className="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">Start shipping AI.</span>
           </h2>
