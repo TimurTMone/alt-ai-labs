@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
@@ -43,14 +42,14 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4 relative">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
+    <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center px-4 relative">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
 
       <div className="w-full max-w-[360px] relative">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-8">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-white to-neutral-300 flex items-center justify-center">
-              <span className="text-sm font-bold text-black">A</span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+              <span className="text-sm font-bold text-white">A</span>
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-white tracking-tight">Create your account</h1>
@@ -71,23 +70,23 @@ export default function SignupPage() {
             <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" placeholder="Min 6 characters" />
           </div>
           {error && <p className="text-[13px] text-red-400">{error}</p>}
-          <Button type="submit" disabled={loading} className="w-full bg-white text-black hover:bg-neutral-100 h-10 text-[13px] font-semibold rounded-xl">
+          <button type="submit" disabled={loading} className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white h-10 text-[13px] font-semibold rounded-xl transition-colors">
             {loading ? 'Creating account...' : 'Create Account'}
-          </Button>
+          </button>
         </form>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/[0.06]" /></div>
-          <div className="relative flex justify-center text-[11px]"><span className="bg-[#09090b] px-3 text-neutral-600">or</span></div>
+          <div className="relative flex justify-center text-[11px]"><span className="bg-[#0a0a0c] px-3 text-neutral-600">or</span></div>
         </div>
 
-        <Button onClick={handleDemo} variant="outline" className="w-full border-white/[0.08] text-neutral-400 hover:text-white hover:bg-white/[0.04] h-10 text-[13px] rounded-xl">
-          Enter Demo Mode <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-        </Button>
+        <button onClick={handleDemo} className="w-full border border-white/[0.08] text-neutral-400 hover:text-white hover:bg-white/[0.04] h-10 text-[13px] rounded-xl transition-colors flex items-center justify-center gap-1.5">
+          Enter Demo Mode <ArrowRight className="w-3.5 h-3.5" />
+        </button>
 
         <p className="text-center text-[13px] text-neutral-600 mt-8">
           Already have an account?{' '}
-          <Link href="/login" className="text-white hover:underline">Sign in</Link>
+          <Link href="/login" className="text-emerald-400 hover:text-emerald-300 transition-colors">Sign in</Link>
         </p>
       </div>
     </div>

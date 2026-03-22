@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Lock, Send, Github, Globe, Video, Paperclip, X, FileText } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -62,15 +61,15 @@ export default function DropDetailPage() {
 
         {/* Progress bar */}
         <div className="flex items-center gap-3 mb-10 p-4 rounded-2xl glass">
-          <div className={`flex items-center gap-2 text-[13px] font-medium ${watched ? 'text-green-400' : 'text-white'}`}>
+          <div className={`flex items-center gap-2 text-[13px] font-medium ${watched ? 'text-emerald-400' : 'text-white'}`}>
             {watched ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">1</div>} Watch
           </div>
-          <div className={`flex-1 h-px ${watched ? 'bg-green-500/30' : 'bg-white/[0.06]'}`} />
-          <div className={`flex items-center gap-2 text-[13px] font-medium ${challengeUnlocked ? (submitted ? 'text-green-400' : 'text-white') : 'text-neutral-600'}`}>
+          <div className={`flex-1 h-px ${watched ? 'bg-emerald-500/30' : 'bg-white/[0.06]'}`} />
+          <div className={`flex items-center gap-2 text-[13px] font-medium ${challengeUnlocked ? (submitted ? 'text-emerald-400' : 'text-white') : 'text-neutral-600'}`}>
             {submitted ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">2</div>} Build
           </div>
-          <div className={`flex-1 h-px ${submitted ? 'bg-green-500/30' : 'bg-white/[0.06]'}`} />
-          <div className={`flex items-center gap-2 text-[13px] font-medium ${submitted ? 'text-green-400' : 'text-neutral-600'}`}>
+          <div className={`flex-1 h-px ${submitted ? 'bg-emerald-500/30' : 'bg-white/[0.06]'}`} />
+          <div className={`flex items-center gap-2 text-[13px] font-medium ${submitted ? 'text-emerald-400' : 'text-neutral-600'}`}>
             {submitted ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">3</div>} Submit
           </div>
         </div>
@@ -88,9 +87,9 @@ export default function DropDetailPage() {
                 <iframe src={drop.video_url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
               </div>
               {!watched ? (
-                <Button onClick={() => setWatched(true)} className="bg-white text-black hover:bg-neutral-100 h-9 px-5 text-[13px] font-semibold rounded-xl"><CheckCircle2 className="w-4 h-4 mr-1.5" /> Mark as Watched</Button>
+                <button onClick={() => setWatched(true)} className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors"><CheckCircle2 className="w-4 h-4" /> Mark as Watched</button>
               ) : (
-                <p className="text-[12px] text-green-400 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Video completed</p>
+                <p className="text-[12px] text-emerald-400 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Video completed</p>
               )}
             </>
           ) : null}
@@ -114,7 +113,7 @@ export default function DropDetailPage() {
           <div className="grid md:grid-cols-2 gap-3 mb-4">
             <div className="rounded-2xl p-5 glass">
               <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider mb-3">What to Submit</h3>
-              <ul className="space-y-2">{drop.challenge_deliverables.map((d, i) => <li key={i} className="flex items-start gap-2 text-[13px] text-neutral-400"><CheckCircle2 className="w-3.5 h-3.5 text-green-400/60 shrink-0 mt-0.5" /> {d}</li>)}</ul>
+              <ul className="space-y-2">{drop.challenge_deliverables.map((d, i) => <li key={i} className="flex items-start gap-2 text-[13px] text-neutral-400"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400/60 shrink-0 mt-0.5" /> {d}</li>)}</ul>
             </div>
             <div className="rounded-2xl p-5 glass">
               <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider mb-3">Rules</h3>

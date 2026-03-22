@@ -2,7 +2,6 @@
 
 import { Users, Lock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { AppLayout } from '@/components/layout/app-layout'
 import { useCommunityRequired } from "@/lib/community-context"
 import { getGroupsForCommunity } from '@/lib/mock-data'
@@ -31,9 +30,9 @@ export default function GroupsPage() {
               {group.visibility === 'private' && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-amber-500/10 text-amber-400 border-amber-500/20"><Lock className="w-2.5 h-2.5 mr-0.5" /> Pro</Badge>}
             </div>
             <p className="text-[12px] text-neutral-500 mb-4">{group.description}</p>
-            <Button size="sm" variant="outline" className="border-white/[0.08] text-neutral-400 hover:text-white hover:bg-white/[0.04] text-[12px] h-8 rounded-xl">
+            <button className={`text-[12px] h-8 px-4 rounded-xl font-medium transition-colors ${group.visibility === 'private' ? 'border border-amber-500/20 text-amber-400 hover:bg-amber-500/10' : 'bg-emerald-500 hover:bg-emerald-400 text-white'}`}>
               {group.visibility === 'private' ? 'Upgrade to Join' : 'Join Group'}
-            </Button>
+            </button>
           </div>
         ))}
       </div>

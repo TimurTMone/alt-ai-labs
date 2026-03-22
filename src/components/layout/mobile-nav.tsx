@@ -39,10 +39,10 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
   }
 
   return (
-    <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/[0.06] bg-[#09090b] sticky top-0 z-50">
+    <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/[0.06] bg-[#0a0a0c] sticky top-0 z-50">
       <Link href={community ? `${base}/dashboard` : '/'} className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-white to-neutral-300 flex items-center justify-center">
-          <span className="text-xs font-bold text-black">{community ? community.name[0] : 'A'}</span>
+        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+          <span className="text-xs font-bold text-white">{community ? community.name[0] : 'A'}</span>
         </div>
         <span className="font-semibold text-white text-sm truncate">{community ? community.name : 'Alt AI Labs'}</span>
       </Link>
@@ -53,7 +53,7 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
             <Menu className="w-5 h-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="bg-[#09090b] border-white/[0.06] w-72 p-0">
+        <SheetContent side="right" className="bg-[#0a0a0c] border-white/[0.06] w-72 p-0">
           <nav className="p-4 space-y-1 mt-8">
             <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 text-[12px] text-neutral-600 hover:text-neutral-400 transition-colors mb-2">
               <ChevronLeft className="w-3 h-3" /> All Communities

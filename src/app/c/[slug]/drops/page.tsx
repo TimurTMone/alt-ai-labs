@@ -24,7 +24,7 @@ export default function DropsPage() {
         <div className="flex items-center gap-2 mb-3">
           <span className="text-[11px] font-bold text-neutral-600 tracking-widest">WEEK {drop.week_number}</span>
           <Badge variant="outline" className={`text-[10px] px-1.5 py-0 rounded-md ${DROP_STATUS_COLORS[drop.status]}`}>
-            {isLive && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse mr-1" />}{drop.status}
+            {isLive && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1" />}{drop.status}
           </Badge>
           {!drop.is_free && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-amber-500/10 text-amber-400 border-amber-500/20"><Lock className="w-2.5 h-2.5 mr-0.5" /> Pro</Badge>}
         </div>
@@ -38,8 +38,8 @@ export default function DropsPage() {
         </div>
         {progress && (
           <div className="flex items-center gap-3 mt-4 pt-3 border-t border-white/[0.06]">
-            <span className={`flex items-center gap-1 text-[11px] ${progress.watched ? 'text-green-400' : 'text-neutral-600'}`}><CheckCircle2 className="w-3 h-3" /> Watched</span>
-            <span className={`flex items-center gap-1 text-[11px] ${progress.submitted ? 'text-green-400' : 'text-neutral-600'}`}><CheckCircle2 className="w-3 h-3" /> Submitted</span>
+            <span className={`flex items-center gap-1 text-[11px] ${progress.watched ? 'text-emerald-400' : 'text-neutral-600'}`}><CheckCircle2 className="w-3 h-3" /> Watched</span>
+            <span className={`flex items-center gap-1 text-[11px] ${progress.submitted ? 'text-emerald-400' : 'text-neutral-600'}`}><CheckCircle2 className="w-3 h-3" /> Submitted</span>
           </div>
         )}
       </Link>
@@ -54,7 +54,7 @@ export default function DropsPage() {
       </div>
       {live.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-[12px] font-semibold text-green-400 mb-3 flex items-center gap-2 uppercase tracking-wider"><span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Live Now</h2>
+          <h2 className="text-[12px] font-semibold text-emerald-400 mb-3 flex items-center gap-2 uppercase tracking-wider"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Now</h2>
           <div className="grid md:grid-cols-2 gap-3">{live.map(d => <DropCard key={d.id} drop={d} />)}</div>
         </div>
       )}

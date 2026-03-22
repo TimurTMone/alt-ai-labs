@@ -10,14 +10,14 @@ export const NAV_ITEMS = [
 ] as const
 
 export const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: 'bg-green-500/10 text-green-500 border-green-500/20',
+  beginner: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
   intermediate: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
   advanced: 'bg-red-500/10 text-red-500 border-red-500/20',
 }
 
 export const DROP_STATUS_COLORS: Record<string, string> = {
   upcoming: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  live: 'bg-green-500/10 text-green-400 border-green-500/20',
+  live: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   completed: 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20',
 }
 

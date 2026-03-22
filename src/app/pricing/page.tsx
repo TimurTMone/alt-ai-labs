@@ -1,12 +1,11 @@
 import Link from 'next/link'
 import { CheckCircle2, ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { PRICING } from '@/lib/constants'
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-[#09090b] text-white px-6 py-12 relative">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
+    <div className="min-h-screen bg-[#0a0a0c] text-white px-6 py-12 relative">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto relative">
         <Link href="/" className="inline-flex items-center gap-1.5 text-[13px] text-neutral-500 hover:text-white mb-10 transition-colors">
@@ -22,13 +21,13 @@ export default function PricingPage() {
             <ul className="space-y-3 mb-8">
               {PRICING.free.features.map(f => (
                 <li key={f} className="flex items-start gap-2 text-[13px] text-neutral-500">
-                  <CheckCircle2 className="w-4 h-4 text-green-400/60 shrink-0 mt-0.5" />{f}
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400/60 shrink-0 mt-0.5" />{f}
                 </li>
               ))}
             </ul>
-            <Button variant="outline" className="w-full border-white/[0.08] text-neutral-400 hover:text-white hover:bg-white/[0.04] h-10 text-[13px] rounded-xl" asChild>
-              <Link href="/signup">Get Started</Link>
-            </Button>
+            <Link href="/signup" className="block w-full border border-white/[0.08] text-neutral-400 hover:text-white hover:bg-white/[0.04] h-10 text-[13px] rounded-xl transition-colors text-center leading-10">
+              Get Started
+            </Link>
           </div>
 
           <div className="rounded-2xl p-8 glass glow-amber relative">
@@ -42,9 +41,9 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <Button className="w-full bg-amber-500 hover:bg-amber-600 text-black font-semibold h-10 text-[13px] rounded-xl" asChild>
-              <Link href="/signup">Start Pro</Link>
-            </Button>
+            <Link href="/signup" className="block w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold h-10 text-[13px] rounded-xl transition-colors text-center leading-10">
+              Start Pro
+            </Link>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ export default function AdminPage() {
 
   const stats = [
     { label: 'Members', value: String(community.member_count), icon: Users, color: 'text-blue-400' },
-    { label: 'Drops', value: String(drops.length), icon: Play, color: 'text-green-400' },
+    { label: 'Drops', value: String(drops.length), icon: Play, color: 'text-emerald-400' },
     { label: 'Submissions', value: String(drops.reduce((a, d) => a + d.submissions_count, 0)), icon: Trophy, color: 'text-amber-400' },
     { label: 'Posts', value: String(posts.length), icon: MessageSquare, color: 'text-violet-400' },
   ]
@@ -40,7 +40,7 @@ export default function AdminPage() {
               {drops.map(drop => (
                 <div key={drop.id} className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-0">
                   <div className="min-w-0"><p className="text-[13px] truncate">Week {drop.week_number}: {drop.title}</p><p className="text-[11px] text-neutral-600">{drop.submissions_count} submissions · ${drop.prize_amount} prize</p></div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${drop.status === 'live' ? 'bg-green-500/10 text-green-400' : drop.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400' : 'bg-white/[0.04] text-neutral-600'}`}>{drop.status}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${drop.status === 'live' ? 'bg-emerald-500/10 text-emerald-400' : drop.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400' : 'bg-white/[0.04] text-neutral-600'}`}>{drop.status}</span>
                 </div>
               ))}
             </div>

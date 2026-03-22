@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { User, Mail, Crown, Sparkles, Calendar } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -77,9 +76,9 @@ export default function ProfilePage() {
             <Label htmlFor="bio" className="text-[13px] text-neutral-400">Bio</Label>
             <Textarea id="bio" value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Tell us about yourself..." className="bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-neutral-600" />
           </div>
-          <Button type="submit" className="bg-white text-black hover:bg-neutral-100 h-9 px-5 text-[13px] font-semibold rounded-xl">
+          <button type="submit" className="bg-emerald-500 hover:bg-emerald-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors">
             {saved ? 'Saved!' : 'Save Changes'}
-          </Button>
+          </button>
         </form>
 
         {/* Membership */}
@@ -87,9 +86,9 @@ export default function ProfilePage() {
           <div className="mt-8 rounded-2xl p-5 glass glow-amber">
             <h3 className="font-semibold text-[13px] text-amber-400 mb-1">Upgrade to Pro</h3>
             <p className="text-[12px] text-neutral-500 mb-3">Get access to all drops, paid challenges, and exclusive groups.</p>
-            <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-600 text-black font-semibold text-[12px] h-8 rounded-xl">
-              <Link href="/pricing">Upgrade — $29/mo</Link>
-            </Button>
+            <Link href="/pricing" className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-semibold text-[12px] h-8 px-4 rounded-xl transition-colors">
+              Upgrade — $29/mo
+            </Link>
           </div>
         )}
       </div>

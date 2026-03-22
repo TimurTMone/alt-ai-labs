@@ -110,10 +110,10 @@ export default function HomePage() {
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="pt-28 pb-20 md:pt-40 md:pb-32 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.012)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.012)_1px,transparent_1px)] bg-[size:72px_72px]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-emerald-500/[0.07] via-emerald-500/[0.02] to-transparent rounded-full blur-3xl" />
-        <div className="absolute top-40 left-1/4 w-[300px] h-[300px] bg-blue-500/[0.03] rounded-full blur-3xl" />
-        <div className="absolute top-40 right-1/4 w-[300px] h-[300px] bg-violet-500/[0.03] rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.012)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.012)_1px,transparent_1px)] bg-[size:72px_72px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-emerald-500/[0.07] via-emerald-500/[0.02] to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-40 left-1/4 w-[300px] h-[300px] bg-blue-500/[0.03] rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-40 right-1/4 w-[300px] h-[300px] bg-violet-500/[0.03] rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center relative">
           {liveDrop && (
@@ -163,7 +163,7 @@ export default function HomePage() {
       {/* ── Terminal Preview ──────────────────────────────────── */}
       <section className="px-6 pb-28">
         <div className="max-w-2xl mx-auto relative">
-          <div className="absolute -inset-6 bg-gradient-to-b from-emerald-500/[0.05] via-transparent to-transparent rounded-3xl blur-2xl" />
+          <div className="absolute -inset-6 bg-gradient-to-b from-emerald-500/[0.05] via-transparent to-transparent rounded-3xl blur-2xl pointer-events-none" />
           <div className="rounded-2xl overflow-hidden border border-white/[0.08] relative shadow-2xl shadow-black/60">
             <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.03] border-b border-white/[0.06]">
               <div className="flex gap-1.5">
@@ -234,7 +234,7 @@ export default function HomePage() {
 
       {/* ── How It Works ──────────────────────────────────────── */}
       <section id="how-it-works" className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/[0.015] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/[0.015] via-transparent to-transparent pointer-events-none" />
         <div className="max-w-5xl mx-auto relative">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/[0.08] border border-emerald-500/15 text-[11px] text-emerald-400 font-medium uppercase tracking-widest mb-5">
@@ -311,7 +311,7 @@ export default function HomePage() {
 
       {/* ── Why Alt AI Labs ───────────────────────────────────── */}
       <section className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.008] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.008] to-transparent pointer-events-none" />
         <div className="max-w-5xl mx-auto relative">
           <div className="text-center mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Why builders choose us</h2>
@@ -363,7 +363,7 @@ export default function HomePage() {
 
       {/* ── Pricing ───────────────────────────────────────────── */}
       <section id="pricing" className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/[0.008] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/[0.008] to-transparent pointer-events-none" />
         <div className="max-w-5xl mx-auto relative">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[11px] text-neutral-400 font-medium uppercase tracking-widest mb-5">
@@ -434,7 +434,7 @@ export default function HomePage() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="rounded-2xl p-10 bg-white/[0.02] border border-violet-500/15 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.04] to-blue-500/[0.04] group-hover:from-violet-500/[0.06] group-hover:to-blue-500/[0.06] transition-all duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.04] to-blue-500/[0.04] group-hover:from-violet-500/[0.06] group-hover:to-blue-500/[0.06] transition-all duration-500 pointer-events-none" />
             <div className="relative text-center">
               <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-5">
                 <Users className="w-7 h-7 text-violet-400" />
@@ -449,8 +449,8 @@ export default function HomePage() {
 
       {/* ── Final CTA ─────────────────────────────────────────── */}
       <section className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/[0.04] via-emerald-500/[0.01] to-transparent" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/[0.04] rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/[0.04] via-emerald-500/[0.01] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/[0.04] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-3xl mx-auto text-center relative">
           <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-[1.05]">
             <span className="text-white">Stop watching tutorials.</span><br />
