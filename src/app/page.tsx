@@ -163,10 +163,10 @@ export default function HomePage() {
             </div>
             <div className="p-6 bg-[#0a0a0c] font-mono text-[13px] leading-loose space-y-0.5">
               <p><span className="text-green-400">$</span> <span className="text-white/80">cat this-week.md</span></p>
-              <p className="text-neutral-600 mt-2"># {liveDrop?.title || 'Week 3: Automate Your Inbox with AI'}</p>
-              <p className="text-neutral-500 mt-1">{liveDrop?.description || 'Build an AI system that reads, categorizes, and drafts responses.'}</p>
+              <p className="text-neutral-600 mt-2"># {liveDrop?.title || 'AI Executive Assistant in Claude Code + VS Code'}</p>
+              <p className="text-neutral-500 mt-1">{liveDrop?.description || 'Build a full AI executive assistant — email triage, calendar management, daily briefings.'}</p>
               <p className="text-neutral-600 mt-3">## Stack</p>
-              <p className="text-blue-400/70">Claude API · Next.js · Gmail API · Vercel</p>
+              <p className="text-blue-400/70">Claude Code · VS Code · Claude API · Vercel</p>
               <p className="text-neutral-600 mt-3">## Prize</p>
               <p className="text-amber-400/80">${liveDrop?.prize_amount || 250} to the best build</p>
               <p className="text-neutral-600 mt-3">## Status</p>
@@ -286,7 +286,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <Link href="/signup" className="inline-flex items-center gap-2 text-[13px] text-neutral-500 hover:text-white transition-colors group">
+            <Link href="/c/alt-ai-labs/drops" className="inline-flex items-center gap-2 text-[13px] text-neutral-500 hover:text-white transition-colors group">
               View all drops <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>
@@ -469,6 +469,7 @@ export default function HomePage() {
                 <li><a href="#how-it-works" className="text-[13px] text-neutral-600 hover:text-white transition-colors">How It Works</a></li>
                 <li><a href="#drops" className="text-[13px] text-neutral-600 hover:text-white transition-colors">Weekly Drops</a></li>
                 <li><a href="#pricing" className="text-[13px] text-neutral-600 hover:text-white transition-colors">Pricing</a></li>
+                <li><Link href="/c/alt-ai-labs/drops" className="text-[13px] text-neutral-600 hover:text-white transition-colors">Browse Drops</Link></li>
               </ul>
             </div>
             <div>
@@ -476,6 +477,7 @@ export default function HomePage() {
               <ul className="space-y-2">
                 <li><Link href="/login" className="text-[13px] text-neutral-600 hover:text-white transition-colors">Sign In</Link></li>
                 <li><Link href="/signup" className="text-[13px] text-neutral-600 hover:text-white transition-colors">Create Account</Link></li>
+                <li><Link href="/c/alt-ai-labs/dashboard" className="text-[13px] text-neutral-600 hover:text-white transition-colors">Dashboard</Link></li>
               </ul>
             </div>
           </div>
@@ -483,8 +485,8 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[12px] text-neutral-600">
             <span>&copy; {new Date().getFullYear()} Alt AI Labs. All rights reserved.</span>
             <div className="flex gap-6">
-              <Link href="/privacy" className="hover:text-neutral-400 transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-neutral-400 transition-colors">Terms of Service</Link>
+              <a href="mailto:hello@altailabs.com" className="hover:text-neutral-400 transition-colors">Contact</a>
+              <a href="https://github.com/TimurTMone/alt-ai-labs" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-400 transition-colors">GitHub</a>
             </div>
           </div>
         </div>
