@@ -1,6 +1,6 @@
 'use client'
 
-import { Users, Lock } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { AppLayout } from '@/components/layout/app-layout'
 import { PreviewBanner } from '@/components/ui/preview-banner'
@@ -29,11 +29,11 @@ export default function GroupsPage() {
                   <span className="text-[11px] text-zinc-600">{group._count?.group_members || 0} members{group.max_members && ` / ${group.max_members} max`}</span>
                 </div>
               </div>
-              {group.visibility === 'private' && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-amber-500/10 text-amber-400 border-amber-500/20"><Lock className="w-2.5 h-2.5 mr-0.5" /> Pro</Badge>}
+              {group.visibility === 'private' && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-violet-500/10 text-violet-400 border-violet-500/20">Invite Only</Badge>}
             </div>
             <p className="text-[12px] text-zinc-500 mb-4">{group.description}</p>
-            <button className={`text-[12px] h-8 px-4 rounded-xl font-medium transition-colors ${group.visibility === 'private' ? 'border border-amber-500/20 text-amber-400 hover:bg-amber-500/10' : 'bg-blue-500 hover:bg-blue-400 text-white'}`}>
-              {group.visibility === 'private' ? 'Upgrade to Join' : 'Join Group'}
+            <button className="text-[12px] h-8 px-4 rounded-xl font-medium transition-colors bg-blue-500 hover:bg-blue-400 text-white">
+              {group.visibility === 'private' ? 'Request to Join' : 'Join Group'}
             </button>
           </div>
         ))}

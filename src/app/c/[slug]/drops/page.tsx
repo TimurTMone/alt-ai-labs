@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Play, Trophy, Clock, CheckCircle2, Lock, ArrowRight } from 'lucide-react'
+import { Play, Trophy, Clock, CheckCircle2, ArrowRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { AppLayout } from '@/components/layout/app-layout'
 import { useCommunityRequired } from "@/lib/community-context"
@@ -26,7 +26,7 @@ export default function DropsPage() {
           <Badge variant="outline" className={`text-[10px] px-1.5 py-0 rounded-md ${DROP_STATUS_COLORS[drop.status]}`}>
             {isLive && <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse mr-1" />}{drop.status}
           </Badge>
-          {!drop.is_free && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-amber-500/10 text-amber-400 border-amber-500/20"><Lock className="w-2.5 h-2.5 mr-0.5" /> Pro</Badge>}
+          {!drop.is_free && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-blue-500/10 text-blue-400 border-blue-500/20">Featured</Badge>}
         </div>
         <h3 className="font-semibold text-[15px] mb-1.5 group-hover:text-white transition-colors">{drop.title}</h3>
         <p className="text-[12px] text-zinc-500 line-clamp-2 mb-4">{drop.description}</p>

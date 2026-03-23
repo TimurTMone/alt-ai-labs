@@ -1,6 +1,15 @@
 export const APP_NAME = 'Alt AI Labs'
 export const APP_DESCRIPTION = 'Watch the lesson. Build the challenge. Ship every week.'
 
+// ── Default community (used across pages that reference the primary community) ──
+export const DEFAULT_COMMUNITY_ID = 'community-001'
+export const DEFAULT_COMMUNITY_SLUG = 'alt-ai-labs'
+
+// ── Demo / Preview mode ─────────────────────────────────────────
+// Max age in seconds (24 hours). Cookie expires automatically.
+export const DEMO_MODE_MAX_AGE = 86400
+export const DEMO_MODE_COOKIE = 'demo_mode'
+
 export const NAV_ITEMS = [
   { label: 'Dashboard', href: '/dashboard', icon: 'LayoutDashboard' },
   { label: 'Drops', href: '/drops', icon: 'Play' },

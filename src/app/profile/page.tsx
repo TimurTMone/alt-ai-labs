@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { User, Mail, Crown, Sparkles, Calendar } from 'lucide-react'
+import { User, Mail, Sparkles, Calendar, ArrowRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -40,8 +40,8 @@ export default function ProfilePage() {
                 <span className="flex items-center gap-1 text-[12px] text-zinc-500">
                   <Mail className="w-3 h-3" /> {mockProfile.email}
                 </span>
-                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 rounded-md ${mockProfile.membership_tier === 'paid' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'border-white/[0.08] text-zinc-500'}`}>
-                  {mockProfile.membership_tier === 'paid' ? <><Crown className="w-2.5 h-2.5 mr-0.5" /> Pro</> : 'Free'}
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-blue-500/10 text-blue-400 border-blue-500/20">
+                  Early Access
                 </Badge>
               </div>
             </div>
@@ -81,16 +81,14 @@ export default function ProfilePage() {
           </button>
         </form>
 
-        {/* Membership */}
-        {mockProfile.membership_tier === 'free' && (
-          <div className="mt-8 rounded-2xl p-5 glass glow-amber">
-            <h3 className="font-semibold text-[13px] text-amber-400 mb-1">Upgrade to Pro</h3>
-            <p className="text-[12px] text-zinc-500 mb-3">Get access to all drops, paid challenges, and exclusive groups.</p>
-            <Link href="/pricing" className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-semibold text-[12px] h-8 px-4 rounded-xl transition-colors">
-              Upgrade — $29/mo
-            </Link>
-          </div>
-        )}
+        {/* Waitlist status */}
+        <div className="mt-8 rounded-2xl p-5 glass glow-blue">
+          <h3 className="font-semibold text-[13px] text-blue-400 mb-1">You&apos;re on the waitlist</h3>
+          <p className="text-[12px] text-zinc-500 mb-3">You&apos;re exploring in preview mode. When we launch, you&apos;ll get full access to all drops, prizes, and community features.</p>
+          <Link href="/signup" className="inline-flex items-center text-[12px] text-blue-400 hover:text-blue-300 font-medium transition-colors gap-1">
+            Secure your spot <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
       </div>
     </AppLayout>
   )

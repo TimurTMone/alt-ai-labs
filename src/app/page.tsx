@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Play, Trophy, Terminal, CheckCircle2, Loader2, ChevronRight, Zap, Bot, Code2, Cpu, GitBranch, Rocket, Users, Star, ArrowUpRight, Sparkles, Shield, Clock, Crown } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ArrowRight, CheckCircle2, Loader2, ChevronRight, Play, Trophy, Users, Sparkles, Zap, Bot, Code2, Rocket, Clock } from 'lucide-react'
 import { getDropsForCommunity } from '@/lib/mock-data'
-import { PRICING } from '@/lib/constants'
+import { DEFAULT_COMMUNITY_ID, DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
 
 /* ── Waitlist Form ─────────────────────────────────────────────── */
-function WaitlistForm({ size = 'default', cta = 'Get Early Access', accent = 'emerald' }: { size?: 'default' | 'large'; cta?: string; accent?: 'emerald' | 'amber' | 'violet' }) {
+function WaitlistForm({ size = 'default', cta = 'Get Early Access' }: { size?: 'default' | 'large'; cta?: string }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -26,29 +27,24 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access', accent = 'em
 
   if (status === 'success') return (
     <div className="flex items-center gap-2 justify-center py-3">
-      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-500/10 border border-blue-500/20">
-        <CheckCircle2 className="w-4 h-4 text-blue-400" />
-        <span className="text-blue-400 text-[14px] font-medium">{message}</span>
+      <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+        <span className="text-emerald-400 text-[15px] font-semibold">{message}</span>
       </div>
     </div>
   )
 
-  const h = size === 'large' ? 'h-[52px]' : 'h-11'
-  const btnColors = {
-    emerald: 'bg-blue-500 hover:bg-blue-400 text-white shadow-[0_0_24px_rgba(59,130,246,0.25)] hover:shadow-[0_0_32px_rgba(59,130,246,0.35)]',
-    amber: 'bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_24px_rgba(245,158,11,0.25)] hover:shadow-[0_0_32px_rgba(245,158,11,0.35)]',
-    violet: 'bg-violet-500 hover:bg-violet-400 text-white shadow-[0_0_24px_rgba(139,92,246,0.25)] hover:shadow-[0_0_32px_rgba(139,92,246,0.35)]',
-  }
+  const h = size === 'large' ? 'h-14' : 'h-12'
 
   return (
     <div className="relative max-w-md mx-auto">
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-        <input type="email" placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} required className={`flex-1 ${h} px-4 rounded-xl bg-white/[0.07] border border-white/[0.12] text-white text-[14px] placeholder:text-zinc-500 focus:outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/15 transition-all duration-200`} />
-        <button type="submit" disabled={status === 'loading'} className={`${h} px-6 text-[13px] font-semibold rounded-xl shrink-0 ${btnColors[accent]} transition-all duration-300 inline-flex items-center justify-center gap-1.5 disabled:opacity-50`}>
-          {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{cta} <ArrowRight className="w-3.5 h-3.5" /></>}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <input type="email" placeholder="Enter your email address" value={email} onChange={e => setEmail(e.target.value)} required className={`w-full ${h} px-5 rounded-2xl bg-white/10 border-2 border-white/20 text-white text-[16px] placeholder:text-zinc-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 transition-all duration-200`} style={{ fontSize: '16px' }} />
+        <button type="submit" disabled={status === 'loading'} className={`w-full ${h} px-7 text-[15px] font-bold rounded-2xl shrink-0 text-white transition-all duration-300 inline-flex items-center justify-center gap-2 disabled:opacity-50`} style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+          {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{cta} <ArrowRight className="w-4 h-4" /></>}
         </button>
       </form>
-      {status === 'error' && <p className="text-orange-500 text-[12px] text-center mt-2">{message}</p>}
+      {status === 'error' && <p className="text-orange-500 text-[13px] text-center mt-2">{message}</p>}
     </div>
   )
 }
@@ -66,23 +62,18 @@ function AnimatedCounter({ target }: { target: number }) {
   return <>{count}</>
 }
 
-/* ── Logo Component ────────────────────────────────────────────── */
-function Logo({ size = 'default' }: { size?: 'default' | 'small' }) {
-  const s = size === 'small' ? 'w-7 h-7' : 'w-8 h-8'
-  return (
-    <div className={`${s} rounded-lg bg-blue-500 flex items-center justify-center relative overflow-hidden`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600" />
-      <div className="absolute top-0 left-0 w-full h-1/2 bg-white/[0.15]" />
-      <span className="relative text-xs font-black text-white tracking-tight" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>AI</span>
-    </div>
-  )
-}
-
 /* ── Main Page ─────────────────────────────────────────────────── */
 export default function HomePage() {
-  const drops = getDropsForCommunity('community-001')
+  const drops = getDropsForCommunity(DEFAULT_COMMUNITY_ID)
   const liveDrop = drops.find(d => d.status === 'live')
   const totalSubmissions = drops.reduce((a, d) => a + d.submissions_count, 0)
+  const router = useRouter()
+
+  const handleExplore = () => {
+    document.cookie = 'demo_mode=true; path=/; max-age=86400'
+    router.push(`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`)
+    router.refresh()
+  }
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white overflow-x-hidden">
@@ -90,378 +81,278 @@ export default function HomePage() {
       {/* ── Nav ──────────────────────────────────────────────── */}
       <header className="fixed top-0 w-full z-50 border-b border-white/[0.06] bg-[#09090b]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <Logo />
-            <span className="font-semibold text-[15px] tracking-tight text-white">Alt AI Labs</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #3b82f6, #7c3aed)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}>
+              <span className="text-xs font-black text-white">AI</span>
+            </div>
+            <span className="font-bold text-[15px] tracking-tight text-white">Alt AI Labs</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-[13px] text-zinc-400">
             <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#drops" className="hover:text-white transition-colors">Drops</a>
-            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+            <a href="#early-access" className="hover:text-white transition-colors">Early Access</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-[13px] text-zinc-400 hover:text-white transition-colors hidden sm:block">Sign In</Link>
-            <Link href="/signup" className="text-[13px] font-semibold h-8 px-4 rounded-lg bg-blue-500 hover:bg-blue-400 text-white inline-flex items-center transition-all duration-200 shadow-[0_0_16px_rgba(59,130,246,0.2)]">
-              Get Started
+            <button onClick={handleExplore} className="text-[13px] text-zinc-400 hover:text-white transition-colors hidden sm:block">Explore</button>
+            <Link href="/signup" className="text-[13px] font-bold h-9 px-5 rounded-xl text-white inline-flex items-center transition-all duration-200" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.2)' }}>
+              Join Waitlist
             </Link>
           </div>
         </div>
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="pt-28 pb-20 md:pt-40 md:pb-32 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.012)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.012)_1px,transparent_1px)] bg-[size:72px_72px] pointer-events-none" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-blue-500/[0.07] via-blue-500/[0.02] to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-40 left-1/4 w-[300px] h-[300px] bg-blue-500/[0.03] rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-40 right-1/4 w-[300px] h-[300px] bg-violet-500/[0.03] rounded-full blur-3xl pointer-events-none" />
+      <section className="pt-32 pb-8 md:pt-36 md:pb-12 px-6 relative overflow-hidden">
+        {/* Gradient orbs */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[700px] bg-gradient-to-b from-blue-600/[0.12] via-violet-600/[0.06] to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-20 left-[20%] w-[400px] h-[400px] bg-blue-500/[0.06] rounded-full blur-3xl pointer-events-none animate-pulse" />
+        <div className="absolute top-40 right-[20%] w-[350px] h-[350px] bg-violet-500/[0.06] rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center relative">
-          {liveDrop && (
-            <Link href={`/c/alt-ai-labs/drops/${liveDrop.slug}`} className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-blue-500/20 bg-blue-500/[0.06] text-[12px] text-blue-400 mb-8 hover:bg-blue-500/[0.1] hover:border-blue-500/30 transition-all duration-300 group max-w-full">
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-400" />
-              </span>
-              <span className="font-medium shrink-0">Week {liveDrop.week_number} is live</span>
-              <span className="text-blue-300/80 truncate hidden sm:inline">{liveDrop.title}</span>
-              <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform shrink-0" />
-            </Link>
-          )}
-
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight mb-6 leading-[1.05]">
-            <span className="text-white">Stop learning AI.</span><br />
-            <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-sky-400 bg-clip-text text-transparent">Start shipping it.</span>
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tight mb-6 leading-[0.95]">
+            <span className="text-white">Build AI.</span><br />
+            <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Win money.</span>
           </h1>
 
-          <p className="text-[17px] md:text-[20px] text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-            Every week: a new AI project. A video lesson. A build challenge.<br className="hidden md:block" />
-            The best builds win <span className="text-amber-400 font-medium">cash prizes</span>.
+          <p className="text-[17px] md:text-[22px] text-zinc-300 mb-8 max-w-xl mx-auto leading-relaxed font-light">
+            Every week: a new AI project. A video lesson. A build challenge. The best builds win <span className="text-amber-400 font-semibold">cash</span>.
           </p>
 
-          <WaitlistForm size="large" cta="Join Free" accent="emerald" />
+          <WaitlistForm size="large" cta="Get Early Access" />
 
           {/* Social proof */}
-          <div className="flex flex-wrap items-center justify-center gap-5 md:gap-8 mt-8 text-[13px] text-zinc-500">
-            <div className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-blue-500/50" />
-              <span><span className="text-white font-medium"><AnimatedCounter target={127} />+</span> builders</span>
-            </div>
-            <div className="w-px h-3 bg-white/[0.08] hidden md:block" />
-            <div className="flex items-center gap-1.5">
-              <Rocket className="w-3.5 h-3.5 text-blue-500/50" />
-              <span><span className="text-white font-medium"><AnimatedCounter target={totalSubmissions} />+</span> builds shipped</span>
-            </div>
-            <div className="w-px h-3 bg-white/[0.08] hidden md:block" />
-            <div className="flex items-center gap-1.5">
-              <Trophy className="w-3.5 h-3.5 text-amber-500/50" />
-              <span><span className="text-amber-400 font-medium">$<AnimatedCounter target={4250} />+</span> in prizes</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Terminal Preview ──────────────────────────────────── */}
-      <section className="px-6 pb-28">
-        <div className="max-w-2xl mx-auto relative">
-          <div className="absolute -inset-6 bg-gradient-to-b from-blue-500/[0.05] via-transparent to-transparent rounded-3xl blur-2xl pointer-events-none" />
-          <div className="rounded-2xl overflow-hidden border border-white/[0.08] relative shadow-2xl shadow-black/60">
-            <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.03] border-b border-white/[0.06]">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-                <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-                <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-8 text-[14px]">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                <Users className="w-4 h-4 text-blue-400" />
               </div>
-              <span className="text-[11px] text-zinc-500 ml-2 font-mono">~/alt-ai-labs</span>
+              <span className="text-zinc-400"><span className="text-white font-bold"><AnimatedCounter target={127} />+</span> builders</span>
             </div>
-            <div className="p-6 bg-[#0c0c0e] font-mono text-[13px] leading-loose space-y-0.5">
-              <p><span className="text-blue-400">$</span> <span className="text-white/80">cat this-week.md</span></p>
-              <p className="text-zinc-500 mt-2"># {liveDrop?.title || 'AI Executive Assistant in Claude Code + VS Code'}</p>
-              <p className="text-zinc-600 mt-1">{liveDrop?.description || 'Build a full AI executive assistant — email triage, calendar management, daily briefings.'}</p>
-              <p className="text-zinc-500 mt-3">## Stack</p>
-              <p className="text-blue-400/80">Claude Code + VS Code + Claude API + Vercel</p>
-              <p className="text-zinc-500 mt-3">## Prize</p>
-              <p className="text-amber-400/90">${liveDrop?.prize_amount || 500} to the best build</p>
-              <p className="text-zinc-500 mt-3">## Status</p>
-              <p className="text-blue-400/90">LIVE — 6 days remaining</p>
-              <p className="mt-3"><span className="text-blue-400">$</span> <span className="text-white/40 animate-pulse">▌</span></p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center">
+                <Rocket className="w-4 h-4 text-violet-400" />
+              </div>
+              <span className="text-zinc-400"><span className="text-white font-bold"><AnimatedCounter target={totalSubmissions} />+</span> shipped</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <Trophy className="w-4 h-4 text-amber-400" />
+              </div>
+              <span className="text-zinc-400"><span className="text-amber-400 font-bold">$<AnimatedCounter target={4250} /></span> in prizes</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Trust Strip ───────────────────────────────────────── */}
-      <section className="py-10 px-6 border-t border-b border-white/[0.04]">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-center text-[10px] text-zinc-600 uppercase tracking-[0.25em] mb-5 font-medium">Build with industry tools</p>
-          <div className="flex items-center justify-center gap-8 md:gap-14 flex-wrap">
-            {['OpenAI', 'Anthropic', 'Vercel', 'Next.js', 'Supabase', 'Stripe'].map(name => (
-              <span key={name} className="text-[13px] font-medium text-zinc-700 hover:text-zinc-400 transition-colors cursor-default">{name}</span>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── LIVE Drop Card (the heartbeat) ──────────────────── */}
+      {liveDrop && (
+        <section className="px-6 pb-16 pt-8">
+          <div className="max-w-3xl mx-auto">
+            <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrop.slug}`} className="block group">
+              <div className="relative rounded-3xl overflow-hidden border border-blue-500/30 bg-gradient-to-br from-blue-950/80 via-[#09090b] to-violet-950/60 p-1 shadow-[0_0_60px_rgba(59,130,246,0.15),0_0_120px_rgba(139,92,246,0.08)]">
+                <div className="rounded-[calc(1.5rem-4px)] bg-[#0c0c10]/90 p-8 md:p-10 relative overflow-hidden">
+                  {/* Background glow */}
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/[0.08] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-60 h-60 bg-violet-500/[0.06] rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none" />
 
-      {/* ── What You'll Build ─────────────────────────────────── */}
-      <section className="py-28 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/[0.08] border border-blue-500/15 text-[11px] text-blue-400 font-medium uppercase tracking-widest mb-5">
-              <Sparkles className="w-3 h-3" /> Real projects
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Not tutorials.<br /><span className="text-zinc-400">Production-grade AI.</span></h2>
-            <p className="text-zinc-500 mt-4 text-[15px] max-w-lg mx-auto">Each week you build something you&apos;d actually use — or sell.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            {[
-              { icon: <Bot className="w-5 h-5" />, title: 'AI Assistants', desc: 'Custom chatbots with tool use, memory, and real integrations.', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/15' },
-              { icon: <Cpu className="w-5 h-5" />, title: 'Autonomous Agents', desc: 'Agents that qualify leads, triage inboxes, and automate workflows.', color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/15' },
-              { icon: <Code2 className="w-5 h-5" />, title: 'Full-Stack AI Apps', desc: 'Production apps with Next.js, auth, payments, and deployment.', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/15' },
-              { icon: <GitBranch className="w-5 h-5" />, title: 'AI Automations', desc: 'Systems that connect APIs, process data, and run on autopilot.', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/15' },
-            ].map((item, i) => (
-              <div key={i} className="group rounded-2xl p-6 bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300">
-                <div className="flex items-start gap-4">
-                  <div className={`w-11 h-11 rounded-xl border ${item.bg} flex items-center justify-center ${item.color} shrink-0`}>{item.icon}</div>
-                  <div>
-                    <h3 className="font-semibold text-[15px] text-white mb-1">{item.title}</h3>
-                    <p className="text-[13px] text-zinc-500 leading-relaxed">{item.desc}</p>
+                  <div className="relative">
+                    {/* Live badge */}
+                    <div className="flex items-center gap-3 mb-5">
+                      <span className="flex items-center gap-2 text-[13px] font-bold text-white px-4 py-2 rounded-full" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.4)' }}>
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
+                        </span>
+                        WEEK {liveDrop.week_number} IS LIVE
+                      </span>
+                      <span className="text-[13px] text-zinc-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 5 days left</span>
+                    </div>
+
+                    <h2 className="text-2xl md:text-4xl font-black mb-3 tracking-tight text-white group-hover:text-blue-200 transition-colors">{liveDrop.title}</h2>
+                    <p className="text-[15px] md:text-[17px] text-zinc-400 mb-6 max-w-lg leading-relaxed">{liveDrop.description}</p>
+
+                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                      <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Play className="w-4 h-4 text-blue-400" /> {liveDrop.duration_minutes} min lesson</span>
+                      <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> Cash prizes</span>
+                      <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Users className="w-4 h-4 text-violet-400" /> {liveDrop.submissions_count} builders in</span>
+                    </div>
+
+                    <div className="inline-flex items-center gap-2 text-white h-12 px-7 text-[15px] font-bold rounded-2xl transition-all duration-300" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+                      Start This Challenge <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
+            </Link>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── How It Works ──────────────────────────────────────── */}
-      <section id="how-it-works" className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.015] via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative">
+      <section id="how-it-works" className="py-24 px-6 relative">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/[0.08] border border-blue-500/15 text-[11px] text-blue-400 font-medium uppercase tracking-widest mb-5">
-              <Zap className="w-3 h-3" /> Every week
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Watch. Build. Ship.</h2>
-            <p className="text-zinc-500 mt-4 text-[15px]">Three steps. Repeat weekly. Get dangerously good at AI.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">Three steps. Every week.</h2>
+            <p className="text-zinc-400 mt-4 text-[16px]">No fluff. No 40-hour courses. Just build.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { icon: <Play className="w-6 h-6" />, num: '01', title: 'Watch the drop', desc: 'A new video lesson every week. I build something real from scratch — you follow along or riff on it.', color: 'text-blue-400', accent: 'border-blue-500/15 bg-blue-500/[0.06]' },
-              { icon: <Terminal className="w-6 h-6" />, num: '02', title: 'Build the challenge', desc: 'The challenge unlocks after watching. Build your own version. Any stack, any spin. 7 days.', color: 'text-blue-400', accent: 'border-blue-500/15 bg-blue-500/[0.06]' },
-              { icon: <Trophy className="w-6 h-6" />, num: '03', title: 'Ship & win', desc: 'Submit your build. Top submissions win cash prizes. Every project goes in your portfolio.', color: 'text-amber-400', accent: 'border-amber-500/15 bg-amber-500/[0.06]' },
+              { num: '01', title: 'Watch', desc: 'A video lesson where I build something real from scratch. Follow along or riff on it.', icon: <Play className="w-7 h-7" />, bg: 'linear-gradient(135deg, #3b82f6, #22d3ee)' },
+              { num: '02', title: 'Build', desc: 'The challenge unlocks. Build your own version — any stack, any spin. You have 7 days.', icon: <Code2 className="w-7 h-7" />, bg: 'linear-gradient(135deg, #8b5cf6, #e879f9)' },
+              { num: '03', title: 'Win', desc: 'Submit your build. Top submissions win cash prizes. Every project goes in your portfolio.', icon: <Trophy className="w-7 h-7" />, bg: 'linear-gradient(135deg, #f59e0b, #f97316)' },
             ].map((step, i) => (
-              <div key={i} className="rounded-2xl p-7 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] relative group transition-all duration-300">
-                <span className="absolute top-5 right-6 text-[52px] font-bold text-white/[0.03] leading-none select-none">{step.num}</span>
-                <div className={`w-12 h-12 rounded-2xl border ${step.accent} flex items-center justify-center ${step.color} mb-5`}>{step.icon}</div>
-                <h3 className="font-semibold text-[16px] text-white mb-2.5">{step.title}</h3>
-                <p className="text-[13px] text-zinc-500 leading-relaxed">{step.desc}</p>
+              <div key={i} className="rounded-3xl p-8 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] relative group transition-all duration-300 hover:translate-y-[-2px]">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg" style={{ background: step.bg }}>{step.icon}</div>
+                <span className="text-[12px] font-bold text-zinc-600 tracking-widest">{step.num}</span>
+                <h3 className="font-black text-[22px] text-white mt-1 mb-3">{step.title}</h3>
+                <p className="text-[14px] text-zinc-400 leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Drops ─────────────────────────────────────────────── */}
-      <section id="drops" className="py-28 px-6">
+      {/* ── What You Build ──────────────────────────────────── */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-tight">
+              <span className="text-white">Not tutorials.</span><br />
+              <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Real products.</span>
+            </h2>
+            <p className="text-zinc-400 mt-4 text-[16px] max-w-lg mx-auto">Each week you build something you&apos;d actually use — or sell.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[
+              { icon: <Bot className="w-6 h-6" />, title: 'AI Assistants', desc: 'Custom chatbots with tool use, memory, and real integrations.', bg: 'linear-gradient(135deg, #3b82f6, #06b6d4)' },
+              { icon: <Zap className="w-6 h-6" />, title: 'Autonomous Agents', desc: 'Agents that qualify leads, triage inboxes, and automate workflows.', bg: 'linear-gradient(135deg, #8b5cf6, #d946ef)' },
+              { icon: <Code2 className="w-6 h-6" />, title: 'Full-Stack AI Apps', desc: 'Production apps with auth, payments, and deployment.', bg: 'linear-gradient(135deg, #3b82f6, #6366f1)' },
+              { icon: <Rocket className="w-6 h-6" />, title: 'AI Automations', desc: 'Systems that connect APIs, process data, and run on autopilot.', bg: 'linear-gradient(135deg, #f59e0b, #f97316)' },
+            ].map((item, i) => (
+              <div key={i} className="group rounded-2xl p-6 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-300">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg" style={{ background: item.bg }}>{item.icon}</div>
+                <h3 className="font-bold text-[17px] text-white mb-2">{item.title}</h3>
+                <p className="text-[13px] text-zinc-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Drop Timeline ───────────────────────────────────── */}
+      <section id="drops" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/[0.08] border border-amber-500/15 text-[11px] text-amber-400 font-medium uppercase tracking-widest mb-5">
-              <Crown className="w-3 h-3" /> Track record
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Real builds. Real prizes.</h2>
-            <p className="text-zinc-500 mt-4 text-[15px]">Here&apos;s what&apos;s been dropped so far.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">The roadmap</h2>
+            <p className="text-zinc-400 mt-4 text-[16px]">8 weeks. 8 real AI products. Here&apos;s what&apos;s dropping.</p>
           </div>
           <div className="space-y-3">
             {drops.map(drop => (
-              <Link key={drop.id} href={`/c/alt-ai-labs/drops/${drop.slug}`} className={`rounded-2xl p-5 bg-white/[0.02] border border-white/[0.06] flex items-center gap-4 group hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300 block ${drop.status === 'live' ? 'border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.08)]' : ''}`}>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${drop.status === 'live' ? 'bg-blue-500/10 border border-blue-500/20' : drop.status === 'upcoming' ? 'bg-blue-500/10 border border-blue-500/15' : 'bg-white/[0.04] border border-white/[0.06]'}`}>
-                  <span className={`text-[14px] font-bold ${drop.status === 'live' ? 'text-blue-400' : drop.status === 'upcoming' ? 'text-blue-400' : 'text-zinc-600'}`}>W{drop.week_number}</span>
+              <Link key={drop.id} href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${drop.slug}`} className={`rounded-2xl p-5 flex items-center gap-4 group transition-all duration-300 block ${
+                drop.status === 'live'
+                  ? 'border border-blue-500/30'
+                  : 'bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]'
+              }`} style={drop.status === 'live' ? { background: 'linear-gradient(to right, rgba(23,37,84,0.6), rgba(46,16,101,0.4))', boxShadow: '0 0 30px rgba(59,130,246,0.1)' } : undefined}>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
+                  drop.status !== 'live' && drop.status === 'completed'
+                    ? 'bg-white/[0.06]'
+                    : drop.status !== 'live'
+                    ? 'bg-white/[0.04] border border-white/[0.08]'
+                    : ''
+                }`} style={drop.status === 'live' ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' } : undefined}>
+                  <span className={`text-[15px] font-black ${drop.status === 'live' ? 'text-white' : drop.status === 'completed' ? 'text-zinc-500' : 'text-zinc-600'}`}>W{drop.week_number}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <h3 className="font-semibold text-[14px] text-white truncate group-hover:text-blue-300 transition-colors">{drop.title}</h3>
+                    <h3 className={`font-bold text-[15px] truncate transition-colors ${drop.status === 'live' ? 'text-white' : 'text-zinc-200 group-hover:text-white'}`}>{drop.title}</h3>
                     {drop.status === 'live' && (
-                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold shrink-0">
-                        <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-400" /></span>
+                      <span className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full text-white font-bold shrink-0" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 12px rgba(99,102,241,0.3)' }}>
+                        <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" /></span>
                         LIVE
                       </span>
                     )}
                     {drop.status === 'upcoming' && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/15 font-semibold shrink-0">SOON</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-zinc-500 font-medium shrink-0">SOON</span>
+                    )}
+                    {drop.status === 'completed' && (
+                      <CheckCircle2 className="w-4 h-4 text-zinc-600 shrink-0" />
                     )}
                   </div>
-                  <p className="text-[12px] text-zinc-600">{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
+                  <p className="text-[12px] text-zinc-500">{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
                 </div>
-                {drop.prize_amount > 0 && (
+                {drop.prize_per_entrant > 0 && (
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Trophy className="w-3.5 h-3.5 text-amber-400/60" />
-                    <span className="text-[13px] text-amber-400 font-semibold">${drop.prize_amount}</span>
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                    <span className="text-[14px] text-amber-400 font-bold">${drop.prize_per_entrant * 5}</span>
                   </div>
                 )}
-                <ArrowRight className="w-4 h-4 text-zinc-700 group-hover:text-white shrink-0 transition-colors" />
+                <ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-white shrink-0 transition-colors group-hover:translate-x-0.5 transition-transform" />
               </Link>
             ))}
           </div>
-          <div className="text-center mt-8">
-            <Link href="/c/alt-ai-labs/drops" className="inline-flex items-center gap-2 text-[13px] text-zinc-500 hover:text-blue-400 transition-colors group">
-              View all drops <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* ── Why Alt AI Labs ───────────────────────────────────── */}
-      <section className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.008] to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Why builders choose us</h2>
-            <p className="text-zinc-500 mt-4 text-[15px] max-w-lg mx-auto">This isn&apos;t a course. It&apos;s a weekly build gym for people who ship.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-4">
-            {[
-              { icon: <Clock className="w-5 h-5" />, title: 'Ship weekly', desc: 'No 40-hour courses. One focused project per week.', color: 'text-blue-400' },
-              { icon: <Trophy className="w-5 h-5" />, title: 'Win real money', desc: 'Cash prizes for the best builds every single week.', color: 'text-amber-400' },
-              { icon: <Star className="w-5 h-5" />, title: 'Build a portfolio', desc: 'Every submission is a real project you can show off.', color: 'text-blue-400' },
-              { icon: <Shield className="w-5 h-5" />, title: 'Production-grade', desc: 'Real APIs, real auth, real deploys. No toy apps.', color: 'text-violet-400' },
-              { icon: <Users className="w-5 h-5" />, title: 'Builder community', desc: 'Share builds, get feedback, find collaborators.', color: 'text-pink-400' },
-              { icon: <Zap className="w-5 h-5" />, title: 'Stay current', desc: 'New tools and techniques every week. Never fall behind.', color: 'text-cyan-400' },
-            ].map((item, i) => (
-              <div key={i} className="rounded-2xl p-6 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] transition-all duration-300">
-                <div className={`w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center ${item.color} mb-4`}>{item.icon}</div>
-                <h3 className="font-semibold text-[14px] text-white mb-1.5">{item.title}</h3>
-                <p className="text-[13px] text-zinc-500 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Who This Is For ───────────────────────────────────── */}
-      <section className="py-28 px-6">
+      {/* ── Why This Works ────────────────────────────────────── */}
+      <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Who this is for</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">Why this works</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
-              { title: 'Developers', desc: 'You can code. You want real AI experience — not another theory course. You want to ship.', icon: <Code2 className="w-6 h-6" />, tag: 'Most popular', color: 'text-blue-400', tagBg: 'bg-blue-500/10 text-blue-400 border-blue-500/15' },
-              { title: 'Founders', desc: 'You need to prototype AI features fast and understand the tech well enough to lead your team.', icon: <Rocket className="w-6 h-6" />, tag: 'Fast track', color: 'text-blue-400', tagBg: 'bg-blue-500/10 text-blue-400 border-blue-500/15' },
-              { title: 'Career Switchers', desc: 'You\'ve used ChatGPT. Now you want to build with AI — and have the portfolio to prove it.', icon: <Bot className="w-6 h-6" />, tag: 'Start here', color: 'text-violet-400', tagBg: 'bg-violet-500/10 text-violet-400 border-violet-500/15' },
+              { icon: <Clock className="w-5 h-5" />, title: 'Ship weekly', desc: 'One focused project per week. Not a 40-hour course.', gradient: 'from-blue-500/20 to-cyan-500/20' },
+              { icon: <Trophy className="w-5 h-5" />, title: 'Real money', desc: 'Cash prizes for the best builds. Every. Single. Week.', gradient: 'from-amber-500/20 to-orange-500/20' },
+              { icon: <Sparkles className="w-5 h-5" />, title: 'Portfolio', desc: 'Every submission is a real project you can show off.', gradient: 'from-violet-500/20 to-fuchsia-500/20' },
+              { icon: <Zap className="w-5 h-5" />, title: 'Stay current', desc: 'New AI tools and techniques every week.', gradient: 'from-cyan-500/20 to-blue-500/20' },
+              { icon: <Users className="w-5 h-5" />, title: 'Community', desc: 'Share builds, get feedback, find collaborators.', gradient: 'from-pink-500/20 to-rose-500/20' },
+              { icon: <Code2 className="w-5 h-5" />, title: 'Production-grade', desc: 'Real APIs, real auth, real deploys. No toy apps.', gradient: 'from-indigo-500/20 to-violet-500/20' },
             ].map((item, i) => (
-              <div key={i} className="rounded-2xl p-7 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] group transition-all duration-300 relative">
-                <div className="absolute top-5 right-5">
-                  <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${item.tagBg}`}>{item.tag}</span>
-                </div>
-                <div className={`w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center ${item.color} mb-5`}>{item.icon}</div>
-                <h3 className="font-semibold text-[17px] text-white mb-2">{item.title}</h3>
-                <p className="text-[13px] text-zinc-500 leading-relaxed">{item.desc}</p>
+              <div key={i} className={`rounded-2xl p-6 bg-gradient-to-br ${item.gradient} border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300`}>
+                <div className="text-white mb-3">{item.icon}</div>
+                <h3 className="font-bold text-[15px] text-white mb-1.5">{item.title}</h3>
+                <p className="text-[13px] text-zinc-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Pricing ───────────────────────────────────────────── */}
-      <section id="pricing" className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/[0.008] to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-[11px] text-zinc-400 font-medium uppercase tracking-widest mb-5">
-              Simple pricing
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">Start free. Upgrade when<br className="hidden md:block" /> you&apos;re ready to compete.</h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {/* Free */}
-            <div className="rounded-2xl p-8 bg-white/[0.02] border border-white/[0.06]">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="font-semibold text-[16px] text-white">{PRICING.free.name}</h3>
-                  <p className="text-[12px] text-zinc-600 mt-0.5">For getting started</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-white">$0</div>
-                  <p className="text-[11px] text-zinc-600">forever</p>
-                </div>
-              </div>
-              <div className="h-px bg-white/[0.06] mb-6" />
-              <ul className="space-y-3.5 mb-8">
-                {PRICING.free.features.map(f => (
-                  <li key={f} className="flex items-start gap-3 text-[13px] text-zinc-400">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-600 shrink-0 mt-0.5" />{f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/signup" className="w-full h-11 rounded-xl border border-white/[0.1] text-[13px] font-semibold text-zinc-300 hover:text-white hover:bg-white/[0.04] hover:border-white/[0.15] transition-all duration-200 flex items-center justify-center">
-                Get Started Free
-              </Link>
-            </div>
+      {/* ── Early Access ────────────────────────────────────── */}
+      <section id="early-access" className="py-24 px-6 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-600/[0.06] via-violet-600/[0.03] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-blue-500/[0.08] to-transparent rounded-full blur-3xl pointer-events-none" />
 
-            {/* Pro */}
-            <div className="rounded-2xl p-8 relative bg-white/[0.03] border border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.08)]">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <span className="text-[11px] font-bold bg-gradient-to-r from-amber-400 to-orange-400 text-black px-5 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
-                  <Zap className="w-3 h-3" /> Most Popular
-                </span>
-              </div>
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="font-semibold text-[16px] text-white">{PRICING.paid.name}</h3>
-                  <p className="text-[12px] text-zinc-500 mt-0.5">For serious builders</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-white">${PRICING.paid.price}<span className="text-sm font-normal text-zinc-500">/mo</span></div>
-                  <p className="text-[11px] text-zinc-600">cancel anytime</p>
-                </div>
-              </div>
-              <div className="h-px bg-white/[0.08] mb-6" />
-              <ul className="space-y-3.5 mb-8">
-                {PRICING.paid.features.map(f => (
-                  <li key={f} className="flex items-start gap-3 text-[13px] text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />{f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/signup" className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black text-[13px] font-bold shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300 flex items-center justify-center gap-1.5">
-                Join Pro Waitlist <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+        <div className="max-w-3xl mx-auto text-center relative">
+          <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-5 tracking-tight leading-[0.95]">
+            <span className="text-white">Stop watching.</span><br />
+            <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Start building.</span>
+          </h2>
+          <p className="text-zinc-400 mb-10 text-[17px] max-w-lg mx-auto leading-relaxed">Join builders who ship a new AI product every week. Early members get founding perks.</p>
+
+          <WaitlistForm size="large" cta="Get Early Access" />
+
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-[13px] text-zinc-500">
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> Free to join</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> No credit card</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> Founding member perks</span>
           </div>
         </div>
       </section>
 
       {/* ── Creator CTA ───────────────────────────────────────── */}
-      <section className="py-20 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="rounded-2xl p-10 bg-white/[0.02] border border-violet-500/15 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.04] to-blue-500/[0.04] group-hover:from-violet-500/[0.06] group-hover:to-blue-500/[0.06] transition-all duration-500 pointer-events-none" />
+          <div className="rounded-3xl p-10 bg-gradient-to-br from-violet-950/60 to-fuchsia-950/40 border border-violet-500/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.06] to-fuchsia-500/[0.04] pointer-events-none" />
             <div className="relative text-center">
-              <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-5">
-                <Users className="w-7 h-7 text-violet-400" />
+              <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-5" style={{ background: 'linear-gradient(135deg, #8b5cf6, #d946ef)', boxShadow: '0 0 30px rgba(139,92,246,0.3)' }}>
+                <Users className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight text-white">Run your own builder community</h3>
-              <p className="text-[14px] text-zinc-500 mb-7 max-w-md mx-auto leading-relaxed">We&apos;re opening the platform to select creators. Teach AI, vibe coding, no-code — whatever you&apos;re best at.</p>
-              <WaitlistForm cta="Request Creator Access" accent="violet" />
+              <h3 className="text-2xl md:text-3xl font-black mb-3 tracking-tight text-white">Run your own builder community</h3>
+              <p className="text-[15px] text-zinc-400 mb-7 max-w-md mx-auto leading-relaxed">We&apos;re opening the platform to select creators. Teach AI, vibe coding, no-code — whatever you&apos;re best at.</p>
+              <WaitlistForm cta="Request Creator Access" />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Final CTA ─────────────────────────────────────────── */}
-      <section className="py-28 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-500/[0.04] via-blue-500/[0.01] to-transparent pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/[0.04] rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-3xl mx-auto text-center relative">
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-[1.05]">
-            <span className="text-white">Stop watching tutorials.</span><br />
-            <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-sky-400 bg-clip-text text-transparent">Start shipping AI.</span>
-          </h2>
-          <p className="text-zinc-500 mb-10 text-[16px] max-w-lg mx-auto">Join a community of builders who ship a new AI project every week.</p>
-          <WaitlistForm size="large" cta="Join Free — $0 Forever" accent="emerald" />
-          <div className="flex flex-wrap items-center justify-center gap-5 mt-6 text-[12px] text-zinc-600">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-blue-600" /> No credit card</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-blue-600" /> Cancel anytime</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-blue-600" /> New drops weekly</span>
           </div>
         </div>
       </section>
@@ -472,8 +363,10 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2.5 mb-3">
-                <Logo size="small" />
-                <span className="font-semibold text-[14px] tracking-tight text-white">Alt AI Labs</span>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #3b82f6, #7c3aed)' }}>
+                  <span className="text-[10px] font-black text-white">AI</span>
+                </div>
+                <span className="font-bold text-[14px] tracking-tight text-white">Alt AI Labs</span>
               </Link>
               <p className="text-[13px] text-zinc-600 max-w-xs leading-relaxed">Learn AI by building real products. New drop every week. Ship or get shipped.</p>
             </div>
@@ -482,16 +375,15 @@ export default function HomePage() {
               <ul className="space-y-2">
                 <li><a href="#how-it-works" className="text-[13px] text-zinc-600 hover:text-white transition-colors">How It Works</a></li>
                 <li><a href="#drops" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Weekly Drops</a></li>
-                <li><a href="#pricing" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Pricing</a></li>
-                <li><Link href="/c/alt-ai-labs/drops" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Browse Drops</Link></li>
+                <li><a href="#early-access" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Early Access</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">Account</h4>
               <ul className="space-y-2">
                 <li><Link href="/login" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Sign In</Link></li>
-                <li><Link href="/signup" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Create Account</Link></li>
-                <li><Link href="/c/alt-ai-labs/dashboard" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Dashboard</Link></li>
+                <li><Link href="/signup" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Join Waitlist</Link></li>
+                <li><Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`} className="text-[13px] text-zinc-600 hover:text-white transition-colors">Explore</Link></li>
               </ul>
             </div>
           </div>
@@ -500,7 +392,6 @@ export default function HomePage() {
             <span>&copy; {new Date().getFullYear()} Alt AI Labs. All rights reserved.</span>
             <div className="flex gap-6">
               <a href="mailto:hello@altailabs.com" className="hover:text-zinc-400 transition-colors">Contact</a>
-              <a href="https://github.com/TimurTMone/alt-ai-labs" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 transition-colors">GitHub</a>
             </div>
           </div>
         </div>

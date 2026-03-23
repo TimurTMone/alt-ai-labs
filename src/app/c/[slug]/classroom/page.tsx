@@ -5,9 +5,9 @@ import { AppLayout } from '@/components/layout/app-layout'
 import { PreviewBanner } from '@/components/ui/preview-banner'
 import { useCommunityRequired } from "@/lib/community-context"
 import {
-  BookOpen, ChevronDown, ChevronRight, Play, FileText, Download, Lock,
-  CheckCircle2, Rocket, HelpCircle, Megaphone, Wrench, Star, Clock,
-  ExternalLink, Copy, Sparkles, FolderOpen
+  BookOpen, ChevronDown, ChevronRight, Play, FileText, Download,
+  CheckCircle2, Rocket, HelpCircle, Megaphone, Wrench, Clock,
+  ExternalLink, FolderOpen
 } from 'lucide-react'
 
 type Lesson = {
@@ -87,16 +87,12 @@ function ModuleCard({ module }: { module: Module }) {
             return (
               <div
                 key={lesson.id}
-                className={`flex items-center gap-3 px-5 py-3.5 border-b border-white/[0.03] last:border-0 transition-colors ${
-                  lesson.locked ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/[0.02] cursor-pointer'
-                }`}
+                className="flex items-center gap-3 px-5 py-3.5 border-b border-white/[0.03] last:border-0 transition-colors hover:bg-white/[0.02] cursor-pointer"
               >
                 {/* Status */}
                 <div className="w-6 flex items-center justify-center shrink-0">
                   {lesson.completed ? (
                     <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                  ) : lesson.locked ? (
-                    <Lock className="w-3.5 h-3.5 text-zinc-600" />
                   ) : (
                     <div className="w-4 h-4 rounded-full border border-white/[0.15]" />
                   )}
@@ -137,9 +133,6 @@ function ModuleCard({ module }: { module: Module }) {
                   }`}>
                     {TYPE_LABELS[lesson.type]}
                   </span>
-                  {lesson.locked && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">PRO</span>
-                  )}
                 </div>
               </div>
             )
@@ -179,10 +172,10 @@ export default function ClassroomPage() {
       lessons: [
         { id: 'tp-1', title: 'Next.js + Claude AI Starter', type: 'template', description: 'Full-stack starter with Claude API, auth, and Tailwind' },
         { id: 'tp-2', title: 'AI Chatbot Template', type: 'template', description: 'Streaming chat UI with conversation history and tool use' },
-        { id: 'tp-3', title: 'AI Agent Framework', type: 'template', description: 'Multi-step agent with tool calling, memory, and error handling', locked: true },
-        { id: 'tp-4', title: 'SaaS MVP Boilerplate', type: 'template', description: 'Auth + Stripe + dashboard + landing page — ready to customize', locked: true },
-        { id: 'tp-5', title: 'Voice AI Starter (Twilio + ElevenLabs)', type: 'template', description: 'Inbound call handler with voice synthesis', locked: true },
-        { id: 'tp-6', title: 'RAG Pipeline Template', type: 'template', description: 'Document ingestion, chunking, embedding, and semantic search', locked: true },
+        { id: 'tp-3', title: 'AI Agent Framework', type: 'template', description: 'Multi-step agent with tool calling, memory, and error handling' },
+        { id: 'tp-4', title: 'SaaS MVP Boilerplate', type: 'template', description: 'Auth + Stripe + dashboard + landing page — ready to customize' },
+        { id: 'tp-5', title: 'Voice AI Starter (Twilio + ElevenLabs)', type: 'template', description: 'Inbound call handler with voice synthesis' },
+        { id: 'tp-6', title: 'RAG Pipeline Template', type: 'template', description: 'Document ingestion, chunking, embedding, and semantic search' },
       ],
     },
     {
@@ -195,9 +188,9 @@ export default function ClassroomPage() {
         { id: 'gd-1', title: 'Prompt Engineering That Actually Works', type: 'doc', duration: '10 min read', description: 'Patterns, anti-patterns, and real examples' },
         { id: 'gd-2', title: 'Tool Use & Function Calling Explained', type: 'video', duration: '15 min', description: 'How to give AI hands — connect it to APIs and databases' },
         { id: 'gd-3', title: 'Streaming Responses in Next.js', type: 'doc', duration: '8 min read', description: 'Server-sent events, edge functions, and real-time UI' },
-        { id: 'gd-4', title: 'Building Multi-Step AI Agents', type: 'video', duration: '22 min', description: 'Planning, execution, error recovery, and human-in-the-loop', locked: true },
-        { id: 'gd-5', title: 'RAG: When and How to Use It', type: 'doc', duration: '12 min read', description: 'Retrieval-augmented generation for real-world apps', locked: true },
-        { id: 'gd-6', title: 'Deploying AI Apps to Production', type: 'video', duration: '18 min', description: 'Vercel, rate limiting, error handling, monitoring', locked: true },
+        { id: 'gd-4', title: 'Building Multi-Step AI Agents', type: 'video', duration: '22 min', description: 'Planning, execution, error recovery, and human-in-the-loop' },
+        { id: 'gd-5', title: 'RAG: When and How to Use It', type: 'doc', duration: '12 min read', description: 'Retrieval-augmented generation for real-world apps' },
+        { id: 'gd-6', title: 'Deploying AI Apps to Production', type: 'video', duration: '18 min', description: 'Vercel, rate limiting, error handling, monitoring' },
       ],
     },
     {
