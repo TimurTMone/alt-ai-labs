@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { useCommunity } from '@/lib/community-context'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { NotificationBell } from '@/components/challenge/notification-bell'
 
 export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
   const [open, setOpen] = useState(false)
@@ -47,12 +48,14 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
         <span className="font-semibold text-white text-sm truncate">{community ? community.name : 'Alt AI Labs'}</span>
       </Link>
 
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-zinc-400">
-            <Menu className="w-5 h-5" />
-          </Button>
-        </SheetTrigger>
+      <div className="flex items-center gap-1">
+        <NotificationBell />
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-zinc-400">
+              <Menu className="w-5 h-5" />
+            </Button>
+          </SheetTrigger>
         <SheetContent side="right" className="bg-[#09090b] border-white/[0.06] w-72 p-0">
           <nav className="p-4 space-y-1 mt-8">
             <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 text-[12px] text-zinc-600 hover:text-zinc-400 transition-colors mb-2">
@@ -76,7 +79,8 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
             </button>
           </nav>
         </SheetContent>
-      </Sheet>
+        </Sheet>
+      </div>
     </div>
   )
 }

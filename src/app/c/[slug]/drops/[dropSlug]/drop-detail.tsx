@@ -23,6 +23,7 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
 
   const [watched, setWatched] = useState(initialProgress?.watched ?? false)
   const [submitted, setSubmitted] = useState(initialProgress?.submitted ?? false)
+  const [submitting, setSubmitting] = useState(false)
   const [githubUrl, setGithubUrl] = useState('')
   const [liveUrl, setLiveUrl] = useState('')
   const [demoVideoUrl, setDemoVideoUrl] = useState('')
@@ -33,7 +34,45 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
   const isUpcoming = drop.status === 'upcoming'
   const challengeUnlocked = watched
 
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); setSubmitted(true) }
+  const handleMarkWatched = async () => {
+    setWatched(true)
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ drop_id: drop.id }),
+      })
+    } catch {
+      // Still mark locally even if API fails (demo mode)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          drop_id: drop.id,
+          github_url: githubUrl,
+          live_url: liveUrl || null,
+          demo_video_url: demoVideoUrl || null,
+          description,
+          attachments,
+        }),
+      })
+      if (res.ok) {
+        setSubmitted(true)
+      }
+    } catch {
+      // In demo mode, still mark as submitted locally
+      setSubmitted(true)
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <AppLayout>
@@ -104,7 +143,7 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
                 <iframe src={drop.video_url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
               </div>
               {!watched ? (
-                <button onClick={() => setWatched(true)} className="inline-flex items-center gap-1.5 bg-blue-500 hover:bg-blue-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+                <button onClick={handleMarkWatched} className="inline-flex items-center gap-1.5 bg-blue-500 hover:bg-blue-400 text-white h-9 px-5 text-[13px] font-semibold rounded-xl transition-colors shadow-[0_0_20px_rgba(59,130,246,0.15)]">
                   <CheckCircle2 className="w-4 h-4" /> Mark as Watched
                 </button>
               ) : (
@@ -195,8 +234,8 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
                   )}
                 </div>
                 <div className="h-px bg-white/[0.06]" />
-                <button type="submit" disabled={!githubUrl || !description} className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed text-white h-11 text-[13px] font-semibold rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:shadow-[0_0_28px_rgba(59,130,246,0.25)] flex items-center justify-center gap-2">
-                  <Send className="w-4 h-4" /> Submit Build
+                <button type="submit" disabled={!githubUrl || !description || submitting} className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed text-white h-11 text-[13px] font-semibold rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:shadow-[0_0_28px_rgba(59,130,246,0.25)] flex items-center justify-center gap-2">
+                  <Send className="w-4 h-4" /> {submitting ? 'Submitting...' : 'Submit Build'}
                 </button>
                 <p className="text-[11px] text-zinc-600 text-center">You can edit your submission until the deadline</p>
               </form>

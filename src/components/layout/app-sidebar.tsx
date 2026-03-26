@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { useCommunity } from '@/lib/community-context'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { NotificationBell } from '@/components/challenge/notification-bell'
 
 interface AppSidebarProps {
   isAdmin?: boolean
@@ -73,6 +74,10 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
       </nav>
 
       <div className="px-3 py-4 space-y-0.5 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-[11px] text-zinc-600 font-medium uppercase tracking-wider">Account</span>
+          <NotificationBell />
+        </div>
         {isAdmin && community && (
           <Link href={`${base}/admin`} className={cn('flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150', pathname.startsWith(`${base}/admin`) ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]')}>
             <Shield className="w-[18px] h-[18px]" /> Admin
