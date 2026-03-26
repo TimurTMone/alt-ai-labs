@@ -2,31 +2,27 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Lock, Send, Github, Globe, Video, Paperclip, X, FileText, Zap, Award } from 'lucide-react'
+import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Send, Github, Globe, Video, Paperclip, X, FileText, Zap, Award } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { AppLayout } from '@/components/layout/app-layout'
-import { useCommunityRequired } from "@/lib/community-context"
 import { DIFFICULTY_COLORS, DROP_STATUS_COLORS, calculatePrizePool } from '@/lib/constants'
-import { getDropsForCommunity, mockProgress } from '@/lib/mock-data'
 import { formatDistanceToNow } from 'date-fns'
-import { useParams } from 'next/navigation'
+import type { Community, WeeklyDrop, DropProgress } from '@/types/database'
 
-export function DropDetailPage() {
-  const community = useCommunityRequired()
-  const params = useParams()
-  const dropSlug = params.dropSlug as string
+interface DropDetailClientProps {
+  community: Community
+  drop: WeeklyDrop
+  initialProgress: DropProgress | null
+}
+
+export function DropDetailClient({ community, drop, initialProgress }: DropDetailClientProps) {
   const base = `/c/${community.slug}`
-  const drops = getDropsForCommunity(community.id)
-  const drop = drops.find(d => d.slug === dropSlug)
-  if (!drop) notFound()
 
-  const existingProgress = mockProgress.find(p => p.drop_id === drop.id)
-  const [watched, setWatched] = useState(existingProgress?.watched ?? false)
-  const [submitted, setSubmitted] = useState(existingProgress?.submitted ?? false)
+  const [watched, setWatched] = useState(initialProgress?.watched ?? false)
+  const [submitted, setSubmitted] = useState(initialProgress?.submitted ?? false)
   const [githubUrl, setGithubUrl] = useState('')
   const [liveUrl, setLiveUrl] = useState('')
   const [demoVideoUrl, setDemoVideoUrl] = useState('')
@@ -41,13 +37,12 @@ export function DropDetailPage() {
 
   return (
     <AppLayout>
-      {/* Back nav */}
       <Link href={`${base}/drops`} className="inline-flex items-center gap-1.5 text-[13px] text-zinc-500 hover:text-white mb-6 transition-colors">
         <ArrowLeft className="w-3.5 h-3.5" /> All Drops
       </Link>
 
       <div className="max-w-3xl">
-        {/* ── Hero Card ────────────────────────────────────────────── */}
+        {/* Hero Card */}
         <div className="rounded-2xl p-6 md:p-8 glass-strong glow-blue relative overflow-hidden mb-6">
           <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/[0.04] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           <div className="relative">
@@ -75,7 +70,7 @@ export function DropDetailPage() {
           </div>
         </div>
 
-        {/* ── Progress Steps ───────────────────────────────────────── */}
+        {/* Progress Steps */}
         <div className="grid grid-cols-3 gap-3 mb-8">
           {[
             { step: 1, label: 'Watch', done: watched, icon: Play },
@@ -91,7 +86,7 @@ export function DropDetailPage() {
           ))}
         </div>
 
-        {/* ── Video Section ────────────────────────────────────────── */}
+        {/* Video Section */}
         <div className="rounded-2xl p-6 glass mb-6">
           <h2 className="text-[13px] font-semibold mb-4 flex items-center gap-2 uppercase tracking-wider text-zinc-400">
             <Play className="w-4 h-4 text-blue-400" /> The Lesson
@@ -119,7 +114,7 @@ export function DropDetailPage() {
           ) : null}
         </div>
 
-        {/* ── Challenge Section ────────────────────────────────────── */}
+        {/* Challenge Section */}
         <div className={`transition-all duration-300 ${!challengeUnlocked ? 'opacity-30 pointer-events-none' : ''}`}>
           <div className="rounded-2xl p-6 glass mb-6">
             <h2 className="text-[13px] font-semibold mb-4 flex items-center gap-2 uppercase tracking-wider text-zinc-400">
@@ -154,49 +149,34 @@ export function DropDetailPage() {
             )}
           </div>
 
-          {/* ── Submit Form ────────────────────────────────────────── */}
+          {/* Submit Form */}
           {challengeUnlocked && !submitted && drop.status === 'live' && (
             <div className="rounded-2xl p-6 glass mb-6">
               <h2 className="text-[13px] font-semibold mb-5 flex items-center gap-2 uppercase tracking-wider text-zinc-400">
                 <Send className="w-4 h-4 text-blue-400" /> Submit Your Build
               </h2>
               <form onSubmit={handleSubmit} className="space-y-5">
-
                 <div className="space-y-1.5">
-                  <Label htmlFor="github" className="text-[13px] text-zinc-400 flex items-center gap-1.5">
-                    <Github className="w-3.5 h-3.5" /> GitHub Repository *
-                  </Label>
+                  <Label htmlFor="github" className="text-[13px] text-zinc-400 flex items-center gap-1.5"><Github className="w-3.5 h-3.5" /> GitHub Repository *</Label>
                   <Input id="github" placeholder="https://github.com/you/project" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} required className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-zinc-600" />
                   <p className="text-[11px] text-zinc-600">Public repo with your source code</p>
                 </div>
-
                 <div className="space-y-1.5">
-                  <Label htmlFor="live" className="text-[13px] text-zinc-400 flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5" /> Live URL
-                  </Label>
+                  <Label htmlFor="live" className="text-[13px] text-zinc-400 flex items-center gap-1.5"><Globe className="w-3.5 h-3.5" /> Live URL</Label>
                   <Input id="live" placeholder="https://your-app.vercel.app" value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-zinc-600" />
                   <p className="text-[11px] text-zinc-600">Deployed app on Vercel, Netlify, or any host</p>
                 </div>
-
                 <div className="space-y-1.5">
-                  <Label htmlFor="demo" className="text-[13px] text-zinc-400 flex items-center gap-1.5">
-                    <Video className="w-3.5 h-3.5" /> Demo Video
-                  </Label>
+                  <Label htmlFor="demo" className="text-[13px] text-zinc-400 flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Demo Video</Label>
                   <Input id="demo" placeholder="https://youtube.com/watch?v=... or https://loom.com/..." value={demoVideoUrl} onChange={e => setDemoVideoUrl(e.target.value)} className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-zinc-600" />
                   <p className="text-[11px] text-zinc-600">YouTube, Loom, or any video link showing your build</p>
                 </div>
-
                 <div className="space-y-1.5">
-                  <Label htmlFor="desc" className="text-[13px] text-zinc-400 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" /> What you built *
-                  </Label>
+                  <Label htmlFor="desc" className="text-[13px] text-zinc-400 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> What you built *</Label>
                   <Textarea id="desc" placeholder="Describe your build: what it does, how it works, what stack you used..." value={description} onChange={e => setDescription(e.target.value)} required rows={4} className="bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-zinc-600" />
                 </div>
-
                 <div className="space-y-1.5">
-                  <Label className="text-[13px] text-zinc-400 flex items-center gap-1.5">
-                    <Paperclip className="w-3.5 h-3.5" /> Attachments
-                  </Label>
+                  <Label className="text-[13px] text-zinc-400 flex items-center gap-1.5"><Paperclip className="w-3.5 h-3.5" /> Attachments</Label>
                   <p className="text-[11px] text-zinc-600 mb-2">Links to PRDs, Figma files, docs, slides, etc.</p>
                   <div className="flex gap-2">
                     <Input placeholder="https://docs.google.com/..." value={attachInput} onChange={e => setAttachInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (attachInput.trim()) { setAttachments([...attachments, attachInput.trim()]); setAttachInput('') } } }} className="h-9 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] placeholder:text-zinc-600" />
@@ -208,17 +188,13 @@ export function DropDetailPage() {
                         <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-[11px] text-zinc-400 max-w-[280px]">
                           <Paperclip className="w-3 h-3 shrink-0" />
                           <span className="truncate">{url}</span>
-                          <button type="button" onClick={() => setAttachments(attachments.filter((_, j) => j !== i))} className="shrink-0 text-zinc-600 hover:text-orange-500 transition-colors">
-                            <X className="w-3 h-3" />
-                          </button>
+                          <button type="button" onClick={() => setAttachments(attachments.filter((_, j) => j !== i))} className="shrink-0 text-zinc-600 hover:text-orange-500 transition-colors"><X className="w-3 h-3" /></button>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
-
                 <div className="h-px bg-white/[0.06]" />
-
                 <button type="submit" disabled={!githubUrl || !description} className="w-full bg-blue-500 hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed text-white h-11 text-[13px] font-semibold rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:shadow-[0_0_28px_rgba(59,130,246,0.25)] flex items-center justify-center gap-2">
                   <Send className="w-4 h-4" /> Submit Build
                 </button>
@@ -227,7 +203,7 @@ export function DropDetailPage() {
             </div>
           )}
 
-          {/* ── Success State ──────────────────────────────────────── */}
+          {/* Success State */}
           {submitted && (
             <div className="rounded-2xl p-8 text-center glass-strong glow-blue mb-6">
               <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto mb-4">
@@ -245,7 +221,7 @@ export function DropDetailPage() {
           )}
         </div>
 
-        {/* ── Prize Pool Tracker ─────────────────────────────────── */}
+        {/* Prize Pool Tracker */}
         {drop.prize_per_entrant > 0 && (
           <div className={`rounded-2xl p-5 glass ${pool.isActive ? 'glow-amber' : ''}`}>
             <div className="flex items-start gap-3 mb-4">
@@ -264,7 +240,6 @@ export function DropDetailPage() {
                     ? 'Pool is active! Every new Pro entrant adds more.'
                     : `${pool.remainingToActivate} more Pro builder${pool.remainingToActivate === 1 ? '' : 's'} needed to activate the pool`}
                 </p>
-                {/* Progress bar */}
                 <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden mb-1">
                   <div className={`h-full rounded-full transition-all duration-500 ${pool.isActive ? 'bg-amber-500' : 'bg-zinc-600'}`} style={{ width: `${pool.progress}%` }} />
                 </div>
@@ -275,7 +250,6 @@ export function DropDetailPage() {
               </div>
             </div>
 
-            {/* Prize split */}
             {pool.isActive && pool.split && (
               <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/[0.06]">
                 {pool.split.map(s => (
@@ -288,7 +262,6 @@ export function DropDetailPage() {
               </div>
             )}
 
-            {/* How it works — only show when pool is inactive */}
             {!pool.isActive && (
               <div className="pt-3 border-t border-white/[0.06]">
                 <p className="text-[11px] text-zinc-600">
