@@ -77,6 +77,9 @@ export const PRICING = {
   free: {
     name: 'Free',
     price: 0,
+    tier: 'free' as const,
+    earlyAccessHours: 0,
+    entryDiscount: 0,
     features: [
       'Access to free weekly drops',
       'Join public community',
@@ -84,21 +87,40 @@ export const PRICING = {
       'Leaderboard access',
     ],
   },
-  paid: {
-    name: 'Pro Builder',
-    price: 29,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || '',
+  pro: {
+    name: 'Pro',
+    price: 9.99,
+    tier: 'pro' as const,
+    earlyAccessHours: 24,
+    entryDiscount: 10,
     features: [
       'All weekly drops unlocked',
       'Access to paid challenges',
       'Eligible for cash prizes',
+      '24hr early access to new drops',
+      '10% entry fee discount',
       'Private groups access',
+    ],
+  },
+  elite: {
+    name: 'Elite',
+    price: 24.99,
+    tier: 'elite' as const,
+    earlyAccessHours: 48,
+    entryDiscount: 20,
+    features: [
+      'Everything in Pro',
+      '48hr early access to new drops',
+      '20% entry fee discount',
       'Templates & starter repos',
       'Past drop archives',
       'Priority support',
+      'Judge nomination eligibility',
     ],
   },
 } as const
+
+export const PLATFORM_FEE_PCT = 15
 
 // ── Prize Pool ──────────────────────────────────────────────────
 // Pool is funded by Pro subscription revenue — creator never pays out of pocket.
