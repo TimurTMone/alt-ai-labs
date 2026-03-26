@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { ArrowRight, Play, Trophy, TrendingUp, Clock, Sparkles, CheckCircle2, MessageSquare, Medal, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { AppLayout } from '@/components/layout/app-layout'
+import { OnboardingOverlay } from '@/components/onboarding/onboarding-overlay'
+import { WelcomeToast } from '@/components/onboarding/welcome-toast'
 import { useCommunityRequired } from "@/lib/community-context"
 import { getDropsForCommunity, getLeaderboardForCommunity, getPostsForCommunity, mockProfile, mockProgress } from '@/lib/mock-data'
 import { DIFFICULTY_COLORS, calculatePrizePool } from '@/lib/constants'
@@ -23,6 +25,8 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
+      <OnboardingOverlay />
+      <WelcomeToast />
       <div className="space-y-6">
         {/* ── Header ───────────────────────────────────────────────── */}
         <div>
