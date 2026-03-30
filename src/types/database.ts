@@ -55,6 +55,10 @@ export interface WeeklyDrop {
   // Prize pool mechanics — funded by Pro subscriptions, never out of pocket
   prize_per_entrant: number        // $ added to pool per Pro participant
   min_entrants_for_prize: number   // minimum Pro participants to activate pool
+  // Creator
+  creator_name: string | null
+  creator_avatar_url: string | null
+  creator_url: string | null
   // Sponsor
   sponsor_name: string | null
   sponsor_logo_url: string | null

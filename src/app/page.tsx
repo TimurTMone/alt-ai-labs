@@ -197,6 +197,13 @@ export default function HomePage() {
                       <span className="text-[13px] text-zinc-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 6 days left</span>
                     </div>
 
+                    {liveDrop.creator_name && (
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center text-[10px] font-bold text-zinc-400">{liveDrop.creator_name.split(' ').map(w => w[0]).join('')}</div>
+                        <span className="text-[13px] text-zinc-400">by <span className="text-white font-medium">{liveDrop.creator_name}</span></span>
+                      </div>
+                    )}
+
                     <h2 className="text-2xl md:text-4xl font-black mb-3 tracking-tight text-white group-hover:text-blue-200 transition-colors">{liveDrop.title}</h2>
                     <p className="text-[15px] md:text-[17px] text-zinc-400 mb-6 max-w-lg leading-relaxed">{liveDrop.description}</p>
 
@@ -350,7 +357,19 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">Challenges</h2>
-            <p className="text-zinc-400 mt-4 text-[16px]">New challenge every week. Jump in anytime. Build your portfolio.</p>
+            <p className="text-zinc-400 mt-4 text-[16px]">Multiple creators. Multiple challenges. Jump in anytime.</p>
+            <div className="flex items-center justify-center gap-4 mt-6">
+              {[
+                { name: 'Nate Herk', initial: 'NH', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+                { name: 'Dan Martell', initial: 'DM', color: 'bg-violet-500/20 text-violet-400 border-violet-500/30' },
+                { name: 'Timur M.', initial: 'TM', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+              ].map((c, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className={`w-7 h-7 rounded-full ${c.color} border flex items-center justify-center text-[10px] font-bold`}>{c.initial}</div>
+                  <span className="text-[13px] text-zinc-400">{c.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="space-y-3">
             {drops.map(drop => (
@@ -395,7 +414,7 @@ export default function HomePage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-[12px] text-zinc-500">{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
+                  <p className="text-[12px] text-zinc-500">{drop.creator_name && <><span className="text-zinc-400">{drop.creator_name}</span> · </>}{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
                 </div>
                 {(drop.prize_amount > 0 || drop.prize_per_entrant > 0) && (
                   <div className="flex items-center gap-1.5 shrink-0">
