@@ -42,14 +42,23 @@ export async function updateSession(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser()
 
+    // Public routes within /c/ — allow anyone to view (sets demo mode automatically)
+    const path = request.nextUrl.pathname
+    const isPublicCommunityRoute = path.match(/^\/c\/[^/]+\/(drops|dashboard|leaderboard|community)/)
+    if (isPublicCommunityRoute && !user) {
+      const response = NextResponse.next({ request })
+      response.cookies.set('demo_mode', 'true', { path: '/', maxAge: 86400 })
+      return response
+    }
+
     // Protected routes
     const protectedPaths = ['/c/', '/profile']
-    const isProtected = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
+    const isProtected = protectedPaths.some(p => path.startsWith(p))
 
     if (isProtected && !user) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
-      url.searchParams.set('redirect', request.nextUrl.pathname)
+      url.searchParams.set('redirect', path)
       return NextResponse.redirect(url)
     }
 
