@@ -1,18 +1,68 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const crypto = require('crypto')
 const { Pool } = require('pg')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const appleSignin = require('apple-signin-auth')
+const { OAuth2Client } = require('google-auth-library')
 
 const app = express()
 const PORT = process.env.PORT || 3001
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'
 
 // ── Database ────────────────────────────────────────────────────
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 })
+
+// ── Google OAuth Client ─────────────────────────────────────────
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  `${process.env.API_URL || `http://localhost:${PORT}`}/api/auth/google/callback`
+)
+
+// ── Helpers ─────────────────────────────────────────────────────
+function signToken(user) {
+  return jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' })
+}
+
+function verifyToken(req) {
+  const authHeader = req.headers.authorization
+  if (!authHeader?.startsWith('Bearer ')) return null
+  try {
+    return jwt.verify(authHeader.slice(7), process.env.JWT_SECRET)
+  } catch {
+    return null
+  }
+}
+
+async function findOrCreateOAuthUser(email, fullName, provider, providerId) {
+  const normalized = email.toLowerCase().trim()
+  const existing = await pool.query('SELECT * FROM profiles WHERE email = $1', [normalized])
+
+  if (existing.rows.length > 0) {
+    const user = existing.rows[0]
+    // Update provider info if not set
+    if (!user[`${provider}_id`]) {
+      await pool.query(
+        `UPDATE profiles SET ${provider}_id = $1, updated_at = NOW() WHERE id = $2`,
+        [providerId, user.id]
+      ).catch(() => {}) // Column might not exist yet, that's fine
+    }
+    return user
+  }
+
+  const result = await pool.query(
+    `INSERT INTO profiles (email, full_name, membership_tier, is_admin, total_points, created_at, updated_at)
+     VALUES ($1, $2, 'free', false, 0, NOW(), NOW()) RETURNING *`,
+    [normalized, fullName || normalized.split('@')[0]]
+  )
+  return result.rows[0]
+}
 
 // ── Middleware ───────────────────────────────────────────────────
 app.use(cors({
@@ -21,6 +71,7 @@ app.use(cors({
   credentials: true,
 }))
 app.use(express.json())
+app.use(express.urlencoded({ extended: true })) // Apple sends form-encoded POST
 
 // ── Health ──────────────────────────────────────────────────────
 app.get('/api/health', async (req, res) => {
@@ -41,8 +92,6 @@ app.post('/api/waitlist', async (req, res) => {
     }
 
     const normalized = email.toLowerCase().trim()
-
-    // Check duplicate
     const existing = await pool.query('SELECT id FROM waitlist WHERE email = $1', [normalized])
     if (existing.rows.length > 0) {
       return res.json({ message: "You're already on the list!" })
@@ -50,7 +99,6 @@ app.post('/api/waitlist', async (req, res) => {
 
     await pool.query('INSERT INTO waitlist (email, joined_at) VALUES ($1, NOW())', [normalized])
     const countResult = await pool.query('SELECT COUNT(*) FROM waitlist')
-
     res.json({ message: "You're in!", count: parseInt(countResult.rows[0].count) })
   } catch (err) {
     console.error('Waitlist error:', err)
@@ -67,7 +115,10 @@ app.get('/api/waitlist', async (req, res) => {
   }
 })
 
-// ── Auth: Signup ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// AUTH — Email/Password
+// ═══════════════════════════════════════════════════════════════
+
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { email, password, full_name } = req.body
@@ -81,7 +132,7 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(409).json({ error: 'Account already exists' })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 12)
     const result = await pool.query(
       `INSERT INTO profiles (email, password_hash, full_name, membership_tier, is_admin, total_points, created_at, updated_at)
        VALUES ($1, $2, $3, 'free', false, 0, NOW(), NOW()) RETURNING id, email, full_name, membership_tier, total_points`,
@@ -89,8 +140,7 @@ app.post('/api/auth/signup', async (req, res) => {
     )
 
     const user = result.rows[0]
-    const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
-
+    const token = signToken(user)
     res.json({ token, user })
   } catch (err) {
     console.error('Signup error:', err)
@@ -98,7 +148,6 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 })
 
-// ── Auth: Login ─────────────────────────────────────────────────
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body
@@ -113,14 +162,17 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const user = result.rows[0]
+    if (!user.password_hash) {
+      return res.status(401).json({ error: 'This account uses Apple or Google sign-in' })
+    }
+
     const valid = await bcrypt.compare(password, user.password_hash)
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials' })
     }
 
-    const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    const token = signToken(user)
     const { password_hash, ...safeUser } = user
-
     res.json({ token, user: safeUser })
   } catch (err) {
     console.error('Login error:', err)
@@ -128,31 +180,132 @@ app.post('/api/auth/login', async (req, res) => {
   }
 })
 
-// ── Auth: Me ────────────────────────────────────────────────────
 app.get('/api/auth/me', async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
 
-    const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET)
+  try {
     const result = await pool.query(
       'SELECT id, email, full_name, avatar_url, bio, membership_tier, is_admin, total_points, created_at, updated_at FROM profiles WHERE id = $1',
       [decoded.sub]
     )
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' })
-    }
-
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' })
     res.json({ user: result.rows[0] })
-  } catch {
-    res.status(401).json({ error: 'Invalid token' })
+  } catch (err) {
+    console.error('Auth me error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
   }
 })
 
-// ── Challenges (Drops) ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// AUTH — Apple Sign In
+// ═══════════════════════════════════════════════════════════════
+
+// Step 1: Frontend redirects here → we redirect to Apple
+app.get('/api/auth/apple', (req, res) => {
+  const state = crypto.randomBytes(16).toString('hex')
+  const params = new URLSearchParams({
+    response_type: 'code id_token',
+    response_mode: 'form_post',
+    client_id: process.env.APPLE_SERVICE_ID || '',
+    redirect_uri: `${process.env.API_URL || `http://localhost:${PORT}`}/api/auth/apple/callback`,
+    scope: 'name email',
+    state,
+  })
+  res.redirect(`https://appleid.apple.com/auth/authorize?${params}`)
+})
+
+// Step 2: Apple POSTs back here with code + id_token
+app.post('/api/auth/apple/callback', async (req, res) => {
+  try {
+    const { code, id_token, user: appleUser } = req.body
+
+    if (!id_token && !code) {
+      return res.redirect(`${FRONTEND_URL}/login?error=apple_auth_failed`)
+    }
+
+    // Verify the identity token from Apple
+    const payload = await appleSignin.verifyIdToken(id_token, {
+      audience: process.env.APPLE_SERVICE_ID,
+      ignoreExpiration: false,
+    })
+
+    const email = payload.email
+    if (!email) {
+      return res.redirect(`${FRONTEND_URL}/login?error=apple_no_email`)
+    }
+
+    // Apple only sends user info on FIRST sign-in — parse it if available
+    let fullName = null
+    if (appleUser) {
+      try {
+        const parsed = typeof appleUser === 'string' ? JSON.parse(appleUser) : appleUser
+        if (parsed.name) {
+          fullName = [parsed.name.firstName, parsed.name.lastName].filter(Boolean).join(' ')
+        }
+      } catch {}
+    }
+
+    const user = await findOrCreateOAuthUser(email, fullName, 'apple', payload.sub)
+    const token = signToken(user)
+
+    // Redirect to frontend with token
+    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`)
+  } catch (err) {
+    console.error('Apple OAuth error:', err)
+    res.redirect(`${FRONTEND_URL}/login?error=apple_auth_failed`)
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH — Google Sign In
+// ═══════════════════════════════════════════════════════════════
+
+// Step 1: Frontend redirects here → we redirect to Google
+app.get('/api/auth/google', (req, res) => {
+  const url = googleClient.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['openid', 'email', 'profile'],
+    prompt: 'select_account',
+  })
+  res.redirect(url)
+})
+
+// Step 2: Google redirects back here with code
+app.get('/api/auth/google/callback', async (req, res) => {
+  try {
+    const { code } = req.query
+    if (!code) {
+      return res.redirect(`${FRONTEND_URL}/login?error=google_auth_failed`)
+    }
+
+    const { tokens } = await googleClient.getToken(code)
+    const ticket = await googleClient.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    })
+
+    const payload = ticket.getPayload()
+    const email = payload.email
+    if (!email) {
+      return res.redirect(`${FRONTEND_URL}/login?error=google_no_email`)
+    }
+
+    const fullName = payload.name || null
+    const user = await findOrCreateOAuthUser(email, fullName, 'google', payload.sub)
+    const token = signToken(user)
+
+    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`)
+  } catch (err) {
+    console.error('Google OAuth error:', err)
+    res.redirect(`${FRONTEND_URL}/login?error=google_auth_failed`)
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// CHALLENGES
+// ═══════════════════════════════════════════════════════════════
+
 app.get('/api/challenges', async (req, res) => {
   try {
     const { community_id, status } = req.query
@@ -169,9 +322,7 @@ app.get('/api/challenges', async (req, res) => {
       params.push(status)
     }
 
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ')
-    }
+    if (conditions.length > 0) query += ' WHERE ' + conditions.join(' AND ')
     query += ' ORDER BY week_number ASC'
 
     const result = await pool.query(query, params)
@@ -185,9 +336,7 @@ app.get('/api/challenges', async (req, res) => {
 app.get('/api/challenges/:slug', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM weekly_drops WHERE slug = $1', [req.params.slug])
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Challenge not found' })
-    }
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Challenge not found' })
     res.json({ challenge: result.rows[0] })
   } catch (err) {
     console.error('Challenge detail error:', err)
@@ -195,17 +344,16 @@ app.get('/api/challenges/:slug', async (req, res) => {
   }
 })
 
-// ── Submissions ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SUBMISSIONS
+// ═══════════════════════════════════════════════════════════════
+
 app.post('/api/submissions', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
   try {
-    const authHeader = req.headers.authorization
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
-
-    const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET)
     const { drop_id, project_url, demo_url, notes } = req.body
-
     if (!drop_id || !project_url) {
       return res.status(400).json({ error: 'drop_id and project_url required' })
     }
@@ -218,10 +366,8 @@ app.post('/api/submissions', async (req, res) => {
        RETURNING *`,
       [decoded.sub, drop_id, project_url, demo_url || null, notes || null]
     )
-
     res.json({ submission: result.rows[0] })
   } catch (err) {
-    if (err.name === 'JsonWebTokenError') return res.status(401).json({ error: 'Invalid token' })
     console.error('Submission error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
@@ -238,7 +384,6 @@ app.get('/api/submissions', async (req, res) => {
        WHERE s.drop_id = $1 ORDER BY s.created_at DESC`,
       [drop_id]
     )
-
     res.json({ submissions: result.rows })
   } catch (err) {
     console.error('Submissions list error:', err)
@@ -246,69 +391,56 @@ app.get('/api/submissions', async (req, res) => {
   }
 })
 
-// ── Leaderboard ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════════════════════════
+
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    const { community_id, limit } = req.query
-    const maxLimit = Math.min(parseInt(limit) || 50, 100)
-
-    let query = `SELECT p.id, p.full_name, p.avatar_url, p.membership_tier, p.total_points
-                 FROM profiles p ORDER BY p.total_points DESC LIMIT $1`
-    const params = [maxLimit]
-
-    const result = await pool.query(query, params)
-    const leaderboard = result.rows.map((row, i) => ({ ...row, rank: i + 1 }))
-
-    res.json({ leaderboard })
+    const maxLimit = Math.min(parseInt(req.query.limit) || 50, 100)
+    const result = await pool.query(
+      'SELECT id, full_name, avatar_url, membership_tier, total_points FROM profiles ORDER BY total_points DESC LIMIT $1',
+      [maxLimit]
+    )
+    res.json({ leaderboard: result.rows.map((row, i) => ({ ...row, rank: i + 1 })) })
   } catch (err) {
     console.error('Leaderboard error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
 })
 
-// ── Profile ─────────────────────────────────────────────────────
-app.patch('/api/profile', async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
+// ═══════════════════════════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════════════════════════
 
-    const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET)
+app.patch('/api/profile', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
     const { full_name, bio } = req.body
     const updates = []
     const params = []
 
-    if (full_name !== undefined) {
-      params.push(full_name)
-      updates.push(`full_name = $${params.length}`)
-    }
-    if (bio !== undefined) {
-      params.push(bio)
-      updates.push(`bio = $${params.length}`)
-    }
-
-    if (updates.length === 0) {
-      return res.status(400).json({ error: 'Nothing to update' })
-    }
+    if (full_name !== undefined) { params.push(full_name); updates.push(`full_name = $${params.length}`) }
+    if (bio !== undefined) { params.push(bio); updates.push(`bio = $${params.length}`) }
+    if (updates.length === 0) return res.status(400).json({ error: 'Nothing to update' })
 
     params.push(decoded.sub)
-    updates.push(`updated_at = NOW()`)
+    updates.push('updated_at = NOW()')
 
     const result = await pool.query(
       `UPDATE profiles SET ${updates.join(', ')} WHERE id = $${params.length} RETURNING id, email, full_name, avatar_url, bio, membership_tier, total_points`,
       params
     )
-
     res.json({ user: result.rows[0] })
   } catch (err) {
-    if (err.name === 'JsonWebTokenError') return res.status(401).json({ error: 'Invalid token' })
     console.error('Profile update error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
 })
 
-// ── Start Server ────────────────────────────────────────────────
+// ── Start ───────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`Alt AI Labs API running on port ${PORT}`)
 })
