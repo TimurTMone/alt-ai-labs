@@ -270,6 +270,81 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Featured Builds ─────────────────────────────────── */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-tight">
+              <span className="text-white">Built on</span>{' '}
+              <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Alt AI Labs</span>
+            </h2>
+            <p className="text-zinc-400 mt-4 text-[16px]">Real projects shipped by our builders. Not demos — products people use.</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-5">
+            {[
+              {
+                title: 'Solo OS',
+                desc: 'A personal AI operating system — tasks, notes, calendar, and habits unified in one AI-powered command center. Natural language control, smart daily planning, and integrations with Google Calendar, Notion, and Todoist.',
+                builder: 'Timur M.',
+                tags: ['AI Agents', 'Full-Stack', 'Productivity'],
+                gradient: 'from-blue-600/20 to-cyan-600/10',
+                border: 'border-blue-500/20 hover:border-blue-500/40',
+                icon: <Bot className="w-6 h-6 text-blue-400" />,
+                status: 'Live',
+              },
+              {
+                title: 'AI Site Builder',
+                desc: 'Generate production-ready websites from a single prompt. Responsive design, real copy (not lorem ipsum), SEO optimization, and one-click deploy to Vercel. Built 12 client sites in the first month.',
+                builder: 'Timur M.',
+                tags: ['No-Code', 'Web Dev', 'AI Generation'],
+                gradient: 'from-violet-600/20 to-fuchsia-600/10',
+                border: 'border-violet-500/20 hover:border-violet-500/40',
+                icon: <Code2 className="w-6 h-6 text-violet-400" />,
+                status: 'Live',
+              },
+              {
+                title: 'AI Song Creator',
+                desc: 'Turn a text prompt into a full song — lyrics, melody, arrangement, and production. Supports multiple genres. Exported tracks used by 3 independent artists on Spotify. Built with Claude + Suno API.',
+                builder: 'Timur M.',
+                tags: ['AI Music', 'Creative AI', 'API Integration'],
+                gradient: 'from-pink-600/20 to-rose-600/10',
+                border: 'border-pink-500/20 hover:border-pink-500/40',
+                icon: <Sparkles className="w-6 h-6 text-pink-400" />,
+                status: 'Live',
+              },
+              {
+                title: 'AI YouTube Pipeline',
+                desc: 'End-to-end content automation — topic research, script generation with hooks and CTAs, thumbnail concepts, SEO-optimized titles and descriptions. Batch-plan 30 days of videos from one brainstorm session.',
+                builder: 'Timur M.',
+                tags: ['Content AI', 'Automation', 'YouTube'],
+                gradient: 'from-amber-600/20 to-orange-600/10',
+                border: 'border-amber-500/20 hover:border-amber-500/40',
+                icon: <Play className="w-6 h-6 text-amber-400" />,
+                status: 'Live',
+              },
+            ].map((project, i) => (
+              <div key={i} className={`rounded-2xl p-6 bg-gradient-to-br ${project.gradient} border ${project.border} transition-all duration-300 group`}>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/[0.06] flex items-center justify-center">{project.icon}</div>
+                  <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">{project.status}</span>
+                </div>
+                <h3 className="font-bold text-[18px] text-white mb-2">{project.title}</h3>
+                <p className="text-[13px] text-zinc-400 leading-relaxed mb-4">{project.desc}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {project.tags.map((tag, j) => (
+                    <span key={j} className="text-[11px] text-zinc-500 bg-white/[0.04] px-2.5 py-1 rounded-lg">{tag}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center text-[10px] font-bold text-zinc-400">T</div>
+                  <span className="text-[12px] text-zinc-500">{project.builder}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Challenges ────────────────────────────────────────── */}
       <section id="challenges" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
