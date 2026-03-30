@@ -1,0 +1,314 @@
+require('dotenv').config()
+const express = require('express')
+const cors = require('cors')
+const { Pool } = require('pg')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+const app = express()
+const PORT = process.env.PORT || 3001
+
+// ── Database ────────────────────────────────────────────────────
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+})
+
+// ── Middleware ───────────────────────────────────────────────────
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: true,
+}))
+app.use(express.json())
+
+// ── Health ──────────────────────────────────────────────────────
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1')
+    res.json({ status: 'ok', timestamp: new Date().toISOString() })
+  } catch (err) {
+    res.status(500).json({ status: 'error', error: err.message })
+  }
+})
+
+// ── Waitlist ────────────────────────────────────────────────────
+app.post('/api/waitlist', async (req, res) => {
+  try {
+    const { email } = req.body
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid email required' })
+    }
+
+    const normalized = email.toLowerCase().trim()
+
+    // Check duplicate
+    const existing = await pool.query('SELECT id FROM waitlist WHERE email = $1', [normalized])
+    if (existing.rows.length > 0) {
+      return res.json({ message: "You're already on the list!" })
+    }
+
+    await pool.query('INSERT INTO waitlist (email, joined_at) VALUES ($1, NOW())', [normalized])
+    const countResult = await pool.query('SELECT COUNT(*) FROM waitlist')
+
+    res.json({ message: "You're in!", count: parseInt(countResult.rows[0].count) })
+  } catch (err) {
+    console.error('Waitlist error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.get('/api/waitlist', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT COUNT(*) FROM waitlist')
+    res.json({ count: parseInt(result.rows[0].count) })
+  } catch {
+    res.json({ count: 0 })
+  }
+})
+
+// ── Auth: Signup ────────────────────────────────────────────────
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { email, password, full_name } = req.body
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' })
+    }
+
+    const normalized = email.toLowerCase().trim()
+    const existing = await pool.query('SELECT id FROM profiles WHERE email = $1', [normalized])
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ error: 'Account already exists' })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const result = await pool.query(
+      `INSERT INTO profiles (email, password_hash, full_name, membership_tier, is_admin, total_points, created_at, updated_at)
+       VALUES ($1, $2, $3, 'free', false, 0, NOW(), NOW()) RETURNING id, email, full_name, membership_tier, total_points`,
+      [normalized, hashedPassword, full_name || normalized.split('@')[0]]
+    )
+
+    const user = result.rows[0]
+    const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
+
+    res.json({ token, user })
+  } catch (err) {
+    console.error('Signup error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ── Auth: Login ─────────────────────────────────────────────────
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' })
+    }
+
+    const normalized = email.toLowerCase().trim()
+    const result = await pool.query('SELECT * FROM profiles WHERE email = $1', [normalized])
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' })
+    }
+
+    const user = result.rows[0]
+    const valid = await bcrypt.compare(password, user.password_hash)
+    if (!valid) {
+      return res.status(401).json({ error: 'Invalid credentials' })
+    }
+
+    const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    const { password_hash, ...safeUser } = user
+
+    res.json({ token, user: safeUser })
+  } catch (err) {
+    console.error('Login error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ── Auth: Me ────────────────────────────────────────────────────
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET)
+    const result = await pool.query(
+      'SELECT id, email, full_name, avatar_url, bio, membership_tier, is_admin, total_points, created_at, updated_at FROM profiles WHERE id = $1',
+      [decoded.sub]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    res.json({ user: result.rows[0] })
+  } catch {
+    res.status(401).json({ error: 'Invalid token' })
+  }
+})
+
+// ── Challenges (Drops) ─────────────────────────────────────────
+app.get('/api/challenges', async (req, res) => {
+  try {
+    const { community_id, status } = req.query
+    let query = 'SELECT * FROM weekly_drops'
+    const params = []
+    const conditions = []
+
+    if (community_id) {
+      conditions.push(`community_id = $${params.length + 1}`)
+      params.push(community_id)
+    }
+    if (status) {
+      conditions.push(`status = $${params.length + 1}`)
+      params.push(status)
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ')
+    }
+    query += ' ORDER BY week_number ASC'
+
+    const result = await pool.query(query, params)
+    res.json({ challenges: result.rows })
+  } catch (err) {
+    console.error('Challenges error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.get('/api/challenges/:slug', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM weekly_drops WHERE slug = $1', [req.params.slug])
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Challenge not found' })
+    }
+    res.json({ challenge: result.rows[0] })
+  } catch (err) {
+    console.error('Challenge detail error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ── Submissions ─────────────────────────────────────────────────
+app.post('/api/submissions', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET)
+    const { drop_id, project_url, demo_url, notes } = req.body
+
+    if (!drop_id || !project_url) {
+      return res.status(400).json({ error: 'drop_id and project_url required' })
+    }
+
+    const result = await pool.query(
+      `INSERT INTO submissions (user_id, drop_id, project_url, demo_url, notes, status, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, 'submitted', NOW(), NOW())
+       ON CONFLICT (user_id, drop_id)
+       DO UPDATE SET project_url = $3, demo_url = $4, notes = $5, updated_at = NOW()
+       RETURNING *`,
+      [decoded.sub, drop_id, project_url, demo_url || null, notes || null]
+    )
+
+    res.json({ submission: result.rows[0] })
+  } catch (err) {
+    if (err.name === 'JsonWebTokenError') return res.status(401).json({ error: 'Invalid token' })
+    console.error('Submission error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.get('/api/submissions', async (req, res) => {
+  try {
+    const { drop_id } = req.query
+    if (!drop_id) return res.status(400).json({ error: 'drop_id required' })
+
+    const result = await pool.query(
+      `SELECT s.*, p.full_name, p.avatar_url FROM submissions s
+       LEFT JOIN profiles p ON s.user_id = p.id
+       WHERE s.drop_id = $1 ORDER BY s.created_at DESC`,
+      [drop_id]
+    )
+
+    res.json({ submissions: result.rows })
+  } catch (err) {
+    console.error('Submissions list error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ── Leaderboard ─────────────────────────────────────────────────
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const { community_id, limit } = req.query
+    const maxLimit = Math.min(parseInt(limit) || 50, 100)
+
+    let query = `SELECT p.id, p.full_name, p.avatar_url, p.membership_tier, p.total_points
+                 FROM profiles p ORDER BY p.total_points DESC LIMIT $1`
+    const params = [maxLimit]
+
+    const result = await pool.query(query, params)
+    const leaderboard = result.rows.map((row, i) => ({ ...row, rank: i + 1 }))
+
+    res.json({ leaderboard })
+  } catch (err) {
+    console.error('Leaderboard error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ── Profile ─────────────────────────────────────────────────────
+app.patch('/api/profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET)
+    const { full_name, bio } = req.body
+    const updates = []
+    const params = []
+
+    if (full_name !== undefined) {
+      params.push(full_name)
+      updates.push(`full_name = $${params.length}`)
+    }
+    if (bio !== undefined) {
+      params.push(bio)
+      updates.push(`bio = $${params.length}`)
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'Nothing to update' })
+    }
+
+    params.push(decoded.sub)
+    updates.push(`updated_at = NOW()`)
+
+    const result = await pool.query(
+      `UPDATE profiles SET ${updates.join(', ')} WHERE id = $${params.length} RETURNING id, email, full_name, avatar_url, bio, membership_tier, total_points`,
+      params
+    )
+
+    res.json({ user: result.rows[0] })
+  } catch (err) {
+    if (err.name === 'JsonWebTokenError') return res.status(401).json({ error: 'Invalid token' })
+    console.error('Profile update error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ── Start Server ────────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`Alt AI Labs API running on port ${PORT}`)
+})

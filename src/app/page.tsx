@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, CheckCircle2, Loader2, ChevronRight, Play, Trophy, Users, Sparkles, Zap, Bot, Code2, Rocket, Clock } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Loader2, ChevronRight, Play, Trophy, Users, Sparkles, Zap, Bot, Code2, Rocket, Clock, Building2, Award } from 'lucide-react'
 import { getDropsForCommunity } from '@/lib/mock-data'
 import { DEFAULT_COMMUNITY_ID, DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
+
+/* ── API URL ───────────────────────────────────────────────────── */
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 /* ── Waitlist Form ─────────────────────────────────────────────── */
 function WaitlistForm({ size = 'default', cta = 'Get Early Access' }: { size?: 'default' | 'large'; cta?: string }) {
@@ -18,7 +21,7 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access' }: { size?: '
     if (!email) return
     setStatus('loading')
     try {
-      const res = await fetch('/api/waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
+      const res = await fetch(`${API_URL}/api/waitlist`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
       const data = await res.json()
       if (res.ok) { setStatus('success'); setMessage(data.message || "You're in!"); setEmail('') }
       else { setStatus('error'); setMessage(data.error || 'Something went wrong') }
@@ -89,14 +92,14 @@ export default function HomePage() {
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-[13px] text-zinc-400">
             <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-            <a href="#drops" className="hover:text-white transition-colors">Drops</a>
-            <a href="#early-access" className="hover:text-white transition-colors">Early Access</a>
+            <a href="#challenges" className="hover:text-white transition-colors">Challenges</a>
+            <a href="#sponsors" className="hover:text-white transition-colors">For Sponsors</a>
           </nav>
           <div className="flex items-center gap-3">
-            <button onClick={handleExplore} className="text-[13px] text-zinc-400 hover:text-white transition-colors hidden sm:block">Explore</button>
-            <Link href="/signup" className="text-[13px] font-bold h-9 px-5 rounded-xl text-white inline-flex items-center transition-all duration-200" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.2)' }}>
-              Join Waitlist
-            </Link>
+            <Link href="/signup" className="text-[13px] text-zinc-400 hover:text-white transition-colors hidden sm:block">Join Waitlist</Link>
+            <button onClick={handleExplore} className="text-[13px] font-bold h-9 px-5 rounded-xl text-white inline-flex items-center gap-1.5 transition-all duration-200" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.2)' }}>
+              Start Building <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </header>
@@ -111,14 +114,22 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto text-center relative">
           <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tight mb-6 leading-[0.95]">
             <span className="text-white">Build AI.</span><br />
-            <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Win money.</span>
+            <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Get paid.</span>
           </h1>
 
-          <p className="text-[17px] md:text-[22px] text-zinc-300 mb-8 max-w-xl mx-auto leading-relaxed font-light">
-            Every week: a new AI project. A video lesson. A build challenge. The best builds win <span className="text-amber-400 font-semibold">cash</span>.
+          <p className="text-[17px] md:text-[22px] text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed font-light">
+            A new AI challenge drops every week. Sponsors fund the prizes. The best builders <span className="text-amber-400 font-semibold">win cash</span> and get hired.
           </p>
 
-          <WaitlistForm size="large" cta="Get Early Access" />
+          {/* Dual CTA */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+            <button onClick={handleExplore} className="w-full sm:w-auto h-14 px-8 text-[15px] font-bold rounded-2xl text-white inline-flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+              Start Building <ArrowRight className="w-4 h-4" />
+            </button>
+            <Link href="/signup" className="w-full sm:w-auto h-14 px-8 text-[15px] font-bold rounded-2xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
+              Join Waitlist
+            </Link>
+          </div>
 
           {/* Social proof */}
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-8 text-[14px]">
@@ -138,15 +149,28 @@ export default function HomePage() {
               <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
                 <Trophy className="w-4 h-4 text-amber-400" />
               </div>
-              <span className="text-zinc-400"><span className="text-amber-400 font-bold">$<AnimatedCounter target={4250} /></span> in prizes</span>
+              <span className="text-zinc-400"><span className="text-amber-400 font-bold">$<AnimatedCounter target={7500} /></span> in prizes</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Sponsor Banner ──────────────────────────────────── */}
+      <section className="px-6 pt-8 pb-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center justify-center gap-3 py-3 px-6 rounded-2xl bg-amber-500/[0.06] border border-amber-500/20">
+            <Building2 className="w-5 h-5 text-amber-400 shrink-0" />
+            <span className="text-[14px] text-zinc-300">
+              Weekly challenges sponsored by <span className="text-amber-400 font-bold">AITIM HOLDING</span> — <span className="text-white font-semibold">$500 prizes</span> every week
+            </span>
+            <Award className="w-5 h-5 text-amber-400 shrink-0" />
           </div>
         </div>
       </section>
 
       {/* ── LIVE Drop Card (the heartbeat) ──────────────────── */}
       {liveDrop && (
-        <section className="px-6 pb-16 pt-8">
+        <section className="px-6 pb-16 pt-4">
           <div className="max-w-3xl mx-auto">
             <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrop.slug}`} className="block group">
               <div className="relative rounded-3xl overflow-hidden border border-blue-500/30 bg-gradient-to-br from-blue-950/80 via-[#09090b] to-violet-950/60 p-1 shadow-[0_0_60px_rgba(59,130,246,0.15),0_0_120px_rgba(139,92,246,0.08)]">
@@ -156,16 +180,21 @@ export default function HomePage() {
                   <div className="absolute bottom-0 left-0 w-60 h-60 bg-violet-500/[0.06] rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none" />
 
                   <div className="relative">
-                    {/* Live badge */}
-                    <div className="flex items-center gap-3 mb-5">
+                    {/* Live badge + Sponsor */}
+                    <div className="flex items-center gap-3 mb-5 flex-wrap">
                       <span className="flex items-center gap-2 text-[13px] font-bold text-white px-4 py-2 rounded-full" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.4)' }}>
                         <span className="relative flex h-2.5 w-2.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
                           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
                         </span>
-                        WEEK {liveDrop.week_number} IS LIVE
+                        THIS WEEK&apos;S CHALLENGE
                       </span>
-                      <span className="text-[13px] text-zinc-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 5 days left</span>
+                      {liveDrop.sponsor_name && (
+                        <span className="flex items-center gap-1.5 text-[12px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
+                          <Award className="w-3.5 h-3.5" /> Sponsored by {liveDrop.sponsor_name}
+                        </span>
+                      )}
+                      <span className="text-[13px] text-zinc-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 6 days left</span>
                     </div>
 
                     <h2 className="text-2xl md:text-4xl font-black mb-3 tracking-tight text-white group-hover:text-blue-200 transition-colors">{liveDrop.title}</h2>
@@ -173,7 +202,9 @@ export default function HomePage() {
 
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                       <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Play className="w-4 h-4 text-blue-400" /> {liveDrop.duration_minutes} min lesson</span>
-                      <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> Cash prizes</span>
+                      {liveDrop.prize_amount > 0 && (
+                        <span className="flex items-center gap-2 text-[13px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> ${liveDrop.prize_amount} prize</span>
+                      )}
                       <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Users className="w-4 h-4 text-violet-400" /> {liveDrop.submissions_count} builders in</span>
                     </div>
 
@@ -239,12 +270,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Drop Timeline ───────────────────────────────────── */}
-      <section id="drops" className="py-24 px-6">
+      {/* ── Challenges ────────────────────────────────────────── */}
+      <section id="challenges" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">The roadmap</h2>
-            <p className="text-zinc-400 mt-4 text-[16px]">8 weeks. 8 real AI products. Here&apos;s what&apos;s dropping.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">Challenges</h2>
+            <p className="text-zinc-400 mt-4 text-[16px]">New challenge every week. Jump in anytime. Build your portfolio.</p>
           </div>
           <div className="space-y-3">
             {drops.map(drop => (
@@ -254,16 +285,22 @@ export default function HomePage() {
                   : 'bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]'
               }`} style={drop.status === 'live' ? { background: 'linear-gradient(to right, rgba(23,37,84,0.6), rgba(46,16,101,0.4))', boxShadow: '0 0 30px rgba(59,130,246,0.1)' } : undefined}>
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
-                  drop.status !== 'live' && drop.status === 'completed'
+                  drop.status === 'live'
+                    ? ''
+                    : drop.status === 'completed'
                     ? 'bg-white/[0.06]'
-                    : drop.status !== 'live'
-                    ? 'bg-white/[0.04] border border-white/[0.08]'
-                    : ''
+                    : 'bg-white/[0.04] border border-white/[0.08]'
                 }`} style={drop.status === 'live' ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' } : undefined}>
-                  <span className={`text-[15px] font-black ${drop.status === 'live' ? 'text-white' : drop.status === 'completed' ? 'text-zinc-500' : 'text-zinc-600'}`}>W{drop.week_number}</span>
+                  {drop.status === 'live' ? (
+                    <Zap className="w-6 h-6 text-white" />
+                  ) : drop.status === 'completed' ? (
+                    <CheckCircle2 className="w-6 h-6 text-zinc-500" />
+                  ) : (
+                    <Clock className="w-5 h-5 text-zinc-600" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                     <h3 className={`font-bold text-[15px] truncate transition-colors ${drop.status === 'live' ? 'text-white' : 'text-zinc-200 group-hover:text-white'}`}>{drop.title}</h3>
                     {drop.status === 'live' && (
                       <span className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full text-white font-bold shrink-0" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 12px rgba(99,102,241,0.3)' }}>
@@ -277,13 +314,18 @@ export default function HomePage() {
                     {drop.status === 'completed' && (
                       <CheckCircle2 className="w-4 h-4 text-zinc-600 shrink-0" />
                     )}
+                    {drop.sponsor_name && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold shrink-0">
+                        {drop.sponsor_name}
+                      </span>
+                    )}
                   </div>
                   <p className="text-[12px] text-zinc-500">{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
                 </div>
-                {drop.prize_per_entrant > 0 && (
+                {(drop.prize_amount > 0 || drop.prize_per_entrant > 0) && (
                   <div className="flex items-center gap-1.5 shrink-0">
                     <Trophy className="w-4 h-4 text-amber-400" />
-                    <span className="text-[14px] text-amber-400 font-bold">${drop.prize_per_entrant * 5}</span>
+                    <span className="text-[14px] text-amber-400 font-bold">${drop.prize_amount > 0 ? drop.prize_amount : drop.prize_per_entrant * 5}</span>
                   </div>
                 )}
                 <ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-white shrink-0 transition-colors group-hover:translate-x-0.5 transition-transform" />
@@ -318,8 +360,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Early Access ────────────────────────────────────── */}
-      <section id="early-access" className="py-24 px-6 relative">
+      {/* ── For Sponsors ─────────────────────────────────────── */}
+      <section id="sponsors" className="py-24 px-6 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-amber-600/[0.04] via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-4xl mx-auto relative">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">For Sponsors</h2>
+            <p className="text-zinc-400 mt-4 text-[16px] max-w-lg mx-auto">Put your brand in front of active AI builders. Fund challenges. Get first look at top talent.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5 mb-12">
+            {[
+              { icon: <Trophy className="w-7 h-7" />, title: 'Fund a Challenge', desc: 'Your brand sponsors a weekly AI challenge. Prize pool starts at $500. Your logo on every submission.', bg: 'linear-gradient(135deg, #f59e0b, #f97316)' },
+              { icon: <Users className="w-7 h-7" />, title: 'Access Talent', desc: 'Browse submissions from builders who ship. Hire the best directly. Skip the resume pile.', bg: 'linear-gradient(135deg, #3b82f6, #22d3ee)' },
+              { icon: <Sparkles className="w-7 h-7" />, title: 'Build Your Brand', desc: 'Every sponsored challenge gets your name in front of thousands of AI builders, creators, and founders.', bg: 'linear-gradient(135deg, #8b5cf6, #e879f9)' },
+            ].map((item, i) => (
+              <div key={i} className="rounded-3xl p-8 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg" style={{ background: item.bg }}>{item.icon}</div>
+                <h3 className="font-black text-[18px] text-white mb-3">{item.title}</h3>
+                <p className="text-[14px] text-zinc-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 h-14 px-8 text-[15px] font-bold rounded-2xl text-white transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', boxShadow: '0 0 30px rgba(245,158,11,0.2)' }}>
+              <Building2 className="w-5 h-5" /> Become a Sponsor <ArrowRight className="w-4 h-4" />
+            </a>
+            <p className="text-zinc-600 text-[13px] mt-4">Starting at $500/week. Custom packages available.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Final CTA ─────────────────────────────────────────── */}
+      <section className="py-24 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-blue-600/[0.06] via-violet-600/[0.03] to-transparent pointer-events-none" />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-blue-500/[0.08] to-transparent rounded-full blur-3xl pointer-events-none" />
 
@@ -328,31 +400,58 @@ export default function HomePage() {
             <span className="text-white">Stop watching.</span><br />
             <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Start building.</span>
           </h2>
-          <p className="text-zinc-400 mb-10 text-[17px] max-w-lg mx-auto leading-relaxed">Join builders who ship a new AI product every week. Early members get founding perks.</p>
+          <p className="text-zinc-400 mb-10 text-[17px] max-w-lg mx-auto leading-relaxed">New challenges drop every week. Join free. Build something real. Win cash.</p>
 
-          <WaitlistForm size="large" cta="Get Early Access" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+            <button onClick={handleExplore} className="w-full sm:w-auto h-14 px-8 text-[15px] font-bold rounded-2xl text-white inline-flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+              Start Building <ArrowRight className="w-4 h-4" />
+            </button>
+            <WaitlistForm cta="Get Notified" />
+          </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-[13px] text-zinc-500">
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> Free to join</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> No credit card</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> Founding member perks</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> New challenge every week</span>
           </div>
         </div>
       </section>
 
-      {/* ── Creator CTA ───────────────────────────────────────── */}
-      <section className="py-16 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="rounded-3xl p-10 bg-gradient-to-br from-violet-950/60 to-fuchsia-950/40 border border-violet-500/20 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.06] to-fuchsia-500/[0.04] pointer-events-none" />
-            <div className="relative text-center">
-              <div className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-5" style={{ background: 'linear-gradient(135deg, #8b5cf6, #d946ef)', boxShadow: '0 0 30px rgba(139,92,246,0.3)' }}>
-                <Users className="w-8 h-8 text-white" />
+      {/* ── Sponsors & Partners ──────────────────────────────── */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">Sponsors & Partners</h2>
+            <p className="text-zinc-400 mt-4 text-[16px]">Our sponsors fund weekly prize pools so builders get paid to learn.</p>
+          </div>
+          <div className="grid sm:grid-cols-1 md:grid-cols-1 gap-6 max-w-xl mx-auto">
+            {/* AITIM HOLDING */}
+            <div className="rounded-3xl p-8 bg-gradient-to-br from-amber-950/40 to-orange-950/30 border border-amber-500/20 relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.04] to-orange-500/[0.02] pointer-events-none" />
+              <div className="relative">
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-amber-500/10 border border-amber-500/20" style={{ boxShadow: '0 0 30px rgba(245,158,11,0.15)' }}>
+                    <Building2 className="w-8 h-8 text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-white">AITIM HOLDING</h3>
+                    <p className="text-[13px] text-amber-400 font-semibold">Title Sponsor</p>
+                  </div>
+                </div>
+                <p className="text-[15px] text-zinc-300 leading-relaxed mb-5">Sponsoring weekly AI challenges with <span className="text-amber-400 font-bold">$500 prize pools</span>. Building the next generation of AI builders through hands-on competition.</p>
+                <div className="flex flex-wrap gap-3">
+                  <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> $500/week prizes</span>
+                  <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Zap className="w-4 h-4 text-blue-400" /> AI Sales Agents</span>
+                  <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Rocket className="w-4 h-4 text-violet-400" /> Content AI</span>
+                </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-black mb-3 tracking-tight text-white">Run your own builder community</h3>
-              <p className="text-[15px] text-zinc-400 mb-7 max-w-md mx-auto leading-relaxed">We&apos;re opening the platform to select creators. Teach AI, vibe coding, no-code — whatever you&apos;re best at.</p>
-              <WaitlistForm cta="Request Creator Access" />
             </div>
+          </div>
+          <div className="text-center mt-10">
+            <p className="text-zinc-500 text-[14px] mb-4">Want to sponsor a challenge and reach AI builders?</p>
+            <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 text-[14px] font-bold text-white h-11 px-6 rounded-xl bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
+              <Building2 className="w-4 h-4" /> Become a Sponsor
+            </a>
           </div>
         </div>
       </section>
@@ -374,8 +473,8 @@ export default function HomePage() {
               <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">Product</h4>
               <ul className="space-y-2">
                 <li><a href="#how-it-works" className="text-[13px] text-zinc-600 hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#drops" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Weekly Drops</a></li>
-                <li><a href="#early-access" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Early Access</a></li>
+                <li><a href="#challenges" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Challenges</a></li>
+                <li><a href="#sponsors" className="text-[13px] text-zinc-600 hover:text-white transition-colors">For Sponsors</a></li>
               </ul>
             </div>
             <div>
