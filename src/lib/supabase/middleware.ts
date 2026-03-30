@@ -2,11 +2,20 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+  const path = request.nextUrl.pathname
+
   // Preview mode — lets visitors explore the app without signing in.
-  // Only allows read-only access to /c/ routes. Admin and profile are blocked.
   const isDemo = request.cookies.get('demo_mode')?.value === 'true'
+
+  // Public community routes — auto-enable demo mode for unauthenticated visitors
+  const isPublicCommunityRoute = /^\/c\/[^/]+\/(drops|dashboard|leaderboard|community)/.test(path)
+  if (isPublicCommunityRoute && !isDemo) {
+    const response = NextResponse.next({ request })
+    response.cookies.set('demo_mode', 'true', { path: '/', maxAge: 86400 })
+    return response
+  }
+
   if (isDemo) {
-    const path = request.nextUrl.pathname
     // Block admin and profile in preview mode — those require real auth
     if (path.includes('/admin') || path.startsWith('/profile')) {
       const url = request.nextUrl.clone()
@@ -16,12 +25,19 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.next({ request })
   }
 
+  // If Supabase is not configured, allow all access in demo mode
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const response = NextResponse.next({ request })
+    response.cookies.set('demo_mode', 'true', { path: '/', maxAge: 86400 })
+    return response
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   try {
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       {
         cookies: {
           getAll() {
@@ -41,15 +57,6 @@ export async function updateSession(request: NextRequest) {
     )
 
     const { data: { user } } = await supabase.auth.getUser()
-
-    // Public routes within /c/ — allow anyone to view (sets demo mode automatically)
-    const path = request.nextUrl.pathname
-    const isPublicCommunityRoute = path.match(/^\/c\/[^/]+\/(drops|dashboard|leaderboard|community)/)
-    if (isPublicCommunityRoute && !user) {
-      const response = NextResponse.next({ request })
-      response.cookies.set('demo_mode', 'true', { path: '/', maxAge: 86400 })
-      return response
-    }
 
     // Protected routes
     const protectedPaths = ['/c/', '/profile']
