@@ -65,13 +65,31 @@ async function findOrCreateOAuthUser(email, fullName, provider, providerId) {
 }
 
 // ── Middleware ───────────────────────────────────────────────────
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://alt-ai-labs.vercel.app',
+  'https://altaihub.com',
+  'http://localhost:3000',
+].filter(Boolean)
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true)
+    cb(null, false)
+  },
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   credentials: true,
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true })) // Apple sends form-encoded POST
+
+// ── Apple Domain Verification ───────────────────────────────────
+app.get('/.well-known/apple-developer-domain-association.txt', (req, res) => {
+  const filePath = require('path').join(__dirname, '.well-known', 'apple-developer-domain-association.txt')
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).send('Verification file not found')
+  })
+})
 
 // ── Health ──────────────────────────────────────────────────────
 app.get('/api/health', async (req, res) => {
