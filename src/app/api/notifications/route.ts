@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
 
+export const dynamic = 'force-static'
+
 // GET /api/notifications — get user's notifications
 export async function GET(request: NextRequest) {
   try {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
 
+export const dynamic = 'force-static'
+
 // POST /api/progress — mark a drop as watched
 export async function POST(request: NextRequest) {
   try {

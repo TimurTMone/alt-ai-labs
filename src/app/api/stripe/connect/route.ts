@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
 
+export const dynamic = 'force-static'
+
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
 }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
 
+export const dynamic = 'force-static'
+
 // PATCH /api/profile — update current user's profile
 export async function PATCH(request: NextRequest) {
   try {

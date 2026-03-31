@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
 
+export const dynamic = 'force-static'
+
 const PLATFORM_FEE_PCT = 15
 
 // POST /api/judge — submit judge score (1-10)
