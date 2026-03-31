@@ -1,11 +1,11 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
-const crypto = require('crypto')
+
 const { Pool } = require('pg')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const appleSignin = require('apple-signin-auth')
+
 const { OAuth2Client } = require('google-auth-library')
 
 const app = express()
@@ -40,20 +40,12 @@ function verifyToken(req) {
   }
 }
 
-async function findOrCreateOAuthUser(email, fullName, provider, providerId) {
+async function findOrCreateOAuthUser(email, fullName) {
   const normalized = email.toLowerCase().trim()
   const existing = await pool.query('SELECT * FROM profiles WHERE email = $1', [normalized])
 
   if (existing.rows.length > 0) {
-    const user = existing.rows[0]
-    // Update provider info if not set
-    if (!user[`${provider}_id`]) {
-      await pool.query(
-        `UPDATE profiles SET ${provider}_id = $1, updated_at = NOW() WHERE id = $2`,
-        [providerId, user.id]
-      ).catch(() => {}) // Column might not exist yet, that's fine
-    }
-    return user
+    return existing.rows[0]
   }
 
   const result = await pool.query(
@@ -81,15 +73,7 @@ app.use(cors({
   credentials: true,
 }))
 app.use(express.json())
-app.use(express.urlencoded({ extended: true })) // Apple sends form-encoded POST
-
-// ── Apple Domain Verification ───────────────────────────────────
-app.get('/.well-known/apple-developer-domain-association.txt', (req, res) => {
-  const filePath = require('path').join(__dirname, '.well-known', 'apple-developer-domain-association.txt')
-  res.sendFile(filePath, (err) => {
-    if (err) res.status(404).send('Verification file not found')
-  })
-})
+app.use(express.urlencoded({ extended: true }))
 
 // ── Health ──────────────────────────────────────────────────────
 app.get('/api/health', async (req, res) => {
@@ -181,7 +165,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     const user = result.rows[0]
     if (!user.password_hash) {
-      return res.status(401).json({ error: 'This account uses Apple or Google sign-in' })
+      return res.status(401).json({ error: 'This account uses Google sign-in' })
     }
 
     const valid = await bcrypt.compare(password, user.password_hash)
@@ -212,66 +196,6 @@ app.get('/api/auth/me', async (req, res) => {
   } catch (err) {
     console.error('Auth me error:', err)
     res.status(500).json({ error: 'Something went wrong' })
-  }
-})
-
-// ═══════════════════════════════════════════════════════════════
-// AUTH — Apple Sign In
-// ═══════════════════════════════════════════════════════════════
-
-// Step 1: Frontend redirects here → we redirect to Apple
-app.get('/api/auth/apple', (req, res) => {
-  const state = crypto.randomBytes(16).toString('hex')
-  const params = new URLSearchParams({
-    response_type: 'code id_token',
-    response_mode: 'form_post',
-    client_id: process.env.APPLE_SERVICE_ID || '',
-    redirect_uri: `${process.env.API_URL || `http://localhost:${PORT}`}/api/auth/apple/callback`,
-    scope: 'name email',
-    state,
-  })
-  res.redirect(`https://appleid.apple.com/auth/authorize?${params}`)
-})
-
-// Step 2: Apple POSTs back here with code + id_token
-app.post('/api/auth/apple/callback', async (req, res) => {
-  try {
-    const { code, id_token, user: appleUser } = req.body
-
-    if (!id_token && !code) {
-      return res.redirect(`${FRONTEND_URL}/login?error=apple_auth_failed`)
-    }
-
-    // Verify the identity token from Apple
-    const payload = await appleSignin.verifyIdToken(id_token, {
-      audience: process.env.APPLE_SERVICE_ID,
-      ignoreExpiration: false,
-    })
-
-    const email = payload.email
-    if (!email) {
-      return res.redirect(`${FRONTEND_URL}/login?error=apple_no_email`)
-    }
-
-    // Apple only sends user info on FIRST sign-in — parse it if available
-    let fullName = null
-    if (appleUser) {
-      try {
-        const parsed = typeof appleUser === 'string' ? JSON.parse(appleUser) : appleUser
-        if (parsed.name) {
-          fullName = [parsed.name.firstName, parsed.name.lastName].filter(Boolean).join(' ')
-        }
-      } catch {}
-    }
-
-    const user = await findOrCreateOAuthUser(email, fullName, 'apple', payload.sub)
-    const token = signToken(user)
-
-    // Redirect to frontend with token
-    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`)
-  } catch (err) {
-    console.error('Apple OAuth error:', err)
-    res.redirect(`${FRONTEND_URL}/login?error=apple_auth_failed`)
   }
 })
 
@@ -310,7 +234,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
     }
 
     const fullName = payload.name || null
-    const user = await findOrCreateOAuthUser(email, fullName, 'google', payload.sub)
+    const user = await findOrCreateOAuthUser(email, fullName)
     const token = signToken(user)
 
     res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`)
