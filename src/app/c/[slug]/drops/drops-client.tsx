@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Play, Trophy, CheckCircle2 } from 'lucide-react'
+import { Play, Trophy, CheckCircle2, Clock, Users, Award, Zap, ChevronRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { AppLayout } from '@/components/layout/app-layout'
-import { DIFFICULTY_COLORS, DROP_STATUS_COLORS, calculatePrizePool } from '@/lib/constants'
+import { DIFFICULTY_COLORS, calculatePrizePool } from '@/lib/constants'
 import type { Community, WeeklyDrop, DropProgress } from '@/types/database'
 
 interface DropsClientProps {
@@ -22,30 +22,68 @@ export function DropsClient({ community, drops, progress }: DropsClientProps) {
   function DropCard({ drop }: { drop: WeeklyDrop }) {
     const dropProgress = progress.find(p => p.drop_id === drop.id)
     const isLive = drop.status === 'live'
+    const hasVideo = !!drop.video_url
     return (
-      <Link href={`${base}/drops/${drop.slug}`} className={`group block rounded-2xl p-5 glass hover:bg-white/[0.04] transition-all duration-200 ${isLive ? 'glow-blue' : ''}`}>
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-[11px] font-bold text-zinc-600 tracking-widest">WEEK {drop.week_number}</span>
-          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 rounded-md ${DROP_STATUS_COLORS[drop.status]}`}>
-            {isLive && <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse mr-1" />}{drop.status}
-          </Badge>
-          {!drop.is_free && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md bg-blue-500/10 text-blue-400 border-blue-500/20">Featured</Badge>}
+      <Link href={`${base}/drops/${drop.slug}`} className={`group block rounded-2xl overflow-hidden glass hover:bg-white/[0.04] transition-all duration-200 ${isLive ? 'glow-blue border-blue-500/20' : ''}`}>
+        <div className="p-5">
+          {/* Top row: week + badges */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs font-semibold text-zinc-600 tracking-wider">W{drop.week_number}</span>
+            {isLive ? (
+              <Badge variant="outline" className="text-xs px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5" />Live
+              </Badge>
+            ) : drop.status === 'upcoming' ? (
+              <Badge variant="outline" className="text-xs px-2 py-0.5 rounded-lg bg-white/[0.04] text-zinc-500 border-white/[0.08]">Coming Soon</Badge>
+            ) : (
+              <Badge variant="outline" className="text-xs px-2 py-0.5 rounded-lg bg-white/[0.04] text-zinc-600 border-white/[0.06]">Completed</Badge>
+            )}
+            <Badge variant="outline" className={`text-xs px-2 py-0.5 rounded-lg ${DIFFICULTY_COLORS[drop.difficulty]}`}>{drop.difficulty}</Badge>
+            {drop.sponsor_name && (
+              <Badge variant="outline" className="text-xs px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 border-amber-500/20 ml-auto">
+                <Award className="w-3 h-3 mr-1" />${drop.prize_amount}
+              </Badge>
+            )}
+          </div>
+
+          {/* Title + description */}
+          <h3 className="font-semibold text-base mb-1.5 text-zinc-200 group-hover:text-white transition-colors leading-snug">{drop.title}</h3>
+          <p className="text-xs text-zinc-500 line-clamp-2 mb-4 leading-relaxed">{drop.description}</p>
+
+          {/* Meta row */}
+          <div className="flex items-center gap-3 text-xs text-zinc-500">
+            {drop.creator_name && (
+              <span className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-gradient-brand flex items-center justify-center text-[8px] font-bold text-white">
+                  {drop.creator_name.split(' ').map(w => w[0]).join('')}
+                </div>
+                {drop.creator_name}
+              </span>
+            )}
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {drop.duration_minutes}m</span>
+            {hasVideo ? (
+              <span className="flex items-center gap-1 text-blue-400"><Play className="w-3 h-3" /> Video</span>
+            ) : (
+              <span className="flex items-center gap-1 text-zinc-600"><Play className="w-3 h-3" /> No video yet</span>
+            )}
+            {drop.submissions_count > 0 && <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {drop.submissions_count}</span>}
+            {!drop.sponsor_name && drop.prize_per_entrant > 0 && (() => {
+              const p = calculatePrizePool(drop.submissions_count, drop.prize_per_entrant, drop.min_entrants_for_prize)
+              return <span className={`flex items-center gap-1 ml-auto ${p.isActive ? 'text-amber-400' : ''}`}><Trophy className="w-3 h-3" /> ${p.isActive ? p.currentPool : `${p.currentPool}/${p.targetPool}`}</span>
+            })()}
+          </div>
         </div>
-        <h3 className="font-semibold text-[15px] mb-1.5 group-hover:text-white transition-colors">{drop.title}</h3>
-        <p className="text-[12px] text-zinc-500 line-clamp-2 mb-4">{drop.description}</p>
-        <div className="flex items-center gap-3 text-[11px] text-zinc-500">
-          <span className="flex items-center gap-1"><Play className="w-3 h-3" /> {drop.duration_minutes} min</span>
-          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 rounded-md ${DIFFICULTY_COLORS[drop.difficulty]}`}>{drop.difficulty}</Badge>
-          {drop.prize_per_entrant > 0 && (() => {
-            const p = calculatePrizePool(drop.submissions_count, drop.prize_per_entrant, drop.min_entrants_for_prize)
-            return <span className={`flex items-center gap-1 ${p.isActive ? 'text-amber-400' : 'text-zinc-500'}`}><Trophy className="w-3 h-3" /> {p.isActive ? `$${p.currentPool}` : `$${p.currentPool}/$${p.targetPool}`}</span>
-          })()}
-          {drop.status !== 'upcoming' && <span className="ml-auto">{drop.submissions_count} builds</span>}
-        </div>
+
+        {/* Progress bar if user has progress */}
         {dropProgress && (
-          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-white/[0.06]">
-            <span className={`flex items-center gap-1 text-[11px] ${dropProgress.watched ? 'text-blue-400' : 'text-zinc-600'}`}><CheckCircle2 className="w-3 h-3" /> Watched</span>
-            <span className={`flex items-center gap-1 text-[11px] ${dropProgress.submitted ? 'text-blue-400' : 'text-zinc-600'}`}><CheckCircle2 className="w-3 h-3" /> Submitted</span>
+          <div className="flex items-center gap-4 px-5 py-3 border-t border-white/[0.06] bg-white/[0.01]">
+            <span className={`flex items-center gap-1.5 text-xs ${dropProgress.watched ? 'text-blue-400' : 'text-zinc-600'}`}>
+              <CheckCircle2 className="w-3.5 h-3.5" /> Watched
+            </span>
+            <span className={`flex items-center gap-1.5 text-xs ${dropProgress.submitted ? 'text-emerald-400' : 'text-zinc-600'}`}>
+              <CheckCircle2 className="w-3.5 h-3.5" /> Submitted
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-700 ml-auto group-hover:text-white transition-colors" />
           </div>
         )}
       </Link>
@@ -55,24 +93,33 @@ export function DropsClient({ community, drops, progress }: DropsClientProps) {
   return (
     <AppLayout>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Weekly Drops</h1>
-        <p className="text-[13px] text-zinc-500 mt-1">Watch the lesson. Do the challenge. Ship.</p>
+        <h1 className="text-2xl font-bold tracking-tight">Challenges</h1>
+        <p className="text-sm text-zinc-500 mt-1">Watch the lesson. Build the challenge. Ship and win.</p>
       </div>
+
       {live.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-[12px] font-semibold text-blue-400 mb-3 flex items-center gap-2 uppercase tracking-wider"><span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" /> Live Now</h2>
+          <h2 className="text-xs font-semibold text-emerald-400 mb-3 flex items-center gap-2 uppercase tracking-wider">
+            <Zap className="w-3.5 h-3.5" /> Live Now — {live.length} active challenge{live.length > 1 ? 's' : ''}
+          </h2>
           <div className="grid md:grid-cols-2 gap-3">{live.map(d => <DropCard key={d.id} drop={d} />)}</div>
         </div>
       )}
+
       {upcoming.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-[12px] font-semibold text-blue-400 mb-3 uppercase tracking-wider">Coming Up</h2>
+          <h2 className="text-xs font-semibold text-zinc-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+            <Clock className="w-3.5 h-3.5" /> Coming Up
+          </h2>
           <div className="grid md:grid-cols-2 gap-3">{upcoming.map(d => <DropCard key={d.id} drop={d} />)}</div>
         </div>
       )}
+
       {completed.length > 0 && (
         <div>
-          <h2 className="text-[12px] font-semibold text-zinc-500 mb-3 uppercase tracking-wider">Past Drops</h2>
+          <h2 className="text-xs font-semibold text-zinc-600 mb-3 uppercase tracking-wider flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Past Challenges
+          </h2>
           <div className="grid md:grid-cols-2 gap-3">{completed.map(d => <DropCard key={d.id} drop={d} />)}</div>
         </div>
       )}
