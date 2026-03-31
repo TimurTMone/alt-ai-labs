@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, CheckCircle2, Loader2, ChevronRight, Play, Trophy, Users, Sparkles, Zap, Bot, Code2, Rocket, Clock, Building2, Award } from 'lucide-react'
-import { getDropsForCommunity } from '@/lib/mock-data'
 import { DEFAULT_COMMUNITY_ID, DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
+import type { Drop } from '@/types/database'
 
 /* ── API URL ───────────────────────────────────────────────────── */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
@@ -67,10 +67,19 @@ function AnimatedCounter({ target }: { target: number }) {
 
 /* ── Main Page ─────────────────────────────────────────────────── */
 export default function HomePage() {
-  const drops = getDropsForCommunity(DEFAULT_COMMUNITY_ID)
+  const [drops, setDrops] = useState<Drop[]>([])
+  const router = useRouter()
+
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_API_URL || ''
+    fetch(`${url}/api/challenges?community_id=${DEFAULT_COMMUNITY_ID}`)
+      .then(r => r.ok ? r.json() : { challenges: [] })
+      .then(d => setDrops(d.challenges || []))
+      .catch(() => {})
+  }, [])
+
   const liveDrop = drops.find(d => d.status === 'live')
   const totalSubmissions = drops.reduce((a, d) => a + d.submissions_count, 0)
-  const router = useRouter()
 
   const handleExplore = () => {
     document.cookie = 'demo_mode=true; path=/; max-age=86400'

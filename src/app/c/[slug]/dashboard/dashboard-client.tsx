@@ -8,11 +8,11 @@ import { OnboardingOverlay } from '@/components/onboarding/onboarding-overlay'
 import { WelcomeToast } from '@/components/onboarding/welcome-toast'
 import { DIFFICULTY_COLORS, calculatePrizePool, getBuilderLevel } from '@/lib/constants'
 import { formatDistanceToNow } from 'date-fns'
-import type { Community, WeeklyDrop, Profile, DropProgress, Post, LeaderboardEntry } from '@/types/database'
+import type { Community, Drop, Profile, DropProgress, Post, LeaderboardEntry } from '@/types/database'
 
 interface DashboardClientProps {
   community: Community
-  drops: WeeklyDrop[]
+  drops: Drop[]
   profile: Profile
   progress: DropProgress[]
   posts: Post[]
@@ -80,7 +80,7 @@ export function DashboardClient({ community, drops, profile, progress, posts, le
               <div className="flex items-center gap-2.5 mb-4">
                 <span className="flex items-center gap-1.5 text-[12px] font-semibold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                  Week {currentDrop.week_number} — LIVE
+                  LIVE
                 </span>
                 <span className="text-[12px] text-zinc-500 ml-auto flex items-center gap-1"><Clock className="w-3 h-3" /> {formatDistanceToNow(new Date(currentDrop.challenge_deadline))} left</span>
               </div>
@@ -179,7 +179,7 @@ export function DashboardClient({ community, drops, profile, progress, posts, le
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-medium truncate group-hover:text-white transition-colors">{drop.title}</p>
-                      <p className="text-[11px] text-zinc-600">Week {drop.week_number} · {drop.difficulty}</p>
+                      <p className="text-[11px] text-zinc-600">{drop.difficulty}</p>
                     </div>
                   </Link>
                 )

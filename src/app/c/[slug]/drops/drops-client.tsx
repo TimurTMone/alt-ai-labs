@@ -5,11 +5,11 @@ import { Play, Trophy, CheckCircle2, Clock, Users, Award, Zap, ChevronRight } fr
 import { Badge } from '@/components/ui/badge'
 import { AppLayout } from '@/components/layout/app-layout'
 import { DIFFICULTY_COLORS, calculatePrizePool } from '@/lib/constants'
-import type { Community, WeeklyDrop, DropProgress } from '@/types/database'
+import type { Community, Drop, DropProgress } from '@/types/database'
 
 interface DropsClientProps {
   community: Community
-  drops: WeeklyDrop[]
+  drops: Drop[]
   progress: DropProgress[]
 }
 
@@ -19,7 +19,7 @@ export function DropsClient({ community, drops, progress }: DropsClientProps) {
   const upcoming = drops.filter(d => d.status === 'upcoming')
   const completed = drops.filter(d => d.status === 'completed')
 
-  function DropCard({ drop }: { drop: WeeklyDrop }) {
+  function DropCard({ drop }: { drop: Drop }) {
     const dropProgress = progress.find(p => p.drop_id === drop.id)
     const isLive = drop.status === 'live'
     const hasVideo = !!drop.video_url
@@ -28,7 +28,7 @@ export function DropsClient({ community, drops, progress }: DropsClientProps) {
         <div className="p-5">
           {/* Top row: week + badges */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-semibold text-zinc-600 tracking-wider">W{drop.week_number}</span>
+            <span className="text-xs font-semibold text-zinc-600 tracking-wider">{drop.difficulty}</span>
             {isLive ? (
               <Badge variant="outline" className="text-xs px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5" />Live

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
+import { getSession, getAuthToken } from '@/lib/auth/server'
 
-export const dynamic = 'force-static'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
-// GET /api/notifications — get user's notifications
+// GET /api/notifications
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession()
@@ -11,33 +11,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20')
-    const supabase = await createServerSupabaseClient()
+    const token = await getAuthToken()
+    const limit = request.nextUrl.searchParams.get('limit') || '20'
 
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .order('created_at', { ascending: false })
-      .limit(limit)
+    const res = await fetch(`${API_URL}/api/notifications?limit=${limit}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
 
-    if (error) throw error
+    if (!res.ok) {
+      return NextResponse.json({ notifications: [], unreadCount: 0 })
+    }
 
-    // Count unread
-    const { count } = await supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', session.user.id)
-      .eq('read', false)
-
-    return NextResponse.json({ notifications: data, unreadCount: count || 0 })
+    const data = await res.json()
+    return NextResponse.json(data)
   } catch (error) {
     console.error('Notifications error:', error)
-    return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 })
+    return NextResponse.json({ notifications: [], unreadCount: 0 })
   }
 }
 
-// PATCH /api/notifications — mark notifications as read
+// PATCH /api/notifications — mark as read
 export async function PATCH(request: NextRequest) {
   try {
     const session = await getSession()
@@ -45,24 +38,20 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { ids } = await request.json() // array of notification IDs, or 'all'
-    const supabase = await createServerSupabaseClient()
+    const token = await getAuthToken()
+    const body = await request.json()
 
-    if (ids === 'all') {
-      await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('user_id', session.user.id)
-        .eq('read', false)
-    } else if (Array.isArray(ids)) {
-      await supabase
-        .from('notifications')
-        .update({ read: true })
-        .in('id', ids)
-        .eq('user_id', session.user.id)
-    }
+    const res = await fetch(`${API_URL}/api/notifications`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    })
 
-    return NextResponse.json({ success: true })
+    const data = await res.json()
+    return NextResponse.json(data, { status: res.status })
   } catch (error) {
     console.error('Mark read error:', error)
     return NextResponse.json({ error: 'Failed to mark as read' }, { status: 500 })

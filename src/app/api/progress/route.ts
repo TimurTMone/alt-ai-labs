@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
+import { getSession, getAuthToken } from '@/lib/auth/server'
 
-export const dynamic = 'force-static'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
-// POST /api/progress — mark a drop as watched
+// POST /api/progress — proxy to Render backend
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession()
@@ -11,46 +11,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { drop_id } = await request.json()
-    if (!drop_id) {
-      return NextResponse.json({ error: 'drop_id required' }, { status: 400 })
-    }
+    const token = await getAuthToken()
+    const body = await request.json()
 
-    const supabase = await createServerSupabaseClient()
+    const res = await fetch(`${API_URL}/api/progress`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    })
 
-    const { data, error } = await supabase
-      .from('drop_progress')
-      .upsert({
-        user_id: session.user.id,
-        drop_id,
-        watched: true,
-        watched_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,drop_id' })
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Progress error:', error)
-      return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 })
-    }
-
-    // Award 5 points for watching (only once)
-    const { data: existingPoints } = await supabase
-      .from('leaderboard_points')
-      .select('id')
-      .eq('user_id', session.user.id)
-      .eq('reason', `watched:${drop_id}`)
-      .single()
-
-    if (!existingPoints) {
-      await supabase.from('leaderboard_points').insert({
-        user_id: session.user.id,
-        points: 5,
-        reason: `watched:${drop_id}`,
-      })
-    }
-
-    return NextResponse.json({ progress: data })
+    const data = await res.json()
+    return NextResponse.json(data, { status: res.status })
   } catch (error) {
     console.error('Progress error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
-
-export const dynamic = 'force-static'
+import { getSession, getAuthToken, getProfile } from '@/lib/auth/server'
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
@@ -17,34 +15,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createServerSupabaseClient()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('stripe_connect_id, email')
-      .eq('id', session.user.id)
-      .single()
+    const profile = await getProfile()
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
 
-    let connectId = profile?.stripe_connect_id
+    let connectId = profile.stripe_connect_id
 
     if (!connectId) {
-      // Create Express connected account
       const account = await stripe.accounts.create({
         type: 'express',
-        email: profile?.email || session.user.email,
-        metadata: { supabase_user_id: session.user.id },
+        email: profile.email || session.user.email,
+        metadata: { user_id: session.user.id },
         capabilities: {
           transfers: { requested: true },
         },
       })
       connectId = account.id
 
-      await supabase
-        .from('profiles')
-        .update({ stripe_connect_id: connectId })
-        .eq('id', session.user.id)
+      const token = await getAuthToken()
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ stripe_connect_id: connectId }),
+      })
     }
 
-    // Create onboarding link
     const accountLink = await stripe.accountLinks.create({
       account: connectId,
       refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/profile?connect=refresh`,

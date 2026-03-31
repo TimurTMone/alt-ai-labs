@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Alt AI Labs',
   webDir: 'out',
   server: {
-    url: 'https://altaihub.com',
+    url: 'https://alt-ai-labs.vercel.app',
     cleartext: false,
   },
   ios: {

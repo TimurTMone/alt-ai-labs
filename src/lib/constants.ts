@@ -1,5 +1,5 @@
 export const APP_NAME = 'Alt AI Labs'
-export const APP_DESCRIPTION = 'Watch the lesson. Build the challenge. Ship every week.'
+export const APP_DESCRIPTION = 'Watch the lesson. Build the challenge. Ship it.'
 
 // ── Default community (used across pages that reference the primary community) ──
 export const DEFAULT_COMMUNITY_ID = 'community-001'
@@ -81,7 +81,7 @@ export const PRICING = {
     earlyAccessHours: 0,
     entryDiscount: 0,
     features: [
-      'Access to free weekly drops',
+      'Access to free drops',
       'Join public community',
       'Submit to free challenges',
       'Leaderboard access',
@@ -94,7 +94,7 @@ export const PRICING = {
     earlyAccessHours: 24,
     entryDiscount: 10,
     features: [
-      'All weekly drops unlocked',
+      'All drops unlocked',
       'Access to paid challenges',
       'Eligible for cash prizes',
       '24hr early access to new drops',

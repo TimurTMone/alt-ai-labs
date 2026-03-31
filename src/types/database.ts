@@ -32,10 +32,9 @@ export interface Profile {
 }
 
 // The core unit: you drop a video + challenge together each week
-export interface WeeklyDrop {
+export interface Drop {
   id: string
   community_id: string
-  week_number: number
   title: string
   slug: string
   description: string

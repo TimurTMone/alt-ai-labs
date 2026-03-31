@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
+import { getSession, getAuthToken } from '@/lib/auth/server'
 
-export const dynamic = 'force-static'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
-// POST /api/votes — cast a community vote (1 per user per challenge)
+// POST /api/votes — proxy to Render backend
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession()
@@ -11,57 +11,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { challengeId, entryId } = await request.json()
-    if (!challengeId || !entryId) {
-      return NextResponse.json({ error: 'Missing challengeId or entryId' }, { status: 400 })
-    }
+    const token = await getAuthToken()
+    const body = await request.json()
 
-    const supabase = await createServerSupabaseClient()
-
-    // Verify challenge is in voting phase
-    const { data: challenge } = await supabase
-      .from('challenges')
-      .select('status')
-      .eq('id', challengeId)
-      .single()
-
-    if (!challenge || challenge.status !== 'voting') {
-      return NextResponse.json({ error: 'Challenge is not in voting phase' }, { status: 400 })
-    }
-
-    // Prevent self-voting
-    const { data: entry } = await supabase
-      .from('challenge_submissions')
-      .select('user_id')
-      .eq('id', entryId)
-      .single()
-
-    if (entry?.user_id === session.user.id) {
-      return NextResponse.json({ error: 'Cannot vote for your own entry' }, { status: 403 })
-    }
-
-    // Insert vote (unique constraint handles duplicates)
-    const { error } = await supabase.from('votes').insert({
-      challenge_id: challengeId,
-      entry_id: entryId,
-      user_id: session.user.id,
+    const res = await fetch(`${API_URL}/api/votes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
     })
 
-    if (error) {
-      if (error.code === '23505') { // unique violation
-        return NextResponse.json({ error: 'Already voted in this challenge' }, { status: 409 })
-      }
-      throw error
-    }
-
-    return NextResponse.json({ success: true })
+    const data = await res.json()
+    return NextResponse.json(data, { status: res.status })
   } catch (error) {
     console.error('Vote error:', error)
     return NextResponse.json({ error: 'Failed to cast vote' }, { status: 500 })
   }
 }
 
-// DELETE /api/votes — remove vote
+// DELETE /api/votes
 export async function DELETE(request: NextRequest) {
   try {
     const session = await getSession()
@@ -69,15 +39,20 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { challengeId } = await request.json()
-    const supabase = await createServerSupabaseClient()
+    const token = await getAuthToken()
+    const body = await request.json()
 
-    await supabase.from('votes')
-      .delete()
-      .eq('challenge_id', challengeId)
-      .eq('user_id', session.user.id)
+    const res = await fetch(`${API_URL}/api/votes`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    })
 
-    return NextResponse.json({ success: true })
+    const data = await res.json()
+    return NextResponse.json(data, { status: res.status })
   } catch (error) {
     console.error('Unvote error:', error)
     return NextResponse.json({ error: 'Failed to remove vote' }, { status: 500 })

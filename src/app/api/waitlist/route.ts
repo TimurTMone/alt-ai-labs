@@ -1,37 +1,19 @@
-import { kv } from '@vercel/kv'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://alt-ai-labs-api.onrender.com'
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json()
-
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
-    }
-
-    const normalizedEmail = email.toLowerCase().trim()
-
-    // Check if already on waitlist
-    const exists = await kv.sismember('waitlist', normalizedEmail)
-    if (exists) {
-      return NextResponse.json({ message: "You're already on the list!" })
-    }
-
-    // Add to waitlist set + store timestamp
-    await kv.sadd('waitlist', normalizedEmail)
-    await kv.hset('waitlist:details', {
-      [normalizedEmail]: JSON.stringify({
-        email: normalizedEmail,
-        joined_at: new Date().toISOString(),
-      }),
+    const body = await request.json()
+    const res = await fetch(`${API_URL}/api/waitlist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     })
-
-    // Get total count
-    const count = await kv.scard('waitlist')
-
-    return NextResponse.json({ message: "You're in!", count })
+    const data = await res.json()
+    return NextResponse.json(data, { status: res.status })
   } catch {
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }
@@ -39,8 +21,9 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const count = await kv.scard('waitlist')
-    return NextResponse.json({ count })
+    const res = await fetch(`${API_URL}/api/waitlist`)
+    const data = await res.json()
+    return NextResponse.json(data)
   } catch {
     return NextResponse.json({ count: 0 })
   }

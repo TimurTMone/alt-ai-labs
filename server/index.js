@@ -251,7 +251,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
 app.get('/api/challenges', async (req, res) => {
   try {
     const { community_id, status } = req.query
-    let query = 'SELECT * FROM weekly_drops'
+    let query = 'SELECT * FROM drops'
     const params = []
     const conditions = []
 
@@ -265,7 +265,7 @@ app.get('/api/challenges', async (req, res) => {
     }
 
     if (conditions.length > 0) query += ' WHERE ' + conditions.join(' AND ')
-    query += ' ORDER BY week_number ASC'
+    query += ' ORDER BY created_at DESC'
 
     const result = await pool.query(query, params)
     res.json({ challenges: result.rows })
@@ -277,7 +277,7 @@ app.get('/api/challenges', async (req, res) => {
 
 app.get('/api/challenges/:slug', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM weekly_drops WHERE slug = $1', [req.params.slug])
+    const result = await pool.query('SELECT * FROM drops WHERE slug = $1', [req.params.slug])
     if (result.rows.length === 0) return res.status(404).json({ error: 'Challenge not found' })
     res.json({ challenge: result.rows[0] })
   } catch (err) {
@@ -378,6 +378,222 @@ app.patch('/api/profile', async (req, res) => {
     res.json({ user: result.rows[0] })
   } catch (err) {
     console.error('Profile update error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// COMMUNITIES
+// ═══════════════════════════════════════════════════════════════
+
+app.get('/api/communities', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM communities ORDER BY created_at')
+    res.json({ communities: result.rows })
+  } catch (err) {
+    console.error('Communities error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.get('/api/communities/:slug', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM communities WHERE slug = $1', [req.params.slug])
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Community not found' })
+    res.json({ community: result.rows[0] })
+  } catch (err) {
+    console.error('Community detail error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// POSTS
+// ═══════════════════════════════════════════════════════════════
+
+app.get('/api/posts', async (req, res) => {
+  try {
+    const { community_id } = req.query
+    if (!community_id) return res.status(400).json({ error: 'community_id required' })
+
+    const result = await pool.query(
+      `SELECT p.*, row_to_json(pr.*) AS profile
+       FROM posts p
+       LEFT JOIN profiles pr ON p.user_id = pr.id
+       WHERE p.community_id = $1
+       ORDER BY p.is_pinned DESC, p.created_at DESC
+       LIMIT 50`,
+      [community_id]
+    )
+
+    // Strip password_hash from joined profile
+    const posts = result.rows.map(p => {
+      if (p.profile) delete p.profile.password_hash
+      return p
+    })
+
+    res.json({ posts })
+  } catch (err) {
+    console.error('Posts error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.post('/api/posts', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const { community_id, title, body, category, drop_id } = req.body
+    if (!community_id || !title || !body) {
+      return res.status(400).json({ error: 'community_id, title, and body required' })
+    }
+
+    const result = await pool.query(
+      `INSERT INTO posts (community_id, user_id, title, body, category, drop_id, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING *`,
+      [community_id, decoded.sub, title, body, category || 'builds', drop_id || null]
+    )
+    res.json({ post: result.rows[0] })
+  } catch (err) {
+    console.error('Create post error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// GROUPS
+// ═══════════════════════════════════════════════════════════════
+
+app.get('/api/groups', async (req, res) => {
+  try {
+    const { community_id } = req.query
+    if (!community_id) return res.status(400).json({ error: 'community_id required' })
+
+    const result = await pool.query(
+      `SELECT g.*, COUNT(gm.id)::int AS member_count
+       FROM groups g
+       LEFT JOIN group_members gm ON g.id = gm.group_id
+       WHERE g.community_id = $1
+       GROUP BY g.id
+       ORDER BY g.created_at`,
+      [community_id]
+    )
+    res.json({ groups: result.rows })
+  } catch (err) {
+    console.error('Groups error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════════════════
+
+app.get('/api/progress', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const { community_id } = req.query
+    if (!community_id) return res.status(400).json({ error: 'community_id required' })
+
+    // Get all drop IDs for this community, then find progress
+    const result = await pool.query(
+      `SELECT dp.* FROM drop_progress dp
+       JOIN drops wd ON dp.drop_id = wd.id
+       WHERE dp.user_id = $1 AND wd.community_id = $2`,
+      [decoded.sub, community_id]
+    )
+    res.json({ progress: result.rows })
+  } catch (err) {
+    console.error('Progress error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.post('/api/progress', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const { drop_id } = req.body
+    if (!drop_id) return res.status(400).json({ error: 'drop_id required' })
+
+    const result = await pool.query(
+      `INSERT INTO drop_progress (user_id, drop_id, watched, watched_at)
+       VALUES ($1, $2, true, NOW())
+       ON CONFLICT (user_id, drop_id)
+       DO UPDATE SET watched = true, watched_at = COALESCE(drop_progress.watched_at, NOW())
+       RETURNING *`,
+      [decoded.sub, drop_id]
+    )
+
+    // Award 5 points for watching (only once)
+    await pool.query(
+      `INSERT INTO leaderboard_points (user_id, points, reason)
+       SELECT $1, 5, $2
+       WHERE NOT EXISTS (SELECT 1 FROM leaderboard_points WHERE user_id = $1 AND reason = $2)`,
+      [decoded.sub, `watched:${drop_id}`]
+    )
+
+    res.json({ progress: result.rows[0] })
+  } catch (err) {
+    console.error('Progress update error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════
+
+app.get('/api/notifications', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50)
+
+    const result = await pool.query(
+      'SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2',
+      [decoded.sub, limit]
+    )
+
+    const countResult = await pool.query(
+      'SELECT COUNT(*)::int AS count FROM notifications WHERE user_id = $1 AND read = false',
+      [decoded.sub]
+    )
+
+    res.json({ notifications: result.rows, unreadCount: countResult.rows[0].count })
+  } catch (err) {
+    console.error('Notifications error:', err)
+    res.json({ notifications: [], unreadCount: 0 })
+  }
+})
+
+app.patch('/api/notifications', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const { ids } = req.body
+
+    if (ids === 'all') {
+      await pool.query(
+        'UPDATE notifications SET read = true WHERE user_id = $1 AND read = false',
+        [decoded.sub]
+      )
+    } else if (Array.isArray(ids) && ids.length > 0) {
+      await pool.query(
+        'UPDATE notifications SET read = true WHERE id = ANY($1) AND user_id = $2',
+        [ids, decoded.sub]
+      )
+    }
+
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Mark read error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
 })

@@ -10,11 +10,11 @@ import { Label } from '@/components/ui/label'
 import { AppLayout } from '@/components/layout/app-layout'
 import { DIFFICULTY_COLORS, calculatePrizePool } from '@/lib/constants'
 import { formatDistanceToNow } from 'date-fns'
-import type { Community, WeeklyDrop, DropProgress } from '@/types/database'
+import type { Community, Drop, DropProgress } from '@/types/database'
 
 interface DropDetailClientProps {
   community: Community
-  drop: WeeklyDrop
+  drop: Drop
   initialProgress: DropProgress | null
 }
 
@@ -96,7 +96,7 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
                 {drop.status === 'live' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5" />}
                 {drop.status === 'live' ? 'Live Now' : 'Coming Soon'}
               </Badge>
-              <span className="text-xs text-zinc-600">Week {drop.week_number}</span>
+              <span className="text-xs text-zinc-600">{drop.difficulty}</span>
               <Badge variant="outline" className={`text-xs px-2 py-0.5 rounded-lg ${DIFFICULTY_COLORS[drop.difficulty]}`}>{drop.difficulty}</Badge>
               {drop.sponsor_name && (
                 <Badge variant="outline" className="text-xs px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 border-amber-500/20 font-semibold">

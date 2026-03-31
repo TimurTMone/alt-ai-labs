@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
-
-export const dynamic = 'force-static'
+import { getSession, getAuthToken, getProfile } from '@/lib/auth/server'
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
@@ -17,74 +15,48 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const profile = await getProfile()
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
     const { challengeId, entryFee } = await request.json()
     if (!challengeId || !entryFee) {
       return NextResponse.json({ error: 'Missing challengeId or entryFee' }, { status: 400 })
     }
 
-    const supabase = await createServerSupabaseClient()
-
     // Get or create Stripe customer
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('stripe_customer_id, email, full_name')
-      .eq('id', session.user.id)
-      .single()
-
-    let customerId = profile?.stripe_customer_id
+    let customerId = profile.stripe_customer_id
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: profile?.email || session.user.email,
-        name: profile?.full_name || undefined,
-        metadata: { supabase_user_id: session.user.id },
+        email: profile.email || session.user.email,
+        name: profile.full_name || undefined,
+        metadata: { user_id: session.user.id },
       })
       customerId = customer.id
-      await supabase
-        .from('profiles')
-        .update({ stripe_customer_id: customerId })
-        .eq('id', session.user.id)
-    }
 
-    // Check for existing entry
-    const { data: existing } = await supabase
-      .from('entry_payments')
-      .select('id')
-      .eq('challenge_id', challengeId)
-      .eq('user_id', session.user.id)
-      .single()
-
-    if (existing) {
-      return NextResponse.json({ error: 'Already entered this challenge' }, { status: 409 })
-    }
-
-    // Get challenge details
-    const { data: challenge } = await supabase
-      .from('challenges')
-      .select('title, status')
-      .eq('id', challengeId)
-      .single()
-
-    if (!challenge || challenge.status !== 'active') {
-      return NextResponse.json({ error: 'Challenge not active' }, { status: 400 })
+      // Update profile with Stripe customer ID via Render backend
+      const token = await getAuthToken()
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ stripe_customer_id: customerId }),
+      })
     }
 
     // Apply tier discount
-    const { data: sub } = await supabase
-      .from('profiles')
-      .select('membership_tier')
-      .eq('id', session.user.id)
-      .single()
-
     let discountPct = 0
-    if (sub?.membership_tier === 'pro') discountPct = 10
-    if (sub?.membership_tier === 'elite') discountPct = 20
-    const finalFee = Math.round(entryFee * (1 - discountPct / 100) * 100) // cents
+    if (profile.membership_tier === 'pro') discountPct = 10
+    if (profile.membership_tier === 'elite') discountPct = 20
+    const finalFee = Math.round(entryFee * (1 - discountPct / 100) * 100)
 
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'payment',
       payment_intent_data: {
-        // Hold funds in escrow — capture manually after challenge closes
         capture_method: 'manual',
         metadata: {
           challenge_id: challengeId,
@@ -95,7 +67,7 @@ export async function POST(request: NextRequest) {
       line_items: [{
         price_data: {
           currency: 'usd',
-          product_data: { name: `Entry Fee: ${challenge.title}` },
+          product_data: { name: `Entry Fee` },
           unit_amount: finalFee,
         },
         quantity: 1,

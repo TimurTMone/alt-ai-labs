@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Play, MessageSquare, Medal, Users, User, Shield, LogOut, ChevronLeft, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCommunity } from '@/lib/community-context'
-import { createClient } from '@/lib/supabase/client'
+import { signOut } from '@/lib/auth/client'
 import { useRouter } from 'next/navigation'
 import { NotificationBell } from '@/components/challenge/notification-bell'
 
@@ -22,17 +22,15 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
 
   const navItems = community ? [
     { label: 'Dashboard', href: `${base}/dashboard`, icon: LayoutDashboard },
-    { label: 'Weekly Drops', href: `${base}/drops`, icon: Play },
+    { label: 'Drops', href: `${base}/drops`, icon: Play },
     { label: 'Classroom', href: `${base}/classroom`, icon: BookOpen },
     { label: 'Community', href: `${base}/community`, icon: MessageSquare },
     { label: 'Leaderboard', href: `${base}/leaderboard`, icon: Medal },
     { label: 'Groups', href: `${base}/groups`, icon: Users },
   ] : []
 
-  const handleSignOut = async () => {
-    document.cookie = 'demo_mode=; path=/; max-age=0'
-    const supabase = createClient()
-    await supabase.auth.signOut()
+  const handleSignOut = () => {
+    signOut()
     router.push('/')
     router.refresh()
   }

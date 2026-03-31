@@ -16,6 +16,14 @@ services:
         value: https://alt-ai-labs.vercel.app
       - key: NODE_ENV
         value: production
+      - key: API_URL
+        value: https://alt-ai-labs-api.onrender.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: APPLE_SERVICE_ID
+        sync: false
 
 databases:
   - name: alt-ai-labs-db

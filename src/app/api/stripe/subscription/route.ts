@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createServerSupabaseClient, getSession } from '@/lib/supabase/server'
-
-export const dynamic = 'force-static'
+import { getSession, getAuthToken, getProfile } from '@/lib/auth/server'
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
@@ -30,25 +28,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Stripe price not configured' }, { status: 500 })
     }
 
-    const supabase = await createServerSupabaseClient()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('stripe_customer_id, email, full_name')
-      .eq('id', session.user.id)
-      .single()
+    const profile = await getProfile()
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
 
-    let customerId = profile?.stripe_customer_id
+    let customerId = profile.stripe_customer_id
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: profile?.email || session.user.email,
-        name: profile?.full_name || undefined,
-        metadata: { supabase_user_id: session.user.id },
+        email: profile.email || session.user.email,
+        name: profile.full_name || undefined,
+        metadata: { user_id: session.user.id },
       })
       customerId = customer.id
-      await supabase
-        .from('profiles')
-        .update({ stripe_customer_id: customerId })
-        .eq('id', session.user.id)
+
+      const token = await getAuthToken()
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ stripe_customer_id: customerId }),
+      })
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?upgrade=cancelled`,
       subscription_data: {
         metadata: {
-          supabase_user_id: session.user.id,
+          user_id: session.user.id,
           tier,
         },
       },

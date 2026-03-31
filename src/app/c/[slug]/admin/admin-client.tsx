@@ -2,11 +2,11 @@
 
 import { Users, Play, Trophy, MessageSquare } from 'lucide-react'
 import { AppLayout } from '@/components/layout/app-layout'
-import type { Community, WeeklyDrop, Post, LeaderboardEntry, Profile } from '@/types/database'
+import type { Community, Drop, Post, LeaderboardEntry, Profile } from '@/types/database'
 
 interface AdminClientProps {
   community: Community
-  drops: WeeklyDrop[]
+  drops: Drop[]
   posts: Post[]
   leaderboard: (LeaderboardEntry & { profile: Profile; rank: number })[]
 }
@@ -36,11 +36,11 @@ export function AdminClient({ community, drops, posts, leaderboard }: AdminClien
         </div>
         <div className="grid lg:grid-cols-2 gap-4">
           <div className="rounded-2xl p-5 glass">
-            <h2 className="font-semibold text-[14px] mb-4">Weekly Drops</h2>
+            <h2 className="font-semibold text-[14px] mb-4">Drops</h2>
             <div className="space-y-1">
               {drops.map(drop => (
                 <div key={drop.id} className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-0">
-                  <div className="min-w-0"><p className="text-[13px] truncate">Week {drop.week_number}: {drop.title}</p><p className="text-[11px] text-zinc-600">{drop.submissions_count} submissions · ${drop.prize_amount} prize</p></div>
+                  <div className="min-w-0"><p className="text-[13px] truncate">{drop.title}</p><p className="text-[11px] text-zinc-600">{drop.submissions_count} submissions · ${drop.prize_amount} prize</p></div>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${drop.status === 'live' ? 'bg-blue-500/10 text-blue-400' : drop.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400' : 'bg-white/[0.04] text-zinc-600'}`}>{drop.status}</span>
                 </div>
               ))}
