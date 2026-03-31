@@ -44,12 +44,12 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
             <span className="text-sm font-bold text-white">{community ? community.name[0] : 'A'}</span>
           </div>
-          <span className="font-semibold text-[15px] text-white tracking-tight truncate">{community ? community.name : 'Alt AI Labs'}</span>
+          <span className="font-semibold text-sm text-white tracking-tight truncate">{community ? community.name : 'Alt AI Labs'}</span>
         </Link>
       </div>
 
       <div className="px-3 pt-3 pb-1">
-        <Link href="/" className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors">
+        <Link href="/" className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
           <ChevronLeft className="w-3 h-3" /> All Communities
         </Link>
       </div>
@@ -62,11 +62,11 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150',
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
                 isActive ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
               )}
             >
-              <item.icon className="w-[18px] h-[18px]" />
+              <item.icon className="w-4.5 h-4.5" />
               {item.label}
             </Link>
           )
@@ -75,19 +75,19 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
 
       <div className="px-3 py-4 space-y-0.5 border-t border-white/[0.06]">
         <div className="flex items-center justify-between px-3 py-2">
-          <span className="text-[11px] text-zinc-600 font-medium uppercase tracking-wider">Account</span>
+          <span className="text-xs text-zinc-600 font-medium uppercase tracking-wider">Account</span>
           <NotificationBell />
         </div>
         {isAdmin && community && (
-          <Link href={`${base}/admin`} className={cn('flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150', pathname.startsWith(`${base}/admin`) ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]')}>
-            <Shield className="w-[18px] h-[18px]" /> Admin
+          <Link href={`${base}/admin`} className={cn('flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150', pathname.startsWith(`${base}/admin`) ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]')}>
+            <Shield className="w-4.5 h-4.5" /> Admin
           </Link>
         )}
-        <Link href="/profile" className={cn('flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150', pathname === '/profile' ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]')}>
-          <User className="w-[18px] h-[18px]" /> Profile
+        <Link href="/profile" className={cn('flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150', pathname === '/profile' ? 'bg-white/[0.08] text-white' : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]')}>
+          <User className="w-4.5 h-4.5" /> Profile
         </Link>
-        <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all duration-150 w-full">
-          <LogOut className="w-[18px] h-[18px]" /> Sign Out
+        <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all duration-150 w-full">
+          <LogOut className="w-4.5 h-4.5" /> Sign Out
         </button>
       </div>
     </aside>

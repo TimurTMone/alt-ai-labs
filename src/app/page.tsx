@@ -32,7 +32,7 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access' }: { size?: '
     <div className="flex items-center gap-2 justify-center py-3">
       <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
         <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-        <span className="text-emerald-400 text-[15px] font-semibold">{message}</span>
+        <span className="text-emerald-400 text-sm font-semibold">{message}</span>
       </div>
     </div>
   )
@@ -42,12 +42,12 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access' }: { size?: '
   return (
     <div className="relative max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input type="email" placeholder="Enter your email address" value={email} onChange={e => setEmail(e.target.value)} required className={`w-full ${h} px-5 rounded-2xl bg-white/10 border-2 border-white/20 text-white text-[16px] placeholder:text-zinc-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 transition-all duration-200`} style={{ fontSize: '16px' }} />
-        <button type="submit" disabled={status === 'loading'} className={`w-full ${h} px-7 text-[15px] font-bold rounded-2xl shrink-0 text-white transition-all duration-300 inline-flex items-center justify-center gap-2 disabled:opacity-50`} style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+        <input type="email" placeholder="Enter your email address" value={email} onChange={e => setEmail(e.target.value)} required className={`w-full ${h} px-5 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white text-base placeholder:text-zinc-500 focus:outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200`} style={{ fontSize: '16px' }} />
+        <button type="submit" disabled={status === 'loading'} className={`w-full ${h} px-7 text-sm font-semibold rounded-xl shrink-0 text-white btn-primary transition-all duration-300 inline-flex items-center justify-center gap-2 disabled:opacity-50`}>
           {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{cta} <ArrowRight className="w-4 h-4" /></>}
         </button>
       </form>
-      {status === 'error' && <p className="text-orange-500 text-[13px] text-center mt-2">{message}</p>}
+      {status === 'error' && <p className="text-orange-500 text-xs text-center mt-2">{message}</p>}
     </div>
   )
 }
@@ -85,19 +85,19 @@ export default function HomePage() {
       <header className="fixed top-0 w-full z-50 border-b border-white/[0.06] bg-[#09090b]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #3b82f6, #7c3aed)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}>
-              <span className="text-xs font-black text-white">AI</span>
+            <div className="w-8 h-8 rounded-xl bg-gradient-brand flex items-center justify-center glow-gradient">
+              <span className="text-xs font-bold text-white">AI</span>
             </div>
-            <span className="font-bold text-[15px] tracking-tight text-white">Alt AI Labs</span>
+            <span className="font-semibold text-sm tracking-tight text-white">Alt AI Labs</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-[13px] text-zinc-400">
+          <nav className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
             <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#challenges" className="hover:text-white transition-colors">Challenges</a>
             <a href="#sponsors" className="hover:text-white transition-colors">For Sponsors</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/signup" className="text-[13px] text-zinc-400 hover:text-white transition-colors hidden sm:block">Join Waitlist</Link>
-            <button onClick={handleExplore} className="text-[13px] font-bold h-9 px-5 rounded-xl text-white inline-flex items-center gap-1.5 transition-all duration-200" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.2)' }}>
+            <Link href="/signup" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">Join Waitlist</Link>
+            <button onClick={handleExplore} className="text-sm font-semibold h-9 px-5 rounded-xl text-white inline-flex items-center gap-1.5 btn-primary transition-all duration-200">
               Start Building <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -112,27 +112,27 @@ export default function HomePage() {
         <div className="absolute top-40 right-[20%] w-[350px] h-[350px] bg-violet-500/[0.06] rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center relative">
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tight mb-6 leading-[0.95]">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-[0.95]">
             <span className="text-white">Build AI.</span><br />
-            <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Get paid.</span>
+            <span className="text-gradient-brand">Get paid.</span>
           </h1>
 
-          <p className="text-[17px] md:text-[22px] text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
             A new AI challenge drops every week. Sponsors fund the prizes. The best builders <span className="text-amber-400 font-semibold">win cash</span> and get hired.
           </p>
 
           {/* Dual CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-            <button onClick={handleExplore} className="w-full sm:w-auto h-14 px-8 text-[15px] font-bold rounded-2xl text-white inline-flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+            <button onClick={handleExplore} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
               Start Building <ArrowRight className="w-4 h-4" />
             </button>
-            <Link href="/signup" className="w-full sm:w-auto h-14 px-8 text-[15px] font-bold rounded-2xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
+            <Link href="/signup" className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
               Join Waitlist
             </Link>
           </div>
 
           {/* Social proof */}
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-8 text-[14px]">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-10 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                 <Users className="w-4 h-4 text-blue-400" />
@@ -160,7 +160,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center justify-center gap-3 py-3 px-6 rounded-2xl bg-amber-500/[0.06] border border-amber-500/20">
             <Building2 className="w-5 h-5 text-amber-400 shrink-0" />
-            <span className="text-[14px] text-zinc-300">
+            <span className="text-sm text-zinc-300">
               Weekly challenges sponsored by <span className="text-amber-400 font-bold">AITIM HOLDING</span> — <span className="text-white font-semibold">$500 prizes</span> every week
             </span>
             <Award className="w-5 h-5 text-amber-400 shrink-0" />
@@ -182,7 +182,7 @@ export default function HomePage() {
                   <div className="relative">
                     {/* Live badge + Sponsor */}
                     <div className="flex items-center gap-3 mb-5 flex-wrap">
-                      <span className="flex items-center gap-2 text-[13px] font-bold text-white px-4 py-2 rounded-full" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.4)' }}>
+                      <span className="flex items-center gap-2 text-sm font-bold text-white px-4 py-2 rounded-full bg-gradient-brand glow-gradient">
                         <span className="relative flex h-2.5 w-2.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
                           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
@@ -190,32 +190,32 @@ export default function HomePage() {
                         THIS WEEK&apos;S CHALLENGE
                       </span>
                       {liveDrop.sponsor_name && (
-                        <span className="flex items-center gap-1.5 text-[12px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
+                        <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
                           <Award className="w-3.5 h-3.5" /> Sponsored by {liveDrop.sponsor_name}
                         </span>
                       )}
-                      <span className="text-[13px] text-zinc-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 6 days left</span>
+                      <span className="text-sm text-zinc-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 6 days left</span>
                     </div>
 
                     {liveDrop.creator_name && (
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center text-[10px] font-bold text-zinc-400">{liveDrop.creator_name.split(' ').map(w => w[0]).join('')}</div>
-                        <span className="text-[13px] text-zinc-400">by <span className="text-white font-medium">{liveDrop.creator_name}</span></span>
+                        <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center text-xs font-bold text-zinc-400">{liveDrop.creator_name.split(' ').map(w => w[0]).join('')}</div>
+                        <span className="text-sm text-zinc-400">by <span className="text-white font-medium">{liveDrop.creator_name}</span></span>
                       </div>
                     )}
 
-                    <h2 className="text-2xl md:text-4xl font-black mb-3 tracking-tight text-white group-hover:text-blue-200 transition-colors">{liveDrop.title}</h2>
-                    <p className="text-[15px] md:text-[17px] text-zinc-400 mb-6 max-w-lg leading-relaxed">{liveDrop.description}</p>
+                    <h2 className="text-2xl md:text-4xl font-bold mb-3 tracking-tight text-white group-hover:text-blue-200 transition-colors">{liveDrop.title}</h2>
+                    <p className="text-sm md:text-base text-zinc-400 mb-6 max-w-lg leading-relaxed">{liveDrop.description}</p>
 
                     <div className="flex flex-wrap items-center gap-3 mb-6">
-                      <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Play className="w-4 h-4 text-blue-400" /> {liveDrop.duration_minutes} min lesson</span>
+                      <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Play className="w-4 h-4 text-blue-400" /> {liveDrop.duration_minutes} min lesson</span>
                       {liveDrop.prize_amount > 0 && (
-                        <span className="flex items-center gap-2 text-[13px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> ${liveDrop.prize_amount} prize</span>
+                        <span className="flex items-center gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> ${liveDrop.prize_amount} prize</span>
                       )}
-                      <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Users className="w-4 h-4 text-violet-400" /> {liveDrop.submissions_count} builders in</span>
+                      <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Users className="w-4 h-4 text-violet-400" /> {liveDrop.submissions_count} builders in</span>
                     </div>
 
-                    <div className="inline-flex items-center gap-2 text-white h-12 px-7 text-[15px] font-bold rounded-2xl transition-all duration-300" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+                    <div className="inline-flex items-center gap-2 text-white h-12 px-7 text-sm font-semibold rounded-xl btn-primary transition-all duration-300">
                       Start This Challenge <ArrowRight className="w-4 h-4" />
                     </div>
                   </div>
@@ -230,8 +230,8 @@ export default function HomePage() {
       <section id="how-it-works" className="py-24 px-6 relative">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">Three steps. Every week.</h2>
-            <p className="text-zinc-400 mt-4 text-[16px]">No fluff. No 40-hour courses. Just build.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">Three steps. Every week.</h2>
+            <p className="text-zinc-400 mt-4 text-base">No fluff. No 40-hour courses. Just build.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -241,9 +241,9 @@ export default function HomePage() {
             ].map((step, i) => (
               <div key={i} className="rounded-3xl p-8 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] relative group transition-all duration-300 hover:translate-y-[-2px]">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg" style={{ background: step.bg }}>{step.icon}</div>
-                <span className="text-[12px] font-bold text-zinc-600 tracking-widest">{step.num}</span>
-                <h3 className="font-black text-[22px] text-white mt-1 mb-3">{step.title}</h3>
-                <p className="text-[14px] text-zinc-400 leading-relaxed">{step.desc}</p>
+                <span className="text-xs font-semibold text-zinc-600 tracking-widest">{step.num}</span>
+                <h3 className="font-bold text-xl text-white mt-1 mb-3">{step.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -254,11 +254,11 @@ export default function HomePage() {
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
               <span className="text-white">Not tutorials.</span><br />
-              <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Real products.</span>
+              <span className="text-gradient-brand">Real products.</span>
             </h2>
-            <p className="text-zinc-400 mt-4 text-[16px] max-w-lg mx-auto">Each week you build something you&apos;d actually use — or sell.</p>
+            <p className="text-zinc-400 mt-4 text-base max-w-lg mx-auto">Each week you build something you&apos;d actually use — or sell.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
@@ -269,8 +269,8 @@ export default function HomePage() {
             ].map((item, i) => (
               <div key={i} className="group rounded-2xl p-6 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-300">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg" style={{ background: item.bg }}>{item.icon}</div>
-                <h3 className="font-bold text-[17px] text-white mb-2">{item.title}</h3>
-                <p className="text-[13px] text-zinc-400 leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-base text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -281,11 +281,11 @@ export default function HomePage() {
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
               <span className="text-white">Built on</span>{' '}
-              <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Alt AI Labs</span>
+              <span className="text-gradient-brand">Alt AI Labs</span>
             </h2>
-            <p className="text-zinc-400 mt-4 text-[16px]">Real projects shipped by our builders. Not demos — products people use.</p>
+            <p className="text-zinc-400 mt-4 text-base">Real projects shipped by our builders. Not demos — products people use.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-5">
             {[
@@ -333,18 +333,18 @@ export default function HomePage() {
               <div key={i} className={`rounded-2xl p-6 bg-gradient-to-br ${project.gradient} border ${project.border} transition-all duration-300 group`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-white/[0.06] flex items-center justify-center">{project.icon}</div>
-                  <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">{project.status}</span>
+                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">{project.status}</span>
                 </div>
-                <h3 className="font-bold text-[18px] text-white mb-2">{project.title}</h3>
-                <p className="text-[13px] text-zinc-400 leading-relaxed mb-4">{project.desc}</p>
+                <h3 className="font-bold text-lg text-white mb-2">{project.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-4">{project.desc}</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.tags.map((tag, j) => (
-                    <span key={j} className="text-[11px] text-zinc-500 bg-white/[0.04] px-2.5 py-1 rounded-lg">{tag}</span>
+                    <span key={j} className="text-xs text-zinc-500 bg-white/[0.04] px-2.5 py-1 rounded-lg">{tag}</span>
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center text-[10px] font-bold text-zinc-400">T</div>
-                  <span className="text-[12px] text-zinc-500">{project.builder}</span>
+                  <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center text-xs font-bold text-zinc-400">T</div>
+                  <span className="text-xs text-zinc-500">{project.builder}</span>
                 </div>
               </div>
             ))}
@@ -356,8 +356,8 @@ export default function HomePage() {
       <section id="challenges" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">Challenges</h2>
-            <p className="text-zinc-400 mt-4 text-[16px]">Multiple creators. Multiple challenges. Jump in anytime.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">Challenges</h2>
+            <p className="text-zinc-400 mt-4 text-base">Multiple creators. Multiple challenges. Jump in anytime.</p>
             <div className="flex items-center justify-center gap-4 mt-6">
               {[
                 { name: 'Nate Herk', initial: 'NH', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
@@ -365,8 +365,8 @@ export default function HomePage() {
                 { name: 'Timur M.', initial: 'TM', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
               ].map((c, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <div className={`w-7 h-7 rounded-full ${c.color} border flex items-center justify-center text-[10px] font-bold`}>{c.initial}</div>
-                  <span className="text-[13px] text-zinc-400">{c.name}</span>
+                  <div className={`w-7 h-7 rounded-full ${c.color} border flex items-center justify-center text-xs font-bold`}>{c.initial}</div>
+                  <span className="text-sm text-zinc-400">{c.name}</span>
                 </div>
               ))}
             </div>
@@ -377,14 +377,14 @@ export default function HomePage() {
                 drop.status === 'live'
                   ? 'border border-blue-500/30'
                   : 'bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]'
-              }`} style={drop.status === 'live' ? { background: 'linear-gradient(to right, rgba(23,37,84,0.6), rgba(46,16,101,0.4))', boxShadow: '0 0 30px rgba(59,130,246,0.1)' } : undefined}>
+              } ${drop.status === 'live' ? 'bg-gradient-brand-subtle glow-blue' : ''}`}>
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
                   drop.status === 'live'
                     ? ''
                     : drop.status === 'completed'
                     ? 'bg-white/[0.06]'
                     : 'bg-white/[0.04] border border-white/[0.08]'
-                }`} style={drop.status === 'live' ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' } : undefined}>
+                } ${drop.status === 'live' ? 'bg-gradient-brand glow-gradient' : ''}`}>
                   {drop.status === 'live' ? (
                     <Zap className="w-6 h-6 text-white" />
                   ) : drop.status === 'completed' ? (
@@ -395,26 +395,26 @@ export default function HomePage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <h3 className={`font-bold text-[15px] truncate transition-colors ${drop.status === 'live' ? 'text-white' : 'text-zinc-200 group-hover:text-white'}`}>{drop.title}</h3>
+                    <h3 className={`font-bold text-sm truncate transition-colors ${drop.status === 'live' ? 'text-white' : 'text-zinc-200 group-hover:text-white'}`}>{drop.title}</h3>
                     {drop.status === 'live' && (
-                      <span className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full text-white font-bold shrink-0" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 12px rgba(99,102,241,0.3)' }}>
+                      <span className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full text-white font-bold shrink-0 bg-gradient-brand glow-gradient">
                         <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" /></span>
                         LIVE
                       </span>
                     )}
                     {drop.status === 'upcoming' && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-zinc-500 font-medium shrink-0">SOON</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-white/[0.06] text-zinc-500 font-medium shrink-0">SOON</span>
                     )}
                     {drop.status === 'completed' && (
                       <CheckCircle2 className="w-4 h-4 text-zinc-600 shrink-0" />
                     )}
                     {drop.sponsor_name && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold shrink-0">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold shrink-0">
                         {drop.sponsor_name}
                       </span>
                     )}
                   </div>
-                  <p className="text-[12px] text-zinc-500">{drop.creator_name && <><span className="text-zinc-400">{drop.creator_name}</span> · </>}{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
+                  <p className="text-xs text-zinc-500">{drop.creator_name && <><span className="text-zinc-400">{drop.creator_name}</span> · </>}{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
                 </div>
                 {(drop.prize_amount > 0 || drop.prize_per_entrant > 0) && (
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -433,7 +433,7 @@ export default function HomePage() {
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">Why this works</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">Why this works</h2>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
@@ -446,8 +446,8 @@ export default function HomePage() {
             ].map((item, i) => (
               <div key={i} className={`rounded-2xl p-6 bg-gradient-to-br ${item.gradient} border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300`}>
                 <div className="text-white mb-3">{item.icon}</div>
-                <h3 className="font-bold text-[15px] text-white mb-1.5">{item.title}</h3>
-                <p className="text-[13px] text-zinc-400 leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-sm text-white mb-1.5">{item.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -459,8 +459,8 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-amber-600/[0.04] via-transparent to-transparent pointer-events-none" />
         <div className="max-w-4xl mx-auto relative">
           <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">For Sponsors</h2>
-            <p className="text-zinc-400 mt-4 text-[16px] max-w-lg mx-auto">Put your brand in front of active AI builders. Fund challenges. Get first look at top talent.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">For Sponsors</h2>
+            <p className="text-zinc-400 mt-4 text-base max-w-lg mx-auto">Put your brand in front of active AI builders. Fund challenges. Get first look at top talent.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-5 mb-12">
             {[
@@ -470,16 +470,16 @@ export default function HomePage() {
             ].map((item, i) => (
               <div key={i} className="rounded-3xl p-8 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg" style={{ background: item.bg }}>{item.icon}</div>
-                <h3 className="font-black text-[18px] text-white mb-3">{item.title}</h3>
-                <p className="text-[14px] text-zinc-400 leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-lg text-white mb-3">{item.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
           <div className="text-center">
-            <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 h-14 px-8 text-[15px] font-bold rounded-2xl text-white transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', boxShadow: '0 0 30px rgba(245,158,11,0.2)' }}>
+            <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 h-14 px-8 text-sm font-bold rounded-2xl text-white transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', boxShadow: '0 0 30px rgba(245,158,11,0.2)' }}>
               <Building2 className="w-5 h-5" /> Become a Sponsor <ArrowRight className="w-4 h-4" />
             </a>
-            <p className="text-zinc-600 text-[13px] mt-4">Starting at $500/week. Custom packages available.</p>
+            <p className="text-zinc-600 text-sm mt-4">Starting at $500/week. Custom packages available.</p>
           </div>
         </div>
       </section>
@@ -492,18 +492,18 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto text-center relative">
           <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-5 tracking-tight leading-[0.95]">
             <span className="text-white">Stop watching.</span><br />
-            <span style={{ background: 'linear-gradient(to right, #60a5fa, #a78bfa, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Start building.</span>
+            <span className="text-gradient-brand">Start building.</span>
           </h2>
-          <p className="text-zinc-400 mb-10 text-[17px] max-w-lg mx-auto leading-relaxed">New challenges drop every week. Join free. Build something real. Win cash.</p>
+          <p className="text-zinc-400 mb-10 text-base max-w-lg mx-auto leading-relaxed">New challenges drop every week. Join free. Build something real. Win cash.</p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-            <button onClick={handleExplore} className="w-full sm:w-auto h-14 px-8 text-[15px] font-bold rounded-2xl text-white inline-flex items-center justify-center gap-2 transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>
+            <button onClick={handleExplore} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
               Start Building <ArrowRight className="w-4 h-4" />
             </button>
             <WaitlistForm cta="Get Notified" />
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-[13px] text-zinc-500">
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm text-zinc-500">
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> Free to join</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> No credit card</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> New challenge every week</span>
@@ -515,8 +515,8 @@ export default function HomePage() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">Sponsors & Partners</h2>
-            <p className="text-zinc-400 mt-4 text-[16px]">Our sponsors fund weekly prize pools so builders get paid to learn.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">Sponsors & Partners</h2>
+            <p className="text-zinc-400 mt-4 text-base">Our sponsors fund weekly prize pools so builders get paid to learn.</p>
           </div>
           <div className="grid sm:grid-cols-1 md:grid-cols-1 gap-6 max-w-xl mx-auto">
             {/* AITIM HOLDING */}
@@ -529,14 +529,14 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-white">AITIM HOLDING</h3>
-                    <p className="text-[13px] text-amber-400 font-semibold">Title Sponsor</p>
+                    <p className="text-sm text-amber-400 font-semibold">Title Sponsor</p>
                   </div>
                 </div>
-                <p className="text-[15px] text-zinc-300 leading-relaxed mb-5">Sponsoring weekly AI challenges with <span className="text-amber-400 font-bold">$500 prize pools</span>. Building the next generation of AI builders through hands-on competition.</p>
+                <p className="text-sm text-zinc-300 leading-relaxed mb-5">Sponsoring weekly AI challenges with <span className="text-amber-400 font-bold">$500 prize pools</span>. Building the next generation of AI builders through hands-on competition.</p>
                 <div className="flex flex-wrap gap-3">
-                  <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> $500/week prizes</span>
-                  <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Zap className="w-4 h-4 text-blue-400" /> AI Sales Agents</span>
-                  <span className="flex items-center gap-2 text-[13px] text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Rocket className="w-4 h-4 text-violet-400" /> Content AI</span>
+                  <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> $500/week prizes</span>
+                  <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Zap className="w-4 h-4 text-blue-400" /> AI Sales Agents</span>
+                  <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Rocket className="w-4 h-4 text-violet-400" /> Content AI</span>
                 </div>
               </div>
             </div>
@@ -556,32 +556,32 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2.5 mb-3">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #3b82f6, #7c3aed)' }}>
-                  <span className="text-[10px] font-black text-white">AI</span>
+                <div className="w-7 h-7 rounded-lg bg-gradient-brand flex items-center justify-center">
+                  <span className="text-xs font-black text-white">AI</span>
                 </div>
                 <span className="font-bold text-[14px] tracking-tight text-white">Alt AI Labs</span>
               </Link>
-              <p className="text-[13px] text-zinc-600 max-w-xs leading-relaxed">Learn AI by building real products. New drop every week. Ship or get shipped.</p>
+              <p className="text-sm text-zinc-600 max-w-xs leading-relaxed">Learn AI by building real products. New drop every week. Ship or get shipped.</p>
             </div>
             <div>
-              <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">Product</h4>
+              <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">Product</h4>
               <ul className="space-y-2">
-                <li><a href="#how-it-works" className="text-[13px] text-zinc-600 hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#challenges" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Challenges</a></li>
-                <li><a href="#sponsors" className="text-[13px] text-zinc-600 hover:text-white transition-colors">For Sponsors</a></li>
+                <li><a href="#how-it-works" className="text-sm text-zinc-600 hover:text-white transition-colors">How It Works</a></li>
+                <li><a href="#challenges" className="text-sm text-zinc-600 hover:text-white transition-colors">Challenges</a></li>
+                <li><a href="#sponsors" className="text-sm text-zinc-600 hover:text-white transition-colors">For Sponsors</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">Account</h4>
+              <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">Account</h4>
               <ul className="space-y-2">
-                <li><Link href="/login" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Sign In</Link></li>
-                <li><Link href="/signup" className="text-[13px] text-zinc-600 hover:text-white transition-colors">Join Waitlist</Link></li>
-                <li><Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`} className="text-[13px] text-zinc-600 hover:text-white transition-colors">Explore</Link></li>
+                <li><Link href="/login" className="text-sm text-zinc-600 hover:text-white transition-colors">Sign In</Link></li>
+                <li><Link href="/signup" className="text-sm text-zinc-600 hover:text-white transition-colors">Join Waitlist</Link></li>
+                <li><Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`} className="text-sm text-zinc-600 hover:text-white transition-colors">Explore</Link></li>
               </ul>
             </div>
           </div>
           <div className="h-px bg-white/[0.06] mb-6" />
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[12px] text-zinc-600">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-zinc-600">
             <span>&copy; {new Date().getFullYear()} Alt AI Labs. All rights reserved.</span>
             <div className="flex gap-6">
               <a href="mailto:hello@altailabs.com" className="hover:text-zinc-400 transition-colors">Contact</a>

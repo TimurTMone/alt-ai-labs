@@ -147,9 +147,20 @@
  * Info:           sky-400   (learning, tips)
  * Destructive:    orange-600 (color-blind safe, not red)
  *
- * Text:  Heading → text-white | Body → text-zinc-400 | Muted → text-zinc-600
+ * Text:  Heading → text-white | Body → text-zinc-400 | Muted → text-zinc-500
  * Border: border-white/[0.06] standard | border-white/[0.08] emphasis
- * Radius: rounded-xl (buttons) | rounded-2xl (cards)
+ * Radius: rounded-xl (buttons, inputs) | rounded-2xl (cards)
+ *
+ * Typography scale (use these instead of arbitrary px):
+ *   text-xs   = 12px  — metadata, timestamps
+ *   text-sm   = 14px  — body, labels, nav
+ *   text-base = 16px  — body emphasis, inputs
+ *   text-lg   = 18px  — subheadings
+ *   text-xl   = 20px  — card titles
+ *   text-2xl  = 24px  — section titles
+ *   text-3xl+ = 30px+ — hero headings (use Tailwind scale)
+ *
+ * Spacing: 4px grid (p-1=4, p-2=8, p-3=12, p-4=16, p-6=24, p-8=32)
  * ────────────────────────────────────────────────────────────────
  */
 
@@ -170,6 +181,26 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Gradients — use instead of inline styles */
+.bg-gradient-brand {
+  background: linear-gradient(135deg, #3b82f6, #7c3aed);
+}
+
+.bg-gradient-brand-hover {
+  background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+}
+
+.bg-gradient-brand-subtle {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(124, 58, 237, 0.08));
+}
+
+.text-gradient-brand {
+  background: linear-gradient(to right, #60a5fa, #a78bfa, #e879f9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Glows */
 .glow-blue {
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 60px rgba(59, 130, 246, 0.06);
@@ -184,7 +215,11 @@
 }
 
 .glow-gradient {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.15), 0 0 80px rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.12), 0 0 64px rgba(139, 92, 246, 0.06);
+}
+
+.glow-gradient-strong {
+  box-shadow: 0 0 32px rgba(59, 130, 246, 0.2), 0 0 80px rgba(139, 92, 246, 0.1);
 }
 
 /* Inputs — blue focus ring (accessible) */
@@ -192,6 +227,22 @@ input:focus, textarea:focus, select:focus {
   border-color: rgba(59, 130, 246, 0.3) !important;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08) !important;
   outline: none !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #7c3aed);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+  box-shadow: 0 0 28px rgba(59, 130, 246, 0.25);
+}
+
+/* Smooth text rendering for large headings */
+h1, h2, h3 {
+  text-rendering: optimizeLegibility;
 }
 
 /* Utility */
