@@ -1,4 +1,6 @@
 require('dotenv').config()
+const fs = require('fs')
+const path = require('path')
 const express = require('express')
 const cors = require('cors')
 
@@ -7,6 +9,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 const { OAuth2Client } = require('google-auth-library')
+const appleSignin = require('apple-signin-auth')
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -241,6 +244,61 @@ app.get('/api/auth/google/callback', async (req, res) => {
   } catch (err) {
     console.error('Google OAuth error:', err)
     res.redirect(`${FRONTEND_URL}/login?error=google_auth_failed`)
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH — Apple Sign In
+// ═══════════════════════════════════════════════════════════════
+
+// Step 1: Frontend/app redirects here → we redirect to Apple
+app.get('/api/auth/apple', (req, res) => {
+  const url = `https://appleid.apple.com/auth/authorize?` +
+    `client_id=${process.env.APPLE_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(`${process.env.API_URL}/api/auth/apple/callback`)}` +
+    `&response_type=code id_token` +
+    `&scope=name email` +
+    `&response_mode=form_post`
+  res.redirect(url)
+})
+
+// Step 2: Apple POSTs back here with id_token + code
+app.post('/api/auth/apple/callback', async (req, res) => {
+  try {
+    const { id_token, user: appleUser } = req.body
+
+    if (!id_token) {
+      return res.redirect(`${FRONTEND_URL}/login?error=apple_auth_failed`)
+    }
+
+    const payload = await appleSignin.verifyIdToken(id_token, {
+      audience: process.env.APPLE_CLIENT_ID,
+      ignoreExpiration: false,
+    })
+
+    const email = payload.email
+    if (!email) {
+      return res.redirect(`${FRONTEND_URL}/login?error=apple_no_email`)
+    }
+
+    // Apple only sends the user's name on the FIRST sign-in
+    let fullName = null
+    if (appleUser) {
+      try {
+        const parsed = typeof appleUser === 'string' ? JSON.parse(appleUser) : appleUser
+        if (parsed.name) {
+          fullName = [parsed.name.firstName, parsed.name.lastName].filter(Boolean).join(' ')
+        }
+      } catch {}
+    }
+
+    const user = await findOrCreateOAuthUser(email, fullName)
+    const token = signToken(user)
+
+    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`)
+  } catch (err) {
+    console.error('Apple OAuth error:', err)
+    res.redirect(`${FRONTEND_URL}/login?error=apple_auth_failed`)
   }
 })
 
@@ -598,7 +656,24 @@ app.patch('/api/notifications', async (req, res) => {
   }
 })
 
+// ── Auto-migrate & seed on startup ─────────────────────────────
+async function migrate() {
+  try {
+    const schema = fs.readFileSync(path.join(__dirname, 'db-init.sql'), 'utf8')
+    await pool.query(schema)
+    console.log('✓ Schema migration complete')
+
+    const seed = fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf8')
+    await pool.query(seed)
+    console.log('✓ Seed data loaded')
+  } catch (err) {
+    console.error('Migration error:', err.message)
+  }
+}
+
 // ── Start ───────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`Alt AI Labs API running on port ${PORT}`)
+migrate().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Alt AI Labs API running on port ${PORT}`)
+  })
 })

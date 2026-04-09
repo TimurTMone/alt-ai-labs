@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { GdprConsent } from "@/components/challenge/gdpr-consent"
+import { PostHogProvider } from "@/components/analytics/posthog-provider"
+import { MetaPixel } from "@/components/analytics/meta-pixel"
 import "./globals.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], display: "swap" })
@@ -60,7 +62,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="min-h-screen bg-zinc-950 text-white antialiased">
-        {children}
+        <PostHogProvider>
+          {children}
+        </PostHogProvider>
+        <MetaPixel />
         <GdprConsent />
         <Analytics />
         <SpeedInsights />

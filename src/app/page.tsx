@@ -5,13 +5,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, CheckCircle2, Loader2, ChevronRight, Play, Trophy, Users, Sparkles, Zap, Bot, Code2, Rocket, Clock, Building2, Award } from 'lucide-react'
 import { DEFAULT_COMMUNITY_ID, DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
+import { track } from '@/lib/analytics'
 import type { Drop } from '@/types/database'
 
 /* ── API URL ───────────────────────────────────────────────────── */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 /* ── Waitlist Form ─────────────────────────────────────────────── */
-function WaitlistForm({ size = 'default', cta = 'Get Early Access' }: { size?: 'default' | 'large'; cta?: string }) {
+function WaitlistForm({ size = 'default', cta = 'Get Early Access', location = 'unknown' }: { size?: 'default' | 'large'; cta?: string; location?: string }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -20,12 +21,25 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access' }: { size?: '
     e.preventDefault()
     if (!email) return
     setStatus('loading')
+    track('waitlist_submit_attempt', { location, email_domain: email.split('@')[1] })
     try {
       const res = await fetch(`${API_URL}/api/waitlist`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
       const data = await res.json()
-      if (res.ok) { setStatus('success'); setMessage(data.message || "You're in!"); setEmail('') }
-      else { setStatus('error'); setMessage(data.error || 'Something went wrong') }
-    } catch { setStatus('error'); setMessage('Something went wrong') }
+      if (res.ok) {
+        setStatus('success')
+        setMessage(data.message || "You're in!")
+        setEmail('')
+        track('waitlist_submit_success', { location, position: data.count, email_domain: email.split('@')[1] })
+      } else {
+        setStatus('error')
+        setMessage(data.error || 'Something went wrong')
+        track('waitlist_submit_error', { location, error: data.error })
+      }
+    } catch {
+      setStatus('error')
+      setMessage('Something went wrong')
+      track('waitlist_submit_error', { location, error: 'network' })
+    }
   }
 
   if (status === 'success') return (
@@ -81,7 +95,8 @@ export default function HomePage() {
   const liveDrop = drops.find(d => d.status === 'live')
   const totalSubmissions = drops.reduce((a, d) => a + d.submissions_count, 0)
 
-  const handleExplore = () => {
+  const handleExplore = (location: string) => {
+    track('cta_click', { cta: 'start_building', location })
     document.cookie = 'demo_mode=true; path=/; max-age=86400'
     router.push(`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`)
     router.refresh()
@@ -105,8 +120,8 @@ export default function HomePage() {
             <a href="#sponsors" className="hover:text-white transition-colors">For Sponsors</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/signup" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">Join Waitlist</Link>
-            <button onClick={handleExplore} className="text-sm font-semibold h-9 px-5 rounded-xl text-white inline-flex items-center gap-1.5 btn-primary transition-all duration-200">
+            <Link href="/signup" onClick={() => track('cta_click', { cta: 'join_waitlist', location: 'nav' })} className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">Join Waitlist</Link>
+            <button onClick={() => handleExplore('nav')} className="text-sm font-semibold h-9 px-5 rounded-xl text-white inline-flex items-center gap-1.5 btn-primary transition-all duration-200">
               Start Building <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -132,10 +147,10 @@ export default function HomePage() {
 
           {/* Dual CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-            <button onClick={handleExplore} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
+            <button onClick={() => handleExplore('hero')} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
               Start Building <ArrowRight className="w-4 h-4" />
             </button>
-            <Link href="/signup" className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
+            <Link href="/signup" onClick={() => track('cta_click', { cta: 'join_waitlist', location: 'hero' })} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
               Join Waitlist
             </Link>
           </div>
@@ -506,10 +521,10 @@ export default function HomePage() {
           <p className="text-zinc-400 mb-10 text-base max-w-lg mx-auto leading-relaxed">New challenges drop every week. Join free. Build something real. Win cash.</p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-            <button onClick={handleExplore} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
+            <button onClick={() => handleExplore('final_cta')} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
               Start Building <ArrowRight className="w-4 h-4" />
             </button>
-            <WaitlistForm cta="Get Notified" />
+            <WaitlistForm cta="Get Notified" location="final_cta" />
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm text-zinc-500">
