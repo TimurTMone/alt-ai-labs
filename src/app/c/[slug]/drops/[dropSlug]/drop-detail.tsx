@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Send, Github, Globe, Video, Paperclip, X, FileText, Zap, Award, Users, ChevronDown, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Send, Github, Globe, Video, Paperclip, X, FileText, Zap, Award, Users, ChevronDown, ExternalLink, Heart } from 'lucide-react'
+import { ShareButtons } from '@/components/social/share-buttons'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -11,6 +12,8 @@ import { AppLayout } from '@/components/layout/app-layout'
 import { DIFFICULTY_COLORS, calculatePrizePool } from '@/lib/constants'
 import { formatDistanceToNow } from 'date-fns'
 import type { Community, Drop, DropProgress } from '@/types/database'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 interface DropDetailClientProps {
   community: Community
@@ -335,6 +338,7 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
                   {demoVideoUrl && <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04]"><Video className="w-3 h-3" /> Video</span>}
                   {attachments.length > 0 && <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04]"><Paperclip className="w-3 h-3" /> {attachments.length} file{attachments.length > 1 ? 's' : ''}</span>}
                 </div>
+                <ShareButtons title={drop.title} />
               </div>
             </div>
           )}
@@ -380,7 +384,126 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
             </div>
           </div>
         )}
+        {/* ── Community Builds ──────────────────────────── */}
+        <CommunityBuilds dropId={drop.id} />
       </div>
     </AppLayout>
+  )
+}
+
+// ── Community Builds Section ─────────────────────────────────
+
+function CommunityBuilds({ dropId }: { dropId: string }) {
+  const [submissions, setSubmissions] = useState<{ id: string; project_url: string; demo_url: string | null; notes: string | null; status: string; full_name: string; avatar_url: string | null; username: string | null; vote_count: number; created_at: string }[]>([])
+  const [loaded, setLoaded] = useState(false)
+  const [votedIds, setVotedIds] = useState<Set<string>>(new Set())
+
+  const loadSubmissions = async () => {
+    if (loaded) return
+    try {
+      const res = await fetch(`${API_URL}/api/submissions/by-drop/${dropId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setSubmissions(data.submissions || [])
+      }
+    } catch { /* ignore */ }
+    setLoaded(true)
+  }
+
+  const handleVote = async (subId: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    if (!token) return
+
+    const isVoted = votedIds.has(subId)
+    try {
+      await fetch(`${API_URL}/api/submissions/${subId}/vote`, {
+        method: isVoted ? 'DELETE' : 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setVotedIds(prev => {
+        const next = new Set(prev)
+        if (isVoted) next.delete(subId); else next.add(subId)
+        return next
+      })
+      setSubmissions(prev => prev.map(s =>
+        s.id === subId ? { ...s, vote_count: s.vote_count + (isVoted ? -1 : 1) } : s
+      ))
+    } catch { /* ignore */ }
+  }
+
+  return (
+    <div className="mt-8">
+      <button
+        onClick={loadSubmissions}
+        className="w-full text-left rounded-2xl p-5 glass hover:bg-white/[0.04] transition-all flex items-center gap-3"
+      >
+        <div className="w-8 h-8 rounded-xl bg-violet-500/15 flex items-center justify-center">
+          <Users className="w-4 h-4 text-violet-400" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold">Community Builds</h3>
+          <p className="text-[11px] text-zinc-600">See what others shipped — vote for the best</p>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-zinc-600 transition-transform ${loaded ? 'rotate-180' : ''}`} />
+      </button>
+
+      {loaded && (
+        <div className="mt-3 space-y-2">
+          {submissions.length === 0 ? (
+            <p className="text-center text-xs text-zinc-600 py-6">No submissions yet. Be the first!</p>
+          ) : (
+            submissions.map(sub => (
+              <div key={sub.id} className="rounded-2xl p-4 glass">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center flex-shrink-0">
+                    <span className="text-[10px] font-medium text-zinc-500">
+                      {sub.full_name?.[0]?.toUpperCase() || '?'}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[13px] font-medium text-white">{sub.full_name}</span>
+                      {sub.username && (
+                        <Link href={`/u/${sub.username}`} className="text-[11px] text-zinc-600 hover:text-blue-400 transition-colors">
+                          @{sub.username}
+                        </Link>
+                      )}
+                    </div>
+                    {sub.notes && (
+                      <p className="text-[12px] text-zinc-500 line-clamp-2 mb-2">{sub.notes}</p>
+                    )}
+                    <div className="flex items-center gap-3 text-[11px]">
+                      {sub.project_url && (
+                        <a href={sub.project_url} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-zinc-500 hover:text-white transition-colors">
+                          <Github className="w-3 h-3" /> Repo
+                        </a>
+                      )}
+                      {sub.demo_url && (
+                        <a href={sub.demo_url} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-zinc-500 hover:text-white transition-colors">
+                          <Globe className="w-3 h-3" /> Demo
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleVote(sub.id)}
+                    className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${
+                      votedIds.has(sub.id)
+                        ? 'bg-red-500/10 text-red-400'
+                        : 'bg-white/[0.04] text-zinc-600 hover:text-red-400 hover:bg-red-500/10'
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${votedIds.has(sub.id) ? 'fill-current' : ''}`} />
+                    <span className="text-[10px] font-medium">{sub.vote_count}</span>
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
   )
 }

@@ -417,17 +417,68 @@ app.get('/api/leaderboard', async (req, res) => {
 // PROFILE
 // ═══════════════════════════════════════════════════════════════
 
+// GET /api/profiles/:username — public profile
+app.get('/api/profiles/:username', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, username, full_name, avatar_url, bio, membership_tier, total_points, github_url, twitter_url, linkedin_url, website_url, created_at
+       FROM profiles WHERE username = $1`,
+      [req.params.username]
+    )
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Profile not found' })
+
+    const profile = result.rows[0]
+
+    // Get submissions
+    const subs = await pool.query(
+      `SELECT s.*, d.title AS drop_title, d.slug AS drop_slug
+       FROM submissions s JOIN drops d ON s.drop_id = d.id
+       WHERE s.user_id = $1 ORDER BY s.created_at DESC`,
+      [profile.id]
+    )
+
+    // Get streak
+    const streak = await pool.query(
+      'SELECT current_streak, longest_streak FROM streaks WHERE user_id = $1',
+      [profile.id]
+    )
+
+    // Get heatmap
+    const heatmap = await pool.query(
+      `SELECT activity_date, COUNT(*)::int AS count
+       FROM daily_activity WHERE user_id = $1 AND activity_date >= CURRENT_DATE - INTERVAL '365 days'
+       GROUP BY activity_date ORDER BY activity_date`,
+      [profile.id]
+    )
+
+    res.json({
+      profile,
+      submissions: subs.rows,
+      streak: streak.rows[0] || { current_streak: 0, longest_streak: 0 },
+      heatmap: heatmap.rows,
+    })
+  } catch (err) {
+    console.error('Public profile error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
 app.patch('/api/profile', async (req, res) => {
   const decoded = verifyToken(req)
   if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
 
   try {
-    const { full_name, bio } = req.body
+    const { full_name, bio, username, github_url, twitter_url, linkedin_url, website_url } = req.body
     const updates = []
     const params = []
 
     if (full_name !== undefined) { params.push(full_name); updates.push(`full_name = $${params.length}`) }
     if (bio !== undefined) { params.push(bio); updates.push(`bio = $${params.length}`) }
+    if (username !== undefined) { params.push(username.toLowerCase().replace(/[^a-z0-9_-]/g, '')); updates.push(`username = $${params.length}`) }
+    if (github_url !== undefined) { params.push(github_url || null); updates.push(`github_url = $${params.length}`) }
+    if (twitter_url !== undefined) { params.push(twitter_url || null); updates.push(`twitter_url = $${params.length}`) }
+    if (linkedin_url !== undefined) { params.push(linkedin_url || null); updates.push(`linkedin_url = $${params.length}`) }
+    if (website_url !== undefined) { params.push(website_url || null); updates.push(`website_url = $${params.length}`) }
     if (updates.length === 0) return res.status(400).json({ error: 'Nothing to update' })
 
     params.push(decoded.sub)
@@ -792,6 +843,113 @@ app.patch('/api/notifications', async (req, res) => {
     res.json({ success: true })
   } catch (err) {
     console.error('Mark read error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// SUBMISSION VOTES + REVIEWS
+// ═══════════════════════════════════════════════════════════════
+
+// GET /api/submissions/by-drop/:dropId — all submissions for a drop (public)
+app.get('/api/submissions/by-drop/:dropId', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT s.*, p.full_name, p.avatar_url, p.username,
+       (SELECT COUNT(*)::int FROM submission_votes sv WHERE sv.submission_id = s.id) AS vote_count
+       FROM submissions s
+       LEFT JOIN profiles p ON s.user_id = p.id
+       WHERE s.drop_id = $1
+       ORDER BY (SELECT COUNT(*) FROM submission_votes sv WHERE sv.submission_id = s.id) DESC, s.created_at DESC`,
+      [req.params.dropId]
+    )
+    res.json({ submissions: result.rows })
+  } catch (err) {
+    console.error('Submissions by drop error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// POST /api/submissions/:id/vote — upvote a submission
+app.post('/api/submissions/:id/vote', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    // Can't vote on own submission
+    const sub = await pool.query('SELECT user_id FROM submissions WHERE id = $1', [req.params.id])
+    if (sub.rows[0]?.user_id === decoded.sub) {
+      return res.status(400).json({ error: "Can't vote on your own submission" })
+    }
+
+    await pool.query(
+      `INSERT INTO submission_votes (submission_id, user_id)
+       VALUES ($1, $2)
+       ON CONFLICT (submission_id, user_id) DO NOTHING`,
+      [req.params.id, decoded.sub]
+    )
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Vote error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// DELETE /api/submissions/:id/vote — remove vote
+app.delete('/api/submissions/:id/vote', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    await pool.query(
+      'DELETE FROM submission_votes WHERE submission_id = $1 AND user_id = $2',
+      [req.params.id, decoded.sub]
+    )
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Unvote error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// POST /api/submissions/:id/review — leave a structured review
+app.post('/api/submissions/:id/review', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const { creativity_score, execution_score, usefulness_score, comment } = req.body
+
+    await pool.query(
+      `INSERT INTO submission_reviews (submission_id, reviewer_id, creativity_score, execution_score, usefulness_score, comment)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (submission_id, reviewer_id)
+       DO UPDATE SET creativity_score = $3, execution_score = $4, usefulness_score = $5, comment = $6`,
+      [req.params.id, decoded.sub, creativity_score, execution_score, usefulness_score, comment || null]
+    )
+
+    // Award 10 points for reviewing
+    await pool.query(
+      `INSERT INTO leaderboard_points (user_id, points, reason)
+       SELECT $1, 10, $2
+       WHERE NOT EXISTS (SELECT 1 FROM leaderboard_points WHERE user_id = $1 AND reason = $2)`,
+      [decoded.sub, `review:${req.params.id}`]
+    )
+
+    // Notify submission author
+    const sub = await pool.query('SELECT user_id FROM submissions WHERE id = $1', [req.params.id])
+    if (sub.rows[0] && sub.rows[0].user_id !== decoded.sub) {
+      await pool.query(
+        `INSERT INTO notifications (user_id, type, title, body)
+         VALUES ($1, 'review', 'Your build got reviewed!', 'Someone left feedback on your submission.')`,
+        [sub.rows[0].user_id]
+      )
+    }
+
+    await recordActivity(decoded.sub, 'review', 10)
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Review error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
 })

@@ -172,6 +172,28 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Submission votes
+CREATE TABLE IF NOT EXISTS submission_votes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  submission_id UUID REFERENCES submissions(id),
+  user_id UUID REFERENCES profiles(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(submission_id, user_id)
+);
+
+-- Submission reviews
+CREATE TABLE IF NOT EXISTS submission_reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  submission_id UUID REFERENCES submissions(id),
+  reviewer_id UUID REFERENCES profiles(id),
+  creativity_score INTEGER CHECK (creativity_score BETWEEN 1 AND 5),
+  execution_score INTEGER CHECK (execution_score BETWEEN 1 AND 5),
+  usefulness_score INTEGER CHECK (usefulness_score BETWEEN 1 AND 5),
+  comment TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(submission_id, reviewer_id)
+);
+
 -- Streaks
 CREATE TABLE IF NOT EXISTS streaks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -33,9 +33,10 @@ export async function getAllCommunities(): Promise<Community[]> {
 // ── Profile ──────────────────────────────────────────────────────
 
 const GUEST_PROFILE: Profile = {
-  id: 'guest', email: '', full_name: 'Explorer', avatar_url: null,
-  bio: null, membership_tier: 'free', stripe_customer_id: null,
+  id: 'guest', email: '', full_name: 'Explorer', username: null,
+  avatar_url: null, bio: null, membership_tier: 'free', stripe_customer_id: null,
   is_admin: false, total_points: 0,
+  github_url: null, twitter_url: null, linkedin_url: null, website_url: null,
   created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
 }
 
