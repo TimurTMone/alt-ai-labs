@@ -1,5 +1,5 @@
 import { getSession, getAuthToken, getProfile } from '@/lib/auth/server'
-import type { Community, Profile, Drop, DropProgress, Post, LeaderboardEntry, Group } from '@/types/database'
+import type { Community, Profile, Drop, DropProgress, Post, LeaderboardEntry, Group, Streak, HeatmapDay } from '@/types/database'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
@@ -78,6 +78,16 @@ export async function getPostsForCommunity(communityId: string): Promise<Post[]>
 export async function getLeaderboardForCommunity(communityId: string): Promise<(LeaderboardEntry & { profile: Profile; rank: number })[]> {
   const data = await apiFetch<{ leaderboard: (LeaderboardEntry & { profile: Profile; rank: number })[] }>('/api/leaderboard?limit=50')
   return data?.leaderboard ?? []
+}
+
+// ── Streaks ──────────────────────────────────────────────────────
+
+export async function getStreakData(): Promise<{ streak: Streak; heatmap: HeatmapDay[] }> {
+  const token = await getAuthToken()
+  if (!token) return { streak: { current: 0, longest: 0, lastActivity: null, freezesLeft: 0 }, heatmap: [] }
+
+  const data = await apiFetch<{ streak: Streak; heatmap: HeatmapDay[] }>('/api/streaks', token)
+  return data ?? { streak: { current: 0, longest: 0, lastActivity: null, freezesLeft: 0 }, heatmap: [] }
 }
 
 // ── Groups ───────────────────────────────────────────────────────

@@ -366,6 +366,10 @@ app.post('/api/submissions', async (req, res) => {
        RETURNING *`,
       [decoded.sub, drop_id, project_url, demo_url || null, notes || null]
     )
+
+    // Record daily activity for streak
+    await recordActivity(decoded.sub, 'submit', 25)
+
     res.json({ submission: result.rows[0] })
   } catch (err) {
     console.error('Submission error:', err)
@@ -512,9 +516,94 @@ app.post('/api/posts', async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) RETURNING *`,
       [community_id, decoded.sub, title, body, category || 'builds', drop_id || null]
     )
+
+    // Record daily activity for streak
+    await recordActivity(decoded.sub, 'post', 5)
+
     res.json({ post: result.rows[0] })
   } catch (err) {
     console.error('Create post error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// COMMENTS
+// ═══════════════════════════════════════════════════════════════
+
+app.get('/api/comments', async (req, res) => {
+  try {
+    const { post_id } = req.query
+    if (!post_id) return res.status(400).json({ error: 'post_id required' })
+
+    const result = await pool.query(
+      `SELECT c.*, row_to_json(p.*) AS profile
+       FROM comments c
+       LEFT JOIN profiles p ON c.user_id = p.id
+       WHERE c.post_id = $1
+       ORDER BY c.created_at ASC`,
+      [post_id]
+    )
+
+    const comments = result.rows.map(c => {
+      if (c.profile) delete c.profile.password_hash
+      return c
+    })
+
+    res.json({ comments })
+  } catch (err) {
+    console.error('Comments error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.post('/api/comments', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const { post_id, body } = req.body
+    if (!post_id || !body) {
+      return res.status(400).json({ error: 'post_id and body required' })
+    }
+
+    const result = await pool.query(
+      `INSERT INTO comments (post_id, user_id, body, created_at)
+       VALUES ($1, $2, $3, NOW()) RETURNING *`,
+      [post_id, decoded.sub, body]
+    )
+
+    // Increment comment count on post
+    await pool.query(
+      'UPDATE posts SET comments_count = comments_count + 1 WHERE id = $1',
+      [post_id]
+    )
+
+    // Notify post author (if different from commenter)
+    const post = await pool.query('SELECT user_id, title FROM posts WHERE id = $1', [post_id])
+    if (post.rows[0] && post.rows[0].user_id !== decoded.sub) {
+      await pool.query(
+        `INSERT INTO notifications (user_id, type, title, body, data)
+         VALUES ($1, 'comment', 'New comment on your post', $2, $3)`,
+        [
+          post.rows[0].user_id,
+          `Someone commented on "${post.rows[0].title}"`,
+          JSON.stringify({ post_id }),
+        ]
+      )
+    }
+
+    // Award 2 points + record activity for streak
+    await pool.query(
+      `INSERT INTO leaderboard_points (user_id, points, reason)
+       VALUES ($1, 2, $2)`,
+      [decoded.sub, `comment:${result.rows[0].id}`]
+    )
+    await recordActivity(decoded.sub, 'comment', 2)
+
+    res.json({ comment: result.rows[0] })
+  } catch (err) {
+    console.error('Create comment error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
 })
@@ -540,6 +629,54 @@ app.get('/api/groups', async (req, res) => {
     res.json({ groups: result.rows })
   } catch (err) {
     console.error('Groups error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.post('/api/groups/:id/join', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const groupId = req.params.id
+
+    // Check group exists and has room
+    const group = await pool.query('SELECT * FROM groups WHERE id = $1', [groupId])
+    if (group.rows.length === 0) return res.status(404).json({ error: 'Group not found' })
+
+    if (group.rows[0].max_members) {
+      const count = await pool.query('SELECT COUNT(*)::int AS count FROM group_members WHERE group_id = $1', [groupId])
+      if (count.rows[0].count >= group.rows[0].max_members) {
+        return res.status(400).json({ error: 'Group is full' })
+      }
+    }
+
+    await pool.query(
+      `INSERT INTO group_members (group_id, user_id, role, joined_at)
+       VALUES ($1, $2, 'member', NOW())
+       ON CONFLICT (group_id, user_id) DO NOTHING`,
+      [groupId, decoded.sub]
+    )
+
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Join group error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.delete('/api/groups/:id/leave', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    await pool.query(
+      'DELETE FROM group_members WHERE group_id = $1 AND user_id = $2',
+      [req.params.id, decoded.sub]
+    )
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Leave group error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
 })
@@ -594,6 +731,9 @@ app.post('/api/progress', async (req, res) => {
        WHERE NOT EXISTS (SELECT 1 FROM leaderboard_points WHERE user_id = $1 AND reason = $2)`,
       [decoded.sub, `watched:${drop_id}`]
     )
+
+    // Record daily activity for streak
+    await recordActivity(decoded.sub, 'watch', 5)
 
     res.json({ progress: result.rows[0] })
   } catch (err) {
@@ -653,6 +793,143 @@ app.patch('/api/notifications', async (req, res) => {
   } catch (err) {
     console.error('Mark read error:', err)
     res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
+// STREAKS + DAILY ACTIVITY
+// ═══════════════════════════════════════════════════════════════
+
+const STREAK_MILESTONES = [
+  { days: 7, bonus: 50 },
+  { days: 30, bonus: 200 },
+  { days: 100, bonus: 1000 },
+]
+
+async function recordActivity(userId, activityType, points = 0) {
+  try {
+    // 1. Log the activity (ignore duplicate for same type on same day)
+    await pool.query(
+      `INSERT INTO daily_activity (user_id, activity_date, activity_type, points_earned)
+       VALUES ($1, CURRENT_DATE, $2, $3)
+       ON CONFLICT (user_id, activity_date, activity_type) DO NOTHING`,
+      [userId, activityType, points]
+    )
+
+    // 2. Update streak
+    const streakResult = await pool.query(
+      'SELECT * FROM streaks WHERE user_id = $1', [userId]
+    )
+
+    const today = new Date().toISOString().split('T')[0]
+
+    if (streakResult.rows.length === 0) {
+      // First ever activity
+      await pool.query(
+        `INSERT INTO streaks (user_id, current_streak, longest_streak, last_activity_date, updated_at)
+         VALUES ($1, 1, 1, CURRENT_DATE, NOW())`,
+        [userId]
+      )
+    } else {
+      const streak = streakResult.rows[0]
+      const lastDate = streak.last_activity_date?.toISOString().split('T')[0]
+
+      if (lastDate === today) {
+        // Already active today, no-op
+        return streak.current_streak
+      }
+
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+      let newStreak
+
+      if (lastDate === yesterday) {
+        // Consecutive day — extend streak
+        newStreak = streak.current_streak + 1
+      } else {
+        // Streak broken — reset to 1
+        newStreak = 1
+      }
+
+      const newLongest = Math.max(newStreak, streak.longest_streak)
+
+      await pool.query(
+        `UPDATE streaks SET current_streak = $1, longest_streak = $2,
+         last_activity_date = CURRENT_DATE, updated_at = NOW()
+         WHERE user_id = $3`,
+        [newStreak, newLongest, userId]
+      )
+
+      // Check milestone bonuses
+      for (const m of STREAK_MILESTONES) {
+        if (newStreak === m.days) {
+          await pool.query(
+            `INSERT INTO leaderboard_points (user_id, points, reason)
+             SELECT $1, $2, $3
+             WHERE NOT EXISTS (SELECT 1 FROM leaderboard_points WHERE user_id = $1 AND reason = $3)`,
+            [userId, m.bonus, `streak:${m.days}day`]
+          )
+          await pool.query(
+            'UPDATE profiles SET total_points = total_points + $1 WHERE id = $2',
+            [m.bonus, userId]
+          )
+        }
+      }
+
+      return newStreak
+    }
+  } catch (err) {
+    console.error('Record activity error:', err.message)
+  }
+}
+
+// GET /api/streaks — current streak + 12-week heatmap
+app.get('/api/streaks', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    // Get streak data
+    const streakResult = await pool.query(
+      'SELECT current_streak, longest_streak, last_activity_date, streak_freeze_count FROM streaks WHERE user_id = $1',
+      [decoded.sub]
+    )
+
+    const streak = streakResult.rows[0] || {
+      current_streak: 0, longest_streak: 0,
+      last_activity_date: null, streak_freeze_count: 0,
+    }
+
+    // Check if streak is still alive (last activity was today or yesterday)
+    if (streak.last_activity_date) {
+      const lastDate = new Date(streak.last_activity_date)
+      const daysSince = Math.floor((Date.now() - lastDate.getTime()) / 86400000)
+      if (daysSince > 1) {
+        streak.current_streak = 0 // Streak is dead but we don't update DB until next action
+      }
+    }
+
+    // Get 12-week heatmap (84 days)
+    const heatmapResult = await pool.query(
+      `SELECT activity_date, COUNT(*)::int AS count, SUM(points_earned)::int AS points
+       FROM daily_activity
+       WHERE user_id = $1 AND activity_date >= CURRENT_DATE - INTERVAL '84 days'
+       GROUP BY activity_date
+       ORDER BY activity_date`,
+      [decoded.sub]
+    )
+
+    res.json({
+      streak: {
+        current: streak.current_streak,
+        longest: streak.longest_streak,
+        lastActivity: streak.last_activity_date,
+        freezesLeft: streak.streak_freeze_count,
+      },
+      heatmap: heatmapResult.rows,
+    })
+  } catch (err) {
+    console.error('Streaks error:', err)
+    res.json({ streak: { current: 0, longest: 0, lastActivity: null, freezesLeft: 0 }, heatmap: [] })
   }
 })
 

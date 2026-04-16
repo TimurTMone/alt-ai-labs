@@ -73,6 +73,16 @@ export function getBuilderLevel(points: number) {
   return { ...current, points, nextLevel, progressToNext: Math.min(progressToNext, 100) }
 }
 
+// ── Streaks ────────────────────────────────────────────────────
+export const STREAK_MILESTONES = [
+  { days: 3, label: 'Getting started', emoji: '🔥' },
+  { days: 7, label: 'One week strong', emoji: '💪', bonus: 50 },
+  { days: 14, label: 'Two weeks', emoji: '⚡' },
+  { days: 30, label: 'Monthly beast', emoji: '🏆', bonus: 200 },
+  { days: 60, label: 'Two months', emoji: '👑' },
+  { days: 100, label: 'Legend status', emoji: '💎', bonus: 1000 },
+] as const
+
 export const PRICING = {
   free: {
     name: 'Free',

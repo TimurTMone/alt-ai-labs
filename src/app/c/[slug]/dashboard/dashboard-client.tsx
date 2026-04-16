@@ -8,7 +8,8 @@ import { OnboardingOverlay } from '@/components/onboarding/onboarding-overlay'
 import { WelcomeToast } from '@/components/onboarding/welcome-toast'
 import { DIFFICULTY_COLORS, calculatePrizePool, getBuilderLevel } from '@/lib/constants'
 import { formatDistanceToNow } from 'date-fns'
-import type { Community, Drop, Profile, DropProgress, Post, LeaderboardEntry } from '@/types/database'
+import type { Community, Drop, Profile, DropProgress, Post, LeaderboardEntry, Streak, HeatmapDay } from '@/types/database'
+import { StreakCard } from '@/components/gamification/streak-card'
 
 interface DashboardClientProps {
   community: Community
@@ -17,9 +18,10 @@ interface DashboardClientProps {
   progress: DropProgress[]
   posts: Post[]
   leaderboard: (LeaderboardEntry & { profile: Profile; rank: number })[]
+  streakData: { streak: Streak; heatmap: HeatmapDay[] }
 }
 
-export function DashboardClient({ community, drops, profile, progress, posts, leaderboard }: DashboardClientProps) {
+export function DashboardClient({ community, drops, profile, progress, posts, leaderboard, streakData }: DashboardClientProps) {
   const base = `/c/${community.slug}`
   const currentDrop = drops.find(d => d.status === 'live')
   const completedDrops = drops.filter(d => d.status === 'completed')
@@ -56,6 +58,9 @@ export function DashboardClient({ community, drops, profile, progress, posts, le
             </div>
           ))}
         </div>
+
+        {/* ── Streak ────────────────────────────────────────────────── */}
+        <StreakCard streak={streakData.streak} heatmap={streakData.heatmap} />
 
         {/* ── Level Progress ───────────────────────────────────────── */}
         {level.nextLevel && (

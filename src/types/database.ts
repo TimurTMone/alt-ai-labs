@@ -144,6 +144,19 @@ export interface Group {
   _count?: { group_members: number }
 }
 
+export interface Streak {
+  current: number
+  longest: number
+  lastActivity: string | null
+  freezesLeft: number
+}
+
+export interface HeatmapDay {
+  activity_date: string
+  count: number
+  points: number
+}
+
 export interface GroupMember {
   id: string
   group_id: string

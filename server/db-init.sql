@@ -172,6 +172,28 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Streaks
+CREATE TABLE IF NOT EXISTS streaks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) UNIQUE,
+  current_streak INTEGER DEFAULT 0,
+  longest_streak INTEGER DEFAULT 0,
+  last_activity_date DATE,
+  streak_freeze_count INTEGER DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Daily activity log (for heatmap + streak tracking)
+CREATE TABLE IF NOT EXISTS daily_activity (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id),
+  activity_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  activity_type VARCHAR(50) NOT NULL,
+  points_earned INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, activity_date, activity_type)
+);
+
 -- ═══════════════════════════════════════════════════════════════
 -- Indexes
 -- ═══════════════════════════════════════════════════════════════
@@ -193,3 +215,5 @@ CREATE INDEX IF NOT EXISTS idx_groups_community ON groups(community_id);
 CREATE INDEX IF NOT EXISTS idx_group_members_group ON group_members(group_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, read) WHERE read = false;
+CREATE INDEX IF NOT EXISTS idx_streaks_user ON streaks(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_activity_user_date ON daily_activity(user_id, activity_date);

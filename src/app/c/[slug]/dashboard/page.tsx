@@ -1,4 +1,4 @@
-import { getDropsForCommunity, getCurrentProfile, getUserProgress, getPostsForCommunity, getLeaderboardForCommunity } from '@/lib/data'
+import { getDropsForCommunity, getCurrentProfile, getUserProgress, getPostsForCommunity, getLeaderboardForCommunity, getStreakData } from '@/lib/data'
 import { getCommunityBySlug } from '@/lib/data'
 import { notFound } from 'next/navigation'
 import { DashboardClient } from './dashboard-client'
@@ -8,12 +8,13 @@ export default async function DashboardPage({ params }: { params: Promise<{ slug
   const community = await getCommunityBySlug(slug)
   if (!community) notFound()
 
-  const [drops, profile, progress, posts, leaderboard] = await Promise.all([
+  const [drops, profile, progress, posts, leaderboard, streakData] = await Promise.all([
     getDropsForCommunity(community.id),
     getCurrentProfile(),
     getUserProgress(community.id),
     getPostsForCommunity(community.id),
     getLeaderboardForCommunity(community.id),
+    getStreakData(),
   ])
 
   return (
@@ -24,6 +25,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ slug
       progress={progress}
       posts={posts}
       leaderboard={leaderboard}
+      streakData={streakData}
     />
   )
 }
