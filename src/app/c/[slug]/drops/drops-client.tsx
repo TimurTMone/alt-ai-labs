@@ -24,7 +24,7 @@ export function DropsClient({ community, drops, progress }: DropsClientProps) {
     const isLive = drop.status === 'live'
     const hasVideo = !!drop.video_url
     return (
-      <Link href={`${base}/drops/${drop.slug}`} className={`group block rounded-2xl overflow-hidden glass hover:bg-white/[0.04] transition-all duration-200 ${isLive ? 'glow-blue border-blue-500/20' : ''}`}>
+      <Link href={`${base}/drops/${drop.slug}`} className={`group block rounded-2xl overflow-hidden transition-all duration-200 ${isLive ? 'glow-border-live' : 'glass hover:bg-white/[0.04]'}`}>
         <div className="p-5">
           {/* Top row: week + badges */}
           <div className="flex items-center gap-2 mb-3">
