@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { GdprConsent } from "@/components/challenge/gdpr-consent"
 import { PostHogProvider } from "@/components/analytics/posthog-provider"
+import { I18nProvider } from "@/lib/i18n/context"
 import { MetaPixel } from "@/components/analytics/meta-pixel"
 import "./globals.css"
 
@@ -63,7 +64,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-zinc-950 text-white antialiased">
         <PostHogProvider>
-          {children}
+          <I18nProvider>
+            {children}
+          </I18nProvider>
         </PostHogProvider>
         <MetaPixel />
         <GdprConsent />

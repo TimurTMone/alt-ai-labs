@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Clock, Trophy, CheckCircle2, AlertCircle, Play, Send, Github, Globe, Video, Paperclip, X, FileText, Zap, Award, Users, ChevronDown, ExternalLink, Heart } from 'lucide-react'
 import { ShareButtons } from '@/components/social/share-buttons'
+import { AIFeedbackCard } from '@/components/submissions/ai-feedback-card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -26,6 +27,7 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
 
   const [watched, setWatched] = useState(initialProgress?.watched ?? false)
   const [submitted, setSubmitted] = useState(initialProgress?.submitted ?? false)
+  const [submissionId, setSubmissionId] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [githubUrl, setGithubUrl] = useState('')
   const [liveUrl, setLiveUrl] = useState('')
@@ -68,6 +70,8 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
         }),
       })
       if (res.ok) {
+        const data = await res.json()
+        setSubmissionId(data.submission?.id || null)
         setSubmitted(true)
       }
     } catch {
@@ -341,6 +345,11 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
                 <ShareButtons title={drop.title} />
               </div>
             </div>
+          )}
+
+          {/* ── AI Feedback ────────────────────────────────── */}
+          {submitted && submissionId && (
+            <AIFeedbackCard submissionId={submissionId} />
           )}
         </div>
 

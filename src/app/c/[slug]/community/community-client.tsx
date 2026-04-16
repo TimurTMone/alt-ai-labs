@@ -5,6 +5,7 @@ import { PreviewBanner } from '@/components/ui/preview-banner'
 import { PostCard } from '@/components/cards/post-card'
 import { POST_CATEGORIES } from '@/lib/constants'
 import type { Community, Post } from '@/types/database'
+import { useI18n } from '@/lib/i18n/context'
 
 interface CommunityClientProps {
   community: Community
@@ -12,6 +13,7 @@ interface CommunityClientProps {
 }
 
 export function CommunityClient({ posts }: CommunityClientProps) {
+  const { t } = useI18n()
   const pinned = posts.filter(p => p.is_pinned)
   const regular = posts.filter(p => !p.is_pinned)
 
@@ -19,8 +21,8 @@ export function CommunityClient({ posts }: CommunityClientProps) {
     <AppLayout>
       <PreviewBanner feature="Community feed" />
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Community</h1>
-        <p className="text-[13px] text-zinc-500 mt-1">Share your wins, ask questions, and connect with other builders.</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('community', 'title')}</h1>
+        <p className="text-[13px] text-zinc-500 mt-1">{t('community', 'subtitle')}</p>
       </div>
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         <button className="text-[12px] px-3.5 py-1.5 rounded-full bg-blue-500 text-white font-medium shrink-0">All</button>

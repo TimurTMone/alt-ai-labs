@@ -7,6 +7,7 @@ import { AppLayout } from '@/components/layout/app-layout'
 import { OnboardingOverlay } from '@/components/onboarding/onboarding-overlay'
 import { WelcomeToast } from '@/components/onboarding/welcome-toast'
 import { DIFFICULTY_COLORS, calculatePrizePool, getBuilderLevel } from '@/lib/constants'
+import { useI18n } from '@/lib/i18n/context'
 import { formatDistanceToNow } from 'date-fns'
 import type { Community, Drop, Profile, DropProgress, Post, LeaderboardEntry, Streak, HeatmapDay } from '@/types/database'
 import { StreakCard } from '@/components/gamification/streak-card'
@@ -23,6 +24,7 @@ interface DashboardClientProps {
 
 export function DashboardClient({ community, drops, profile, progress, posts, leaderboard, streakData }: DashboardClientProps) {
   const base = `/c/${community.slug}`
+  const { t } = useI18n()
   const currentDrop = drops.find(d => d.status === 'live')
   const completedDrops = drops.filter(d => d.status === 'completed')
   const currentProgress = currentDrop ? progress.find(p => p.drop_id === currentDrop.id) : null
@@ -35,17 +37,17 @@ export function DashboardClient({ community, drops, profile, progress, posts, le
       <div className="space-y-6">
         {/* ── Header ───────────────────────────────────────────────── */}
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome back, {profile.full_name.split(' ')[0]}</h1>
-          <p className="text-[13px] text-zinc-500 mt-1">Watch the video. Do the challenge. Ship.</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('dashboard', 'welcomeBack')}, {profile.full_name.split(' ')[0]}</h1>
+          <p className="text-[13px] text-zinc-500 mt-1">{t('dashboard', 'watchBuildShip')}</p>
         </div>
 
         {/* ── Stats ────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: 'Points', value: profile.total_points, icon: Sparkles, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-            { label: 'Level', value: level.name, icon: Zap, color: level.color, bg: `${level.bg.split(' ')[0]}` },
-            { label: 'Completed', value: `${completedDrops.length}/${drops.length}`, icon: CheckCircle2, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-            { label: 'Rank', value: `#${leaderboard.findIndex(e => e.user_id === profile.id) + 1 || '—'}`, icon: TrendingUp, color: 'text-violet-400', bg: 'bg-violet-500/10' },
+            { label: t('dashboard', 'points'), value: profile.total_points, icon: Sparkles, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+            { label: t('dashboard', 'level'), value: level.name, icon: Zap, color: level.color, bg: `${level.bg.split(' ')[0]}` },
+            { label: t('dashboard', 'completed'), value: `${completedDrops.length}/${drops.length}`, icon: CheckCircle2, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+            { label: t('dashboard', 'rank'), value: `#${leaderboard.findIndex(e => e.user_id === profile.id) + 1 || '—'}`, icon: TrendingUp, color: 'text-violet-400', bg: 'bg-violet-500/10' },
           ].map(s => (
             <div key={s.label} className="rounded-2xl p-4 glass">
               <div className="flex items-center gap-2 mb-3">

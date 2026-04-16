@@ -7,6 +7,7 @@ const cors = require('cors')
 const { Pool } = require('pg')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const Anthropic = require('@anthropic-ai/sdk')
 
 const { OAuth2Client } = require('google-auth-library')
 const appleSignin = require('apple-signin-auth')
@@ -345,6 +346,82 @@ app.get('/api/challenges/:slug', async (req, res) => {
 })
 
 // ═══════════════════════════════════════════════════════════════
+// AI REVIEW (async, non-blocking)
+// ═══════════════════════════════════════════════════════════════
+
+async function generateAIReview(submissionId, dropId, projectUrl, demoUrl, notes) {
+  if (!process.env.ANTHROPIC_API_KEY) return
+
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+
+    // Get drop details for context
+    const dropResult = await pool.query(
+      'SELECT title, challenge_brief, challenge_deliverables, challenge_rules FROM drops WHERE id = $1',
+      [dropId]
+    )
+    if (dropResult.rows.length === 0) return
+    const drop = dropResult.rows[0]
+
+    const deliverables = Array.isArray(drop.challenge_deliverables) ? drop.challenge_deliverables.join('\n- ') : ''
+    const rules = Array.isArray(drop.challenge_rules) ? drop.challenge_rules.join('\n- ') : ''
+
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 800,
+      messages: [{
+        role: 'user',
+        content: `You are a friendly AI mentor reviewing a builder's submission on Alt AI Labs.
+
+CHALLENGE: "${drop.title}"
+BRIEF: ${drop.challenge_brief || 'N/A'}
+DELIVERABLES:
+- ${deliverables || 'N/A'}
+RULES:
+- ${rules || 'N/A'}
+
+SUBMISSION:
+- Project URL: ${projectUrl}
+- Demo URL: ${demoUrl || 'Not provided'}
+- Builder's notes: ${notes || 'None'}
+
+Give a short, encouraging review in this exact JSON format:
+{
+  "score": <number 1-100>,
+  "strengths": ["<strength 1>", "<strength 2>"],
+  "improvements": ["<suggestion 1>", "<suggestion 2>"],
+  "summary": "<1-2 sentence overall feedback>"
+}
+
+Be encouraging but honest. Focus on what they built, not what they didn't. Keep each item under 15 words. Return ONLY the JSON, no markdown.`
+      }]
+    })
+
+    const responseText = message.content[0]?.text
+    if (!responseText) return
+
+    // Parse and store
+    const review = JSON.parse(responseText)
+    await pool.query(
+      'UPDATE submissions SET feedback = $1, score = $2, updated_at = NOW() WHERE id = $3',
+      [JSON.stringify(review), review.score, submissionId]
+    )
+
+    // Notify the builder
+    const sub = await pool.query('SELECT user_id FROM submissions WHERE id = $1', [submissionId])
+    if (sub.rows[0]) {
+      await pool.query(
+        `INSERT INTO notifications (user_id, type, title, body, data)
+         VALUES ($1, 'ai_review', 'AI Review Ready', $2, $3)`,
+        [sub.rows[0].user_id, review.summary, JSON.stringify({ submission_id: submissionId })]
+      )
+    }
+  } catch (err) {
+    console.error('AI review error:', err.message)
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SUBMISSIONS
 // ═══════════════════════════════════════════════════════════════
 
@@ -369,6 +446,10 @@ app.post('/api/submissions', async (req, res) => {
 
     // Record daily activity for streak
     await recordActivity(decoded.sub, 'submit', 25)
+
+    // Trigger async AI review (non-blocking)
+    generateAIReview(result.rows[0].id, drop_id, project_url, demo_url, notes)
+      .catch(err => console.error('AI review failed:', err.message))
 
     res.json({ submission: result.rows[0] })
   } catch (err) {
@@ -843,6 +924,23 @@ app.patch('/api/notifications', async (req, res) => {
     res.json({ success: true })
   } catch (err) {
     console.error('Mark read error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// GET /api/submissions/:id/ai-review — get AI feedback
+app.get('/api/submissions/:id/ai-review', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT feedback, score FROM submissions WHERE id = $1',
+      [req.params.id]
+    )
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' })
+    const { feedback, score } = result.rows[0]
+    if (!feedback) return res.json({ review: null })
+    res.json({ review: typeof feedback === 'string' ? JSON.parse(feedback) : feedback, score })
+  } catch (err) {
+    console.error('AI review fetch error:', err)
     res.status(500).json({ error: 'Something went wrong' })
   }
 })

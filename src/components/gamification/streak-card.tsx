@@ -2,6 +2,7 @@
 
 import type { Streak, HeatmapDay } from '@/types/database'
 import { STREAK_MILESTONES } from '@/lib/constants'
+import { useI18n } from '@/lib/i18n/context'
 
 interface StreakCardProps {
   streak: Streak
@@ -9,6 +10,7 @@ interface StreakCardProps {
 }
 
 export function StreakCard({ streak, heatmap }: StreakCardProps) {
+  const { t } = useI18n()
   const isActive = streak.current > 0
   const nextMilestone = STREAK_MILESTONES.find(m => m.days > streak.current)
 
@@ -31,10 +33,10 @@ export function StreakCard({ streak, heatmap }: StreakCardProps) {
             <div>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl font-bold tracking-tight">{streak.current}</span>
-                <span className="text-xs text-zinc-500 font-medium">day streak</span>
+                <span className="text-xs text-zinc-500 font-medium">{t('dashboard', 'dayStreak')}</span>
               </div>
               {streak.longest > streak.current && (
-                <p className="text-[10px] text-zinc-600">Best: {streak.longest} days</p>
+                <p className="text-[10px] text-zinc-600">{t('dashboard', 'bestStreak')}: {streak.longest}</p>
               )}
             </div>
           </div>

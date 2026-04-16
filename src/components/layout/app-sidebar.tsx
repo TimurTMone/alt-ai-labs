@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils'
 import { useCommunity } from '@/lib/community-context'
 import { signOut } from '@/lib/auth/client'
 import { useRouter } from 'next/navigation'
+import { useI18n } from '@/lib/i18n/context'
+import { LanguageSwitcher } from './language-switcher'
 import { NotificationBell } from '@/components/challenge/notification-bell'
 
 interface AppSidebarProps {
@@ -18,15 +20,16 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const community = useCommunity()
+  const { t } = useI18n()
   const base = community ? `/c/${community.slug}` : ''
 
   const navItems = community ? [
-    { label: 'Dashboard', href: `${base}/dashboard`, icon: LayoutDashboard },
-    { label: 'Drops', href: `${base}/drops`, icon: Play },
-    { label: 'Classroom', href: `${base}/classroom`, icon: BookOpen },
-    { label: 'Community', href: `${base}/community`, icon: MessageSquare },
-    { label: 'Leaderboard', href: `${base}/leaderboard`, icon: Medal },
-    { label: 'Groups', href: `${base}/groups`, icon: Users },
+    { label: t('nav', 'dashboard'), href: `${base}/dashboard`, icon: LayoutDashboard },
+    { label: t('nav', 'drops'), href: `${base}/drops`, icon: Play },
+    { label: t('nav', 'classroom'), href: `${base}/classroom`, icon: BookOpen },
+    { label: t('nav', 'community'), href: `${base}/community`, icon: MessageSquare },
+    { label: t('nav', 'leaderboard'), href: `${base}/leaderboard`, icon: Medal },
+    { label: t('nav', 'groups'), href: `${base}/groups`, icon: Users },
   ] : []
 
   const handleSignOut = () => {
@@ -85,8 +88,11 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
           <User className="w-4.5 h-4.5" /> Profile
         </Link>
         <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all duration-150 w-full">
-          <LogOut className="w-4.5 h-4.5" /> Sign Out
+          <LogOut className="w-4.5 h-4.5" /> {t('nav', 'signOut')}
         </button>
+        <div className="mt-2 px-1">
+          <LanguageSwitcher />
+        </div>
       </div>
     </aside>
   )
