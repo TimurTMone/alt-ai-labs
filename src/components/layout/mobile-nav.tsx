@@ -12,6 +12,7 @@ import { signOut } from '@/lib/auth/client'
 import { useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
 import { LanguageSwitcher } from './language-switcher'
+import { ThemeToggle } from './theme-toggle'
 import { NotificationBell } from '@/components/challenge/notification-bell'
 
 export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
@@ -78,8 +79,9 @@ export function MobileNav({ isAdmin }: { isAdmin?: boolean }) {
             <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] w-full">
               <LogOut className="w-4 h-4" /> {t('nav', 'signOut')}
             </button>
-            <div className="mt-4 px-3 pt-3 border-t border-white/[0.06]">
+            <div className="mt-4 px-3 pt-3 border-t border-white/[0.06] flex items-center gap-1">
               <LanguageSwitcher />
+              <ThemeToggle />
             </div>
           </nav>
         </SheetContent>

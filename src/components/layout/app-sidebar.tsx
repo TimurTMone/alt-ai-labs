@@ -9,6 +9,7 @@ import { signOut } from '@/lib/auth/client'
 import { useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
 import { LanguageSwitcher } from './language-switcher'
+import { ThemeToggle } from './theme-toggle'
 import { NotificationBell } from '@/components/challenge/notification-bell'
 
 interface AppSidebarProps {
@@ -90,8 +91,9 @@ export function AppSidebar({ isAdmin, className }: AppSidebarProps) {
         <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all duration-150 w-full">
           <LogOut className="w-4.5 h-4.5" /> {t('nav', 'signOut')}
         </button>
-        <div className="mt-2 px-1">
+        <div className="mt-2 px-1 flex items-center gap-1">
           <LanguageSwitcher />
+          <ThemeToggle />
         </div>
       </div>
     </aside>

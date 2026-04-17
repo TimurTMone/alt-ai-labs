@@ -18,7 +18,7 @@
 
 .glow-border-live {
   position: relative;
-  background: #18181b;
+  background: var(--app-card);
   border-radius: 1rem;
   isolation: isolate;
 }
@@ -37,7 +37,7 @@
   position: absolute;
   inset: 1px;
   border-radius: inherit;
-  background: #18181b;
+  background: var(--app-card);
   z-index: -1;
 }
 
@@ -85,42 +85,56 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ─── Dark-only app. Primary = blue-500 ────────────────────────── */
+/* ═══ LIGHT THEME (default) ══════════════════════════════════════ */
 :root {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.623 0.214 259.815);   /* blue-500 */
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(0.97 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.623 0.214 259.815);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.646 0.222 41.116);  /* orange-600 — color-blind safe */
-  --border: oklch(1 0 0 / 8%);
-  --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.623 0.214 259.815);   /* blue-500 */
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --secondary: oklch(0.94 0 0);
+  --secondary-foreground: oklch(0.25 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.94 0 0);
+  --accent-foreground: oklch(0.25 0 0);
+  --destructive: oklch(0.646 0.222 41.116);
+  --border: oklch(0 0 0 / 8%);
+  --input: oklch(0 0 0 / 6%);
+  --ring: oklch(0.623 0.214 259.815);
+  --chart-1: oklch(0.25 0 0);
+  --chart-2: oklch(0.45 0 0);
+  --chart-3: oklch(0.55 0 0);
+  --chart-4: oklch(0.65 0 0);
+  --chart-5: oklch(0.75 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.975 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.623 0.214 259.815);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.94 0 0);
+  --sidebar-accent-foreground: oklch(0.25 0 0);
+  --sidebar-border: oklch(0 0 0 / 8%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* App-level vars for hardcoded references */
+  --app-bg: #ffffff;
+  --app-surface: #f8f8fa;
+  --app-card: #f4f4f5;
+  --app-text: #18181b;
+  --app-text-secondary: #52525b;
+  --app-text-muted: #71717a;
+  --app-text-dim: #a1a1aa;
+  --app-border: rgba(0, 0, 0, 0.08);
+  --app-border-emphasis: rgba(0, 0, 0, 0.12);
+  --app-glass-bg: rgba(0, 0, 0, 0.03);
+  --app-glass-border: rgba(0, 0, 0, 0.07);
 }
 
+/* ═══ DARK THEME ════════════════════════════════════════════════ */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -153,6 +167,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  --app-bg: #09090b;
+  --app-surface: #111113;
+  --app-card: #18181b;
+  --app-text: #ffffff;
+  --app-text-secondary: #a1a1aa;
+  --app-text-muted: #71717a;
+  --app-text-dim: #52525b;
+  --app-border: rgba(255, 255, 255, 0.06);
+  --app-border-emphasis: rgba(255, 255, 255, 0.08);
+  --app-glass-bg: rgba(255, 255, 255, 0.03);
+  --app-glass-border: rgba(255, 255, 255, 0.06);
 }
 
 @layer base {
@@ -173,64 +199,104 @@
   }
 }
 
-/*
- * ─── DESIGN SYSTEM ──────────────────────────────────────────────
- *
- * Background:     zinc-950 (#09090b)
- * Surface:        .card / .glass
- * Primary:        blue-500  (accessible to all color vision types)
- * Achievement:    amber-500 (prizes, gold)
- * Creator:        violet-500 (premium, creator)
- * Info:           sky-400   (learning, tips)
- * Destructive:    orange-600 (color-blind safe, not red)
- *
- * Text:  Heading → text-white | Body → text-zinc-400 | Muted → text-zinc-500
- * Border: border-white/[0.06] standard | border-white/[0.08] emphasis
- * Radius: rounded-xl (buttons, inputs) | rounded-2xl (cards)
- *
- * Typography scale (use these instead of arbitrary px):
- *   text-xs   = 12px  — metadata, timestamps
- *   text-sm   = 14px  — body, labels, nav
- *   text-base = 16px  — body emphasis, inputs
- *   text-lg   = 18px  — subheadings
- *   text-xl   = 20px  — card titles
- *   text-2xl  = 24px  — section titles
- *   text-3xl+ = 30px+ — hero headings (use Tailwind scale)
- *
- * Spacing: 4px grid (p-1=4, p-2=8, p-3=12, p-4=16, p-6=24, p-8=32)
- * ────────────────────────────────────────────────────────────────
- */
+/* ═══ THEME-AWARE OVERRIDES ═════════════════════════════════════
+ * These override the hardcoded dark colors used throughout
+ * the app (bg-[#09090b], text-white, bg-white/[0.06], etc.)
+ * so they automatically adapt to light theme.
+ * ═══════════════════════════════════════════════════════════════ */
 
-/* Cards */
-.card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 1rem;
+/* Body & full-page backgrounds */
+html:not(.dark) body {
+  background: var(--app-bg) !important;
+  color: var(--app-text) !important;
+}
+html:not(.dark) .min-h-screen.bg-\[\#09090b\],
+html:not(.dark) .bg-\[\#09090b\] {
+  background: var(--app-bg) !important;
+}
+html:not(.dark) .bg-zinc-950 {
+  background: var(--app-bg) !important;
 }
 
+/* Text colors */
+html:not(.dark) .text-white {
+  color: var(--app-text) !important;
+}
+html:not(.dark) .text-zinc-400 {
+  color: var(--app-text-secondary) !important;
+}
+html:not(.dark) .text-zinc-500 {
+  color: var(--app-text-muted) !important;
+}
+html:not(.dark) .text-zinc-600 {
+  color: var(--app-text-dim) !important;
+}
+
+/* Borders */
+html:not(.dark) [class*="border-white\\/"] {
+  border-color: var(--app-border) !important;
+}
+
+/* Glass/card backgrounds */
+html:not(.dark) [class*="bg-white\\/\\[0\\.0"] {
+  background: var(--app-glass-bg) !important;
+}
+
+/* Sidebar and nav */
+html:not(.dark) .bg-\[\#09090b\]\/80 {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Input fields */
+html:not(.dark) .bg-white\/10,
+html:not(.dark) .bg-white\/\[0\.04\],
+html:not(.dark) .bg-white\/\[0\.06\] {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+html:not(.dark) input, html:not(.dark) textarea {
+  color: var(--app-text) !important;
+}
+
+/* Cards */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--app-glass-bg);
+  border: 1px solid var(--app-glass-border);
 }
 
 .glass-strong {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
+html:not(.dark) .glass-strong {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
 
-/* Gradients — use instead of inline styles */
+.card {
+  background: var(--app-glass-bg);
+  border: 1px solid var(--app-glass-border);
+  border-radius: 1rem;
+}
+
+/* Sheets and modals */
+html:not(.dark) .bg-\[\#111113\] {
+  background: #ffffff !important;
+}
+html:not(.dark) .bg-\[\#18181b\] {
+  background: #f4f4f5 !important;
+}
+
+/* Gradients — stay the same in both themes */
 .bg-gradient-brand {
   background: linear-gradient(135deg, #3b82f6, #7c3aed);
 }
-
 .bg-gradient-brand-hover {
   background: linear-gradient(135deg, #60a5fa, #8b5cf6);
 }
-
 .bg-gradient-brand-subtle {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(124, 58, 237, 0.08));
 }
-
 .text-gradient-brand {
   background: linear-gradient(to right, #60a5fa, #a78bfa, #e879f9);
   -webkit-background-clip: text;
@@ -238,28 +304,18 @@
   background-clip: text;
 }
 
-/* Glows */
-.glow-blue {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 60px rgba(59, 130, 246, 0.06);
-}
+/* Glows — subtle in light, more visible in dark */
+.glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 60px rgba(59, 130, 246, 0.06); }
+.glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 60px rgba(245, 158, 11, 0.06); }
+.glow-violet { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15), 0 0 60px rgba(139, 92, 246, 0.06); }
+.glow-gradient { box-shadow: 0 0 24px rgba(59, 130, 246, 0.12), 0 0 64px rgba(139, 92, 246, 0.06); }
+.glow-gradient-strong { box-shadow: 0 0 32px rgba(59, 130, 246, 0.2), 0 0 80px rgba(139, 92, 246, 0.1); }
 
-.glow-amber {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 60px rgba(245, 158, 11, 0.06);
-}
+html:not(.dark) .glow-blue { box-shadow: 0 2px 12px rgba(59, 130, 246, 0.1); }
+html:not(.dark) .glow-amber { box-shadow: 0 2px 12px rgba(245, 158, 11, 0.1); }
+html:not(.dark) .glow-violet { box-shadow: 0 2px 12px rgba(139, 92, 246, 0.1); }
 
-.glow-violet {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.15), 0 0 60px rgba(139, 92, 246, 0.06);
-}
-
-.glow-gradient {
-  box-shadow: 0 0 24px rgba(59, 130, 246, 0.12), 0 0 64px rgba(139, 92, 246, 0.06);
-}
-
-.glow-gradient-strong {
-  box-shadow: 0 0 32px rgba(59, 130, 246, 0.2), 0 0 80px rgba(139, 92, 246, 0.1);
-}
-
-/* Inputs — blue focus ring (accessible) */
+/* Inputs — blue focus ring */
 input:focus, textarea:focus, select:focus {
   border-color: rgba(59, 130, 246, 0.3) !important;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08) !important;
@@ -277,12 +333,11 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 28px rgba(59, 130, 246, 0.25);
 }
 
-/* Smooth text rendering for large headings */
-h1, h2, h3 {
-  text-rendering: optimizeLegibility;
-}
+/* Smooth text rendering */
+h1, h2, h3 { text-rendering: optimizeLegibility; }
 
-/* Utility */
-.h-13 {
-  height: 3.25rem;
-}
+/* Light theme meta-color for mobile */
+html:not(.dark) { color-scheme: light; }
+.dark { color-scheme: dark; }
+
+.h-13 { height: 3.25rem; }

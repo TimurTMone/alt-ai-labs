@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { GdprConsent } from "@/components/challenge/gdpr-consent"
 import { PostHogProvider } from "@/components/analytics/posthog-provider"
 import { I18nProvider } from "@/lib/i18n/context"
+import { ThemeProvider } from "@/lib/theme-provider"
 import { MetaPixel } from "@/components/analytics/meta-pixel"
 import "./globals.css"
 
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -64,9 +65,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-zinc-950 text-white antialiased">
         <PostHogProvider>
-          <I18nProvider>
-            {children}
-          </I18nProvider>
+          <ThemeProvider>
+            <I18nProvider>
+              {children}
+            </I18nProvider>
+          </ThemeProvider>
         </PostHogProvider>
         <MetaPixel />
         <GdprConsent />

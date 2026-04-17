@@ -10,6 +10,7 @@ import { ArrowRight, Play } from 'lucide-react'
 import { DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
 import { useI18n } from '@/lib/i18n/context'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
@@ -133,9 +134,10 @@ function LoginForm() {
           </>
         )}
 
-        {/* Language switcher */}
-        <div className="flex justify-center mt-6">
+        {/* Language + Theme */}
+        <div className="flex justify-center gap-2 mt-6">
           <LanguageSwitcher />
+          <ThemeToggle />
         </div>
       </div>
     </div>
