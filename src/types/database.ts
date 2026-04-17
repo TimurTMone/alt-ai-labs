@@ -36,16 +36,22 @@ export interface Profile {
   updated_at: string
 }
 
-// The core unit: you drop a video + challenge together each week
+export type DropType = 'video' | 'text' | 'github'
+
+// A drop = content + challenge. Can be video-based, text-based, or code-based.
 export interface Drop {
   id: string
   community_id: string
+  drop_type: DropType
   title: string
   slug: string
   description: string
-  // The lesson/video
+  // Video content (drop_type = 'video')
   video_url: string | null
   thumbnail_url: string | null
+  // Text/code content (drop_type = 'text' or 'github')
+  content_body: string | null
+  resource_urls: { label: string; url: string }[]
   duration_minutes: number
   difficulty: Difficulty
   is_free: boolean

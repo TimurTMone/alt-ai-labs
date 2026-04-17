@@ -22,7 +22,7 @@ export function DropsClient({ community, drops, progress }: DropsClientProps) {
   function DropCard({ drop }: { drop: Drop }) {
     const dropProgress = progress.find(p => p.drop_id === drop.id)
     const isLive = drop.status === 'live'
-    const hasVideo = !!drop.video_url
+    const isVideo = drop.drop_type === 'video' || (!drop.drop_type && !!drop.video_url)
     return (
       <Link href={`${base}/drops/${drop.slug}`} className={`group block rounded-2xl overflow-hidden transition-all duration-200 ${isLive ? 'glow-border-live' : 'glass hover:bg-white/[0.04]'}`}>
         <div className="p-5">
@@ -61,7 +61,7 @@ export function DropsClient({ community, drops, progress }: DropsClientProps) {
               </span>
             )}
             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {drop.duration_minutes}m</span>
-            {hasVideo ? (
+            {isVideo ? (
               <span className="flex items-center gap-1 text-blue-400"><Play className="w-3 h-3" /> Video</span>
             ) : (
               <span className="flex items-center gap-1 text-zinc-600"><Play className="w-3 h-3" /> No video yet</span>

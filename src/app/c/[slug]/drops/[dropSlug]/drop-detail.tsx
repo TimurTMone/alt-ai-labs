@@ -174,34 +174,71 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
         <div className="rounded-2xl overflow-hidden glass mb-6">
           <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
             <h2 className="text-sm font-semibold flex items-center gap-2 text-zinc-300">
-              <div className="w-6 h-6 rounded-lg bg-blue-500/15 flex items-center justify-center"><Play className="w-3.5 h-3.5 text-blue-400" /></div>
-              Video Lesson
+              <div className="w-6 h-6 rounded-lg bg-blue-500/15 flex items-center justify-center">
+                {drop.drop_type === 'video' ? <Play className="w-3.5 h-3.5 text-blue-400" /> : <FileText className="w-3.5 h-3.5 text-blue-400" />}
+              </div>
+              {drop.drop_type === 'video' ? 'Video Lesson' : drop.drop_type === 'github' ? 'Code Walkthrough' : 'Lesson'}
             </h2>
             {watched && <span className="text-xs text-blue-400 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Completed</span>}
           </div>
           <div className="p-6">
-            {isUpcoming && !drop.video_url ? (
-              <div className="aspect-video rounded-xl bg-white/[0.02] border border-dashed border-white/[0.08] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-white/[0.04] flex items-center justify-center mx-auto mb-3">
-                    <Play className="w-7 h-7 text-zinc-600" />
+            {/* ── Video Drop ──────────────────────────────── */}
+            {drop.drop_type === 'video' && (
+              isUpcoming && !drop.video_url ? (
+                <div className="aspect-video rounded-xl bg-white/[0.02] border border-dashed border-white/[0.08] flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-white/[0.04] flex items-center justify-center mx-auto mb-3">
+                      <Play className="w-7 h-7 text-zinc-600" />
+                    </div>
+                    <p className="text-sm font-medium text-zinc-500">Coming Soon</p>
+                    <p className="text-xs text-zinc-600 mt-1">This lesson hasn&apos;t dropped yet</p>
                   </div>
-                  <p className="text-sm font-medium text-zinc-500">Coming Soon</p>
-                  <p className="text-xs text-zinc-600 mt-1">This lesson hasn&apos;t dropped yet</p>
                 </div>
-              </div>
-            ) : drop.video_url ? (
-              <>
-                <div className="aspect-video rounded-xl overflow-hidden bg-black border border-white/[0.06]">
-                  <iframe src={drop.video_url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-                </div>
+              ) : drop.video_url ? (
+                <>
+                  <div className="aspect-video rounded-xl overflow-hidden bg-black border border-white/[0.06]">
+                    <iframe src={drop.video_url} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                  </div>
+                  {!watched && (
+                    <button onClick={handleMarkWatched} className="mt-4 inline-flex items-center gap-2 btn-primary text-white h-10 px-5 text-sm font-semibold rounded-xl transition-all">
+                      <CheckCircle2 className="w-4 h-4" /> I watched this — unlock the challenge
+                    </button>
+                  )}
+                </>
+              ) : null
+            )}
+
+            {/* ── Text / GitHub Drop ─────────────────────── */}
+            {(drop.drop_type === 'text' || drop.drop_type === 'github') && (
+              <div className="space-y-4">
+                {drop.content_body && (
+                  <div className="text-[13px] text-zinc-300 leading-relaxed whitespace-pre-wrap">{drop.content_body}</div>
+                )}
+                {drop.resource_urls && drop.resource_urls.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-zinc-600 font-medium uppercase tracking-wider">Resources</p>
+                    {drop.resource_urls.map((r: { label: string; url: string }, i: number) => (
+                      <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2.5 px-4 py-3 rounded-xl glass hover:bg-white/[0.06] transition-colors group">
+                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                          {r.url.includes('github.com') ? <Github className="w-4 h-4 text-blue-400" /> : <ExternalLink className="w-4 h-4 text-blue-400" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-medium text-zinc-200 truncate">{r.label}</p>
+                          <p className="text-[11px] text-zinc-600 truncate">{r.url}</p>
+                        </div>
+                        <ExternalLink className="w-3.5 h-3.5 text-zinc-600 group-hover:text-blue-400 transition-colors" />
+                      </a>
+                    ))}
+                  </div>
+                )}
                 {!watched && (
-                  <button onClick={handleMarkWatched} className="mt-4 inline-flex items-center gap-2 btn-primary text-white h-10 px-5 text-sm font-semibold rounded-xl transition-all">
-                    <CheckCircle2 className="w-4 h-4" /> I watched this — unlock the challenge
+                  <button onClick={handleMarkWatched} className="inline-flex items-center gap-2 btn-primary text-white h-10 px-5 text-sm font-semibold rounded-xl transition-all">
+                    <CheckCircle2 className="w-4 h-4" /> I read this — unlock the challenge
                   </button>
                 )}
-              </>
-            ) : null}
+              </div>
+            )}
           </div>
         </div>
 
