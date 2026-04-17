@@ -8,6 +8,7 @@ const { Pool } = require('pg')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const Anthropic = require('@anthropic-ai/sdk')
+const { Resend } = require('resend')
 
 const { OAuth2Client } = require('google-auth-library')
 const appleSignin = require('apple-signin-auth')
@@ -57,7 +58,67 @@ async function findOrCreateOAuthUser(email, fullName) {
      VALUES ($1, $2, 'free', false, 0, NOW(), NOW()) RETURNING *`,
     [normalized, fullName || normalized.split('@')[0]]
   )
+  // Welcome email for new OAuth users
+  emailWelcome(normalized, fullName || normalized.split('@')[0])
   return result.rows[0]
+}
+
+// ── Email (Resend) ─────────────────────────────────────────────
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Alt AI Labs <noreply@altailabs.com>'
+
+async function sendEmail(to, subject, html) {
+  if (!resend) return
+  try {
+    await resend.emails.send({ from: FROM_EMAIL, to, subject, html })
+    console.log(`Email sent: ${subject} → ${to}`)
+  } catch (err) {
+    console.error('Email error:', err.message)
+  }
+}
+
+function emailWelcome(email, name) {
+  const appUrl = FRONTEND_URL
+  sendEmail(email, 'Welcome to Alt AI Labs!',
+    `<div style="font-family:system-ui;max-width:480px;margin:0 auto;padding:24px">
+      <div style="background:linear-gradient(135deg,#3b82f6,#7c3aed);padding:16px 20px;border-radius:12px;margin-bottom:24px">
+        <span style="color:white;font-weight:800;font-size:18px">AI</span>
+      </div>
+      <h1 style="font-size:22px;margin:0 0 8px">Welcome, ${name}!</h1>
+      <p style="color:#666;font-size:14px;line-height:1.6">You've joined Alt AI Labs — where builders learn AI by shipping real projects and winning cash prizes.</p>
+      <p style="color:#666;font-size:14px;line-height:1.6">Here's how it works:</p>
+      <ol style="color:#666;font-size:14px;line-height:1.8">
+        <li><strong>Watch</strong> a drop (video or text lesson)</li>
+        <li><strong>Build</strong> the challenge</li>
+        <li><strong>Submit</strong> and compete for prizes</li>
+      </ol>
+      <a href="${appUrl}/c/alt-ai-labs/drops" style="display:inline-block;background:#3b82f6;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;margin-top:12px">Browse Drops →</a>
+      <p style="color:#999;font-size:12px;margin-top:24px">Keep your streak alive — build something every day 🔥</p>
+    </div>`)
+}
+
+function emailSubmissionConfirmed(email, name, dropTitle) {
+  sendEmail(email, `Build submitted: ${dropTitle}`,
+    `<div style="font-family:system-ui;max-width:480px;margin:0 auto;padding:24px">
+      <h1 style="font-size:20px;margin:0 0 8px">Nice work, ${name}! 🚀</h1>
+      <p style="color:#666;font-size:14px;line-height:1.6">Your submission for <strong>"${dropTitle}"</strong> is in. Good luck!</p>
+      <p style="color:#666;font-size:14px;line-height:1.6">Your build is now visible to the community. Other builders can vote and review it.</p>
+      <p style="color:#999;font-size:12px;margin-top:24px">Share your build on social media to get more votes!</p>
+    </div>`)
+}
+
+function emailNewDrop(email, name, dropTitle, dropSlug) {
+  const url = `${FRONTEND_URL}/c/alt-ai-labs/drops/${dropSlug}`
+  sendEmail(email, `New drop: ${dropTitle}`,
+    `<div style="font-family:system-ui;max-width:480px;margin:0 auto;padding:24px">
+      <h1 style="font-size:20px;margin:0 0 8px">New drop just landed 🔥</h1>
+      <p style="color:#666;font-size:14px;line-height:1.6">Hey ${name}, a new challenge is live:</p>
+      <div style="background:#f8f8fa;border:1px solid #eee;border-radius:12px;padding:16px;margin:16px 0">
+        <p style="font-weight:700;font-size:16px;margin:0 0 4px">${dropTitle}</p>
+        <p style="color:#666;font-size:13px;margin:0">Watch. Build. Win.</p>
+      </div>
+      <a href="${url}" style="display:inline-block;background:#3b82f6;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">Start Building →</a>
+    </div>`)
 }
 
 // ── Middleware ───────────────────────────────────────────────────
@@ -147,6 +208,10 @@ app.post('/api/auth/signup', async (req, res) => {
 
     const user = result.rows[0]
     const token = signToken(user)
+
+    // Send welcome email
+    emailWelcome(user.email, user.full_name)
+
     res.json({ token, user })
   } catch (err) {
     console.error('Signup error:', err)
@@ -486,6 +551,13 @@ app.post('/api/submissions', async (req, res) => {
     // Trigger async AI review (non-blocking)
     generateAIReview(result.rows[0].id, drop_id, project_url, demo_url, notes)
       .catch(err => console.error('AI review failed:', err.message))
+
+    // Send submission confirmation email
+    const dropInfo = await pool.query('SELECT title FROM drops WHERE id = $1', [drop_id])
+    const userInfo = await pool.query('SELECT email, full_name FROM profiles WHERE id = $1', [decoded.sub])
+    if (dropInfo.rows[0] && userInfo.rows[0]) {
+      emailSubmissionConfirmed(userInfo.rows[0].email, userInfo.rows[0].full_name, dropInfo.rows[0].title)
+    }
 
     res.json({ submission: result.rows[0] })
   } catch (err) {
