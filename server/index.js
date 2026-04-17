@@ -126,6 +126,8 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://alt-ai-labs.vercel.app',
   'https://altaihub.com',
+  'https://altailabs.club',
+  'https://www.altailabs.club',
   'http://localhost:3000',
 ].filter(Boolean)
 

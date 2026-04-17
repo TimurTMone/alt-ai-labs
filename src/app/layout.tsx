@@ -13,35 +13,35 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], dis
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://alt-ai-labs.vercel.app"),
+  metadataBase: new URL("https://altailabs.club"),
   title: {
-    default: "Alt AI Labs — Learn AI by Building Real Products",
-    template: "%s | Alt AI Labs",
+    default: "Alt AI Labs Club — AI Tournament for Future Founders",
+    template: "%s | Alt AI Labs Club",
   },
-  description: "Every week: a new AI project, a video lesson, a build challenge. Ship real AI products and win cash prizes. Join 127+ builders.",
-  keywords: ["AI", "learn AI", "build AI", "AI projects", "Claude", "AI course", "AI community", "AI challenges", "vibe coding", "AI agents"],
+  description: "Learn AI by building. Compete in challenges. Win cash prizes. Top builders get hired. Join the club.",
+  keywords: ["AI", "learn AI", "build AI", "AI tournament", "AI challenges", "AI community", "win prizes", "AI jobs", "future founders", "vibe coding"],
   authors: [{ name: "Alt AI Labs" }],
   creator: "Alt AI Labs",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://alt-ai-labs.vercel.app",
-    siteName: "Alt AI Labs",
-    title: "Alt AI Labs — Stop Learning AI. Start Shipping It.",
-    description: "Every week: a new AI project, a video lesson, a build challenge. The best builds win cash prizes. Join free.",
+    url: "https://altailabs.club",
+    siteName: "Alt AI Labs Club",
+    title: "Alt AI Labs Club — Learn. Build. Compete. Get Hired.",
+    description: "AI tournament for future founders. Watch drops, build challenges, win cash prizes. Top performers get hired by Alt AI Labs and partners.",
     images: [
       {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Alt AI Labs — Learn AI by building real products",
+        alt: "Alt AI Labs Club — AI Tournament for Future Founders",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alt AI Labs — Stop Learning AI. Start Shipping It.",
-    description: "Every week: a new AI project, a video lesson, a build challenge. The best builds win cash prizes. Join free.",
+    title: "Alt AI Labs Club — Learn. Build. Compete. Get Hired.",
+    description: "AI tournament for future founders. Watch drops, build challenges, win cash prizes. Top performers get hired.",
     images: ["/og.png"],
   },
   robots: {
