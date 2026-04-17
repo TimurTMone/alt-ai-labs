@@ -422,6 +422,42 @@ Be encouraging but honest. Focus on what they built, not what they didn't. Keep 
 }
 
 // ═══════════════════════════════════════════════════════════════
+// REVENUECAT WEBHOOK
+// ═══════════════════════════════════════════════════════════════
+
+app.post('/api/webhooks/revenuecat', async (req, res) => {
+  try {
+    const { event } = req.body
+    if (!event) return res.json({ ok: true })
+
+    const appUserId = event.app_user_id
+    const type = event.type
+
+    // Map RevenueCat events to membership tier updates
+    if (['INITIAL_PURCHASE', 'RENEWAL', 'UNCANCELLATION'].includes(type)) {
+      // User subscribed or renewed
+      await pool.query(
+        "UPDATE profiles SET membership_tier = 'pro', updated_at = NOW() WHERE id = $1",
+        [appUserId]
+      )
+      console.log(`RevenueCat: ${appUserId} → pro (${type})`)
+    } else if (['CANCELLATION', 'EXPIRATION', 'BILLING_ISSUE'].includes(type)) {
+      // Subscription ended
+      await pool.query(
+        "UPDATE profiles SET membership_tier = 'free', updated_at = NOW() WHERE id = $1",
+        [appUserId]
+      )
+      console.log(`RevenueCat: ${appUserId} → free (${type})`)
+    }
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('RevenueCat webhook error:', err.message)
+    res.json({ ok: true }) // Always 200 so RevenueCat doesn't retry
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
 // SUBMISSIONS
 // ═══════════════════════════════════════════════════════════════
 
