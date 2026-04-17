@@ -116,7 +116,7 @@ export function ProfileClient({ profile }: ProfileClientProps) {
           <div className="space-y-1.5">
             <Label htmlFor="username" className="text-[13px] text-zinc-400">Username</Label>
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-zinc-600">altaihub.com/u/</span>
+              <span className="text-[13px] text-zinc-600">altailabs.club/u/</span>
               <Input id="username" value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                 placeholder="your-username" className="h-10 bg-white/[0.04] border-white/[0.08] text-white rounded-xl text-[13px] flex-1" />
             </div>

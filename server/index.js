@@ -124,8 +124,6 @@ function emailNewDrop(email, name, dropTitle, dropSlug) {
 // ── Middleware ───────────────────────────────────────────────────
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  'https://alt-ai-labs.vercel.app',
-  'https://altaihub.com',
   'https://altailabs.club',
   'https://www.altailabs.club',
   'http://localhost:3000',
