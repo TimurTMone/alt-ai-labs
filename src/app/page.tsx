@@ -3,16 +3,14 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, CheckCircle2, Loader2, ChevronRight, Play, Trophy, Users, Sparkles, Zap, Bot, Code2, Rocket, Clock, Building2, Award } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Loader2, Play, Trophy, Zap, Clock, Building2 } from 'lucide-react'
 import { DEFAULT_COMMUNITY_ID, DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
 import { track } from '@/lib/analytics'
 import type { Drop } from '@/types/database'
 
-/* ── API URL ───────────────────────────────────────────────────── */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
-/* ── Waitlist Form ─────────────────────────────────────────────── */
-function WaitlistForm({ size = 'default', cta = 'Get Early Access', location = 'unknown' }: { size?: 'default' | 'large'; cta?: string; location?: string }) {
+function WaitlistForm({ location = 'unknown' }: { location?: string }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -21,107 +19,70 @@ function WaitlistForm({ size = 'default', cta = 'Get Early Access', location = '
     e.preventDefault()
     if (!email) return
     setStatus('loading')
-    track('waitlist_submit_attempt', { location, email_domain: email.split('@')[1] })
+    track('waitlist_submit_attempt', { location })
     try {
       const res = await fetch(`${API_URL}/api/waitlist`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
       const data = await res.json()
-      if (res.ok) {
-        setStatus('success')
-        setMessage(data.message || "You're in!")
-        setEmail('')
-        track('waitlist_submit_success', { location, position: data.count, email_domain: email.split('@')[1] })
-      } else {
-        setStatus('error')
-        setMessage(data.error || 'Something went wrong')
-        track('waitlist_submit_error', { location, error: data.error })
-      }
-    } catch {
-      setStatus('error')
-      setMessage('Something went wrong')
-      track('waitlist_submit_error', { location, error: 'network' })
-    }
+      if (res.ok) { setStatus('success'); setMessage(data.message || "You're in!"); setEmail(''); track('waitlist_submit_success', { location }) }
+      else { setStatus('error'); setMessage(data.error || 'Something went wrong') }
+    } catch { setStatus('error'); setMessage('Something went wrong') }
   }
 
   if (status === 'success') return (
-    <div className="flex items-center gap-2 justify-center py-3">
-      <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-        <span className="text-emerald-400 text-sm font-semibold">{message}</span>
-      </div>
+    <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+      <span className="text-emerald-400 text-sm font-medium">{message}</span>
     </div>
   )
-
-  const h = size === 'large' ? 'h-14' : 'h-12'
 
   return (
-    <div className="relative max-w-md mx-auto">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input type="email" placeholder="Enter your email address" value={email} onChange={e => setEmail(e.target.value)} required className={`w-full ${h} px-5 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white text-base placeholder:text-zinc-500 focus:outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200`} style={{ fontSize: '16px' }} />
-        <button type="submit" disabled={status === 'loading'} className={`w-full ${h} px-7 text-sm font-semibold rounded-xl shrink-0 text-white btn-primary transition-all duration-300 inline-flex items-center justify-center gap-2 disabled:opacity-50`}>
-          {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{cta} <ArrowRight className="w-4 h-4" /></>}
-        </button>
-      </form>
-      {status === 'error' && <p className="text-orange-500 text-xs text-center mt-2">{message}</p>}
-    </div>
+    <form onSubmit={handleSubmit} className="flex gap-2 w-full max-w-sm">
+      <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} required
+        className="flex-1 h-11 px-4 rounded-xl bg-foreground/[0.06] border border-foreground/[0.1] text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:border-blue-500/50 transition-colors" style={{ fontSize: '16px' }} />
+      <button type="submit" disabled={status === 'loading'}
+        className="h-11 px-5 text-sm font-semibold rounded-xl text-white bg-blue-500 hover:bg-blue-600 transition-colors disabled:opacity-50 shrink-0">
+        {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Notify me'}
+      </button>
+    </form>
   )
 }
 
-/* ── Animated Counter ──────────────────────────────────────────── */
-function AnimatedCounter({ target }: { target: number }) {
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    const steps = 40
-    const inc = target / steps
-    let c = 0
-    const t = setInterval(() => { c += inc; if (c >= target) { setCount(target); clearInterval(t) } else setCount(Math.floor(c)) }, 1500 / steps)
-    return () => clearInterval(t)
-  }, [target])
-  return <>{count}</>
-}
-
-/* ── Main Page ─────────────────────────────────────────────────── */
 export default function HomePage() {
   const [drops, setDrops] = useState<Drop[]>([])
   const router = useRouter()
 
   useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_API_URL || ''
-    fetch(`${url}/api/challenges?community_id=${DEFAULT_COMMUNITY_ID}`)
+    fetch(`${API_URL}/api/challenges?community_id=${DEFAULT_COMMUNITY_ID}`)
       .then(r => r.ok ? r.json() : { challenges: [] })
       .then(d => setDrops(d.challenges || []))
       .catch(() => {})
   }, [])
 
-  const liveDrop = drops.find(d => d.status === 'live')
+  const liveDrops = drops.filter(d => d.status === 'live')
   const totalSubmissions = drops.reduce((a, d) => a + d.submissions_count, 0)
 
-  const handleExplore = (location: string) => {
-    track('cta_click', { cta: 'start_building', location })
+  const handleStart = () => {
+    track('cta_click', { cta: 'start_building', location: 'hero' })
     document.cookie = 'demo_mode=true; path=/; max-age=86400'
-    router.push(`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`)
+    router.push(`/c/${DEFAULT_COMMUNITY_SLUG}/drops`)
     router.refresh()
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
 
       {/* ── Nav ──────────────────────────────────────────────── */}
-      <header className="fixed top-0 w-full z-50 border-b border-white/[0.06] bg-[#09090b]/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <header className="fixed top-0 w-full z-50 border-b border-foreground/[0.06] bg-background/80 backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-brand flex items-center justify-center glow-gradient">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
               <span className="text-xs font-bold text-white">AI</span>
             </div>
-            <span className="font-semibold text-sm tracking-tight text-white">Alt AI Labs</span>
+            <span className="font-bold text-sm tracking-tight">Alt AI Labs</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
-            <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-            <a href="#challenges" className="hover:text-white transition-colors">Challenges</a>
-            <a href="#sponsors" className="hover:text-white transition-colors">For Sponsors</a>
-          </nav>
           <div className="flex items-center gap-3">
-            <Link href="/signup" onClick={() => track('cta_click', { cta: 'join_waitlist', location: 'nav' })} className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">Join Waitlist</Link>
-            <button onClick={() => handleExplore('nav')} className="text-sm font-semibold h-9 px-5 rounded-xl text-white inline-flex items-center gap-1.5 btn-primary transition-all duration-200">
+            <Link href="/login" className="text-sm text-foreground/50 hover:text-foreground transition-colors hidden sm:block">Sign In</Link>
+            <button onClick={handleStart} className="text-sm font-semibold h-9 px-5 rounded-xl text-white bg-blue-500 hover:bg-blue-600 transition-colors inline-flex items-center gap-1.5">
               Start Building <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -129,501 +90,227 @@ export default function HomePage() {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="pt-32 pb-8 md:pt-36 md:pb-12 px-6 relative overflow-hidden">
-        {/* Gradient orbs */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[700px] bg-gradient-to-b from-blue-600/[0.12] via-violet-600/[0.06] to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-20 left-[20%] w-[400px] h-[400px] bg-blue-500/[0.06] rounded-full blur-3xl pointer-events-none animate-pulse" />
-        <div className="absolute top-40 right-[20%] w-[350px] h-[350px] bg-violet-500/[0.06] rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-6">
+      <section className="pt-28 pb-16 md:pt-36 md:pb-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm font-semibold mb-8">
             <Trophy className="w-4 h-4" /> $500 prizes every week
           </div>
 
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-[0.95]">
-            <span className="text-white">AI Tournament</span><br />
-            <span className="text-gradient-brand">for Future Founders</span>
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight mb-6 leading-[0.95]">
+            Learn AI by building.<br />
+            <span className="text-blue-500">Compete for cash.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Watch a drop. Build the challenge. Win cash. <span className="text-white font-semibold">Top performers get hired</span> by Alt AI Labs and partners.
+          <p className="text-lg text-foreground/60 mb-10 max-w-xl mx-auto leading-relaxed">
+            Watch a drop. Build the challenge. Submit your project. The best builders win prizes and get hired.
           </p>
 
-          {/* Dual CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-            <button onClick={() => handleExplore('hero')} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
-              Start Building <ArrowRight className="w-4 h-4" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+            <button onClick={handleStart} className="w-full sm:w-auto h-12 px-8 text-sm font-bold rounded-xl text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-500/20 transition-all inline-flex items-center justify-center gap-2">
+              Start Building — Free <ArrowRight className="w-4 h-4" />
             </button>
-            {liveDrop && (
-              <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrop.slug}`} onClick={() => track('cta_click', { cta: 'watch_drop', location: 'hero' })} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
+            {liveDrops[0] && (
+              <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrops[0].slug}`}
+                className="w-full sm:w-auto h-12 px-8 text-sm font-semibold rounded-xl text-foreground/70 border border-foreground/10 hover:border-foreground/20 hover:bg-foreground/[0.03] transition-all inline-flex items-center justify-center gap-2">
                 <Play className="w-4 h-4" /> Watch a Drop
               </Link>
             )}
           </div>
 
-          {/* Social proof */}
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-10 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                <Users className="w-4 h-4 text-blue-400" />
-              </div>
-              <span className="text-zinc-400"><span className="text-white font-bold"><AnimatedCounter target={127} />+</span> builders</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center">
-                <Rocket className="w-4 h-4 text-violet-400" />
-              </div>
-              <span className="text-zinc-400"><span className="text-white font-bold"><AnimatedCounter target={totalSubmissions} />+</span> shipped</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
-                <Trophy className="w-4 h-4 text-amber-400" />
-              </div>
-              <span className="text-zinc-400"><span className="text-amber-400 font-bold">$<AnimatedCounter target={7500} /></span> in prizes</span>
-            </div>
-          </div>
-          <p className="text-xs text-zinc-600 mt-4">Builders from Kyrgyzstan, Russia, USA, and 10+ countries</p>
-        </div>
-      </section>
-
-      {/* ── Sponsor Banner ──────────────────────────────────── */}
-      <section className="px-6 pt-8 pb-4">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center justify-center gap-3 py-3 px-6 rounded-2xl bg-amber-500/[0.06] border border-amber-500/20">
-            <Building2 className="w-5 h-5 text-amber-400 shrink-0" />
-            <span className="text-sm text-zinc-300">
-              Weekly challenges sponsored by <span className="text-amber-400 font-bold">AITIM HOLDING</span> — <span className="text-white font-semibold">$500 prizes</span> every week
-            </span>
-            <Award className="w-5 h-5 text-amber-400 shrink-0" />
+          {/* Stats */}
+          <div className="flex items-center justify-center gap-8 text-sm text-foreground/40">
+            <span><span className="text-foreground font-bold">{127}+</span> builders</span>
+            <span><span className="text-foreground font-bold">{totalSubmissions}+</span> projects shipped</span>
+            <span className="text-amber-500 font-bold">$7,500+ in prizes</span>
           </div>
         </div>
       </section>
 
-      {/* ── LIVE Drop Card (the heartbeat) ──────────────────── */}
-      {liveDrop && (
-        <section className="px-6 pb-16 pt-4">
-          <div className="max-w-3xl mx-auto">
-            <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrop.slug}`} className="block group">
-              <div className="relative rounded-3xl overflow-hidden border border-blue-500/30 bg-gradient-to-br from-blue-950/80 via-[#09090b] to-violet-950/60 p-1 shadow-[0_0_60px_rgba(59,130,246,0.15),0_0_120px_rgba(139,92,246,0.08)]">
-                <div className="rounded-[calc(1.5rem-4px)] bg-[#0c0c10]/90 p-8 md:p-10 relative overflow-hidden">
-                  {/* YouTube Thumbnail */}
-                  {liveDrop.video_url && (() => {
-                    const videoId = liveDrop.video_url!.split('/embed/')[1]?.split('?')[0]
-                    return videoId ? (
-                      <div className="absolute inset-0 opacity-20">
-                        <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#0c0c10] via-[#0c0c10]/80 to-transparent" />
-                      </div>
-                    ) : null
-                  })()}
-
-                  <div className="relative">
-                    {/* Live badge + Sponsor */}
-                    <div className="flex items-center gap-3 mb-5 flex-wrap">
-                      <span className="flex items-center gap-2 text-sm font-bold text-white px-4 py-2 rounded-full bg-gradient-brand glow-gradient">
-                        <span className="relative flex h-2.5 w-2.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
-                        </span>
-                        THIS WEEK&apos;S CHALLENGE
-                      </span>
-                      {liveDrop.sponsor_name && (
-                        <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
-                          <Award className="w-3.5 h-3.5" /> Sponsored by {liveDrop.sponsor_name}
-                        </span>
-                      )}
-                      <span className="text-sm text-zinc-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> 6 days left</span>
-                    </div>
-
-                    {liveDrop.creator_name && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center text-xs font-bold text-zinc-400">{liveDrop.creator_name.split(' ').map(w => w[0]).join('')}</div>
-                        <span className="text-sm text-zinc-400">by <span className="text-white font-medium">{liveDrop.creator_name}</span></span>
+      {/* ── Live Drops (the product) ────────────────────────── */}
+      {liveDrops.length > 0 && (
+        <section className="px-6 pb-20">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-xs font-bold text-foreground/30 uppercase tracking-widest mb-6 text-center">Live Now</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {liveDrops.slice(0, 4).map(drop => {
+                const videoId = drop.video_url?.split('/embed/')[1]?.split('?')[0]
+                return (
+                  <Link key={drop.id} href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${drop.slug}`}
+                    className="group rounded-2xl overflow-hidden border border-foreground/[0.08] hover:border-blue-500/30 transition-all bg-foreground/[0.02] hover:bg-foreground/[0.04]">
+                    {/* Thumbnail */}
+                    {videoId && (
+                      <div className="aspect-video relative overflow-hidden">
+                        <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} alt={drop.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                          <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-blue-500 px-2.5 py-1 rounded-lg">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> LIVE
+                          </span>
+                          {drop.prize_amount > 0 && (
+                            <span className="text-xs font-bold text-amber-300 bg-black/40 backdrop-blur px-2.5 py-1 rounded-lg">
+                              <Trophy className="w-3 h-3 inline mr-1" />${drop.prize_amount}
+                            </span>
+                          )}
+                        </div>
+                        <div className="absolute bottom-3 right-3">
+                          <span className="text-xs text-white/70 bg-black/40 backdrop-blur px-2 py-1 rounded-lg">{drop.duration_minutes} min</span>
+                        </div>
                       </div>
                     )}
-
-                    <h2 className="text-2xl md:text-4xl font-bold mb-3 tracking-tight text-white group-hover:text-blue-200 transition-colors">{liveDrop.title}</h2>
-                    <p className="text-sm md:text-base text-zinc-400 mb-6 max-w-lg leading-relaxed">{liveDrop.description}</p>
-
-                    <div className="flex flex-wrap items-center gap-3 mb-6">
-                      <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Play className="w-4 h-4 text-blue-400" /> {liveDrop.duration_minutes} min lesson</span>
-                      {liveDrop.prize_amount > 0 && (
-                        <span className="flex items-center gap-2 text-sm text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> ${liveDrop.prize_amount} prize</span>
-                      )}
-                      <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Users className="w-4 h-4 text-violet-400" /> {liveDrop.submissions_count} builders in</span>
+                    {/* Info */}
+                    <div className="p-4">
+                      <h3 className="font-bold text-sm mb-1 group-hover:text-blue-500 transition-colors">{drop.title}</h3>
+                      <p className="text-xs text-foreground/50 line-clamp-2">{drop.description}</p>
+                      <div className="flex items-center gap-3 mt-3 text-xs text-foreground/40">
+                        {drop.creator_name && <span>by {drop.creator_name}</span>}
+                        <span>{drop.submissions_count} builds</span>
+                        <span>{drop.difficulty}</span>
+                      </div>
                     </div>
-
-                    <div className="inline-flex items-center gap-2 text-white h-12 px-7 text-sm font-semibold rounded-xl btn-primary transition-all duration-300">
-                      Start This Challenge <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         </section>
       )}
 
       {/* ── How It Works ──────────────────────────────────────── */}
-      <section id="how-it-works" className="py-24 px-6 relative">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">Three steps. Every week.</h2>
-            <p className="text-zinc-400 mt-4 text-base">No fluff. No 40-hour courses. Just build.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              { num: '01', title: 'Watch', desc: 'A video lesson where I build something real from scratch. Follow along or riff on it.', icon: <Play className="w-7 h-7" />, bg: 'linear-gradient(135deg, #3b82f6, #22d3ee)' },
-              { num: '02', title: 'Build', desc: 'The challenge unlocks. Build your own version — any stack, any spin. You have 7 days.', icon: <Code2 className="w-7 h-7" />, bg: 'linear-gradient(135deg, #8b5cf6, #e879f9)' },
-              { num: '03', title: 'Win', desc: 'Submit your build. Top submissions win cash prizes. Every project goes in your portfolio.', icon: <Trophy className="w-7 h-7" />, bg: 'linear-gradient(135deg, #f59e0b, #f97316)' },
-            ].map((step, i) => (
-              <div key={i} className="rounded-3xl p-8 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] relative group transition-all duration-300 hover:translate-y-[-2px]">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg" style={{ background: step.bg }}>{step.icon}</div>
-                <span className="text-xs font-semibold text-zinc-600 tracking-widest">{step.num}</span>
-                <h3 className="font-bold text-xl text-white mt-1 mb-3">{step.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── What You Build ──────────────────────────────────── */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-              <span className="text-white">Not tutorials.</span><br />
-              <span className="text-gradient-brand">Real products.</span>
-            </h2>
-            <p className="text-zinc-400 mt-4 text-base max-w-lg mx-auto">Each week you build something you&apos;d actually use — or sell.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {[
-              { icon: <Bot className="w-6 h-6" />, title: 'AI Assistants', desc: 'Custom chatbots with tool use, memory, and real integrations.', bg: 'linear-gradient(135deg, #3b82f6, #06b6d4)' },
-              { icon: <Zap className="w-6 h-6" />, title: 'Autonomous Agents', desc: 'Agents that qualify leads, triage inboxes, and automate workflows.', bg: 'linear-gradient(135deg, #8b5cf6, #d946ef)' },
-              { icon: <Code2 className="w-6 h-6" />, title: 'Full-Stack AI Apps', desc: 'Production apps with auth, payments, and deployment.', bg: 'linear-gradient(135deg, #3b82f6, #6366f1)' },
-              { icon: <Rocket className="w-6 h-6" />, title: 'AI Automations', desc: 'Systems that connect APIs, process data, and run on autopilot.', bg: 'linear-gradient(135deg, #f59e0b, #f97316)' },
-            ].map((item, i) => (
-              <div key={i} className="group rounded-2xl p-6 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg" style={{ background: item.bg }}>{item.icon}</div>
-                <h3 className="font-bold text-base text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Featured Builds ─────────────────────────────────── */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-              <span className="text-white">Built on</span>{' '}
-              <span className="text-gradient-brand">Alt AI Labs</span>
-            </h2>
-            <p className="text-zinc-400 mt-4 text-base">Real projects shipped by our builders. Not demos — products people use.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-5">
-            {[
-              {
-                title: 'Solo OS',
-                desc: 'A personal AI operating system — tasks, notes, calendar, and habits unified in one AI-powered command center. Natural language control, smart daily planning, and integrations with Google Calendar, Notion, and Todoist.',
-                builder: 'Timur M.',
-                tags: ['AI Agents', 'Full-Stack', 'Productivity'],
-                gradient: 'from-blue-600/20 to-cyan-600/10',
-                border: 'border-blue-500/20 hover:border-blue-500/40',
-                icon: <Bot className="w-6 h-6 text-blue-400" />,
-                status: 'Live',
-              },
-              {
-                title: 'AI Site Builder',
-                desc: 'Generate production-ready websites from a single prompt. Responsive design, real copy (not lorem ipsum), SEO optimization, and one-click deploy to Vercel. Built 12 client sites in the first month.',
-                builder: 'Timur M.',
-                tags: ['No-Code', 'Web Dev', 'AI Generation'],
-                gradient: 'from-violet-600/20 to-fuchsia-600/10',
-                border: 'border-violet-500/20 hover:border-violet-500/40',
-                icon: <Code2 className="w-6 h-6 text-violet-400" />,
-                status: 'Live',
-              },
-              {
-                title: 'AI Song Creator',
-                desc: 'Turn a text prompt into a full song — lyrics, melody, arrangement, and production. Supports multiple genres. Exported tracks used by 3 independent artists on Spotify. Built with Claude + Suno API.',
-                builder: 'Timur M.',
-                tags: ['AI Music', 'Creative AI', 'API Integration'],
-                gradient: 'from-pink-600/20 to-rose-600/10',
-                border: 'border-pink-500/20 hover:border-pink-500/40',
-                icon: <Sparkles className="w-6 h-6 text-pink-400" />,
-                status: 'Live',
-              },
-              {
-                title: 'AI YouTube Pipeline',
-                desc: 'End-to-end content automation — topic research, script generation with hooks and CTAs, thumbnail concepts, SEO-optimized titles and descriptions. Batch-plan 30 days of videos from one brainstorm session.',
-                builder: 'Timur M.',
-                tags: ['Content AI', 'Automation', 'YouTube'],
-                gradient: 'from-amber-600/20 to-orange-600/10',
-                border: 'border-amber-500/20 hover:border-amber-500/40',
-                icon: <Play className="w-6 h-6 text-amber-400" />,
-                status: 'Live',
-              },
-            ].map((project, i) => (
-              <div key={i} className={`rounded-2xl p-6 bg-gradient-to-br ${project.gradient} border ${project.border} transition-all duration-300 group`}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-white/[0.06] flex items-center justify-center">{project.icon}</div>
-                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">{project.status}</span>
-                </div>
-                <h3 className="font-bold text-lg text-white mb-2">{project.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed mb-4">{project.desc}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map((tag, j) => (
-                    <span key={j} className="text-xs text-zinc-500 bg-white/[0.04] px-2.5 py-1 rounded-lg">{tag}</span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center text-xs font-bold text-zinc-400">T</div>
-                  <span className="text-xs text-zinc-500">{project.builder}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Challenges ────────────────────────────────────────── */}
-      <section id="challenges" className="py-24 px-6">
+      <section className="py-20 px-6 border-y border-foreground/[0.06]">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">Challenges</h2>
-            <p className="text-zinc-400 mt-4 text-base">Multiple creators. Multiple challenges. Jump in anytime.</p>
-            <div className="flex items-center justify-center gap-4 mt-6">
-              {[
-                { name: 'Nate Herk', initial: 'NH', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-                { name: 'Dan Martell', initial: 'DM', color: 'bg-violet-500/20 text-violet-400 border-violet-500/30' },
-                { name: 'Timur M.', initial: 'TM', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-              ].map((c, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className={`w-7 h-7 rounded-full ${c.color} border flex items-center justify-center text-xs font-bold`}>{c.initial}</div>
-                  <span className="text-sm text-zinc-400">{c.name}</span>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-16">Three steps. Every week.</h2>
+          <div className="grid md:grid-cols-3 gap-10 text-center">
+            {[
+              { num: '1', title: 'Watch', desc: 'A creator drops a video lesson. Follow along or riff on it.', icon: Play, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+              { num: '2', title: 'Build', desc: 'The challenge unlocks. Build your version. Any stack. 7 days.', icon: Zap, color: 'text-violet-500', bg: 'bg-violet-500/10' },
+              { num: '3', title: 'Win', desc: 'Submit. Community votes. Top builders win cash prizes.', icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+            ].map((step, i) => (
+              <div key={i}>
+                <div className={`w-16 h-16 rounded-2xl ${step.bg} flex items-center justify-center mx-auto mb-5`}>
+                  <step.icon className={`w-7 h-7 ${step.color}`} />
                 </div>
+                <div className="text-xs font-bold text-foreground/30 mb-2">STEP {step.num}</div>
+                <h3 className="font-bold text-lg mb-2">{step.title}</h3>
+                <p className="text-sm text-foreground/50 leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── All Drops ─────────────────────────────────────────── */}
+      {drops.length > 0 && (
+        <section className="py-20 px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">Challenges</h2>
+              <p className="text-foreground/50 text-sm">From creators like Nate Herk, Dan Martell, and Timur M.</p>
+            </div>
+            <div className="space-y-2">
+              {drops.map(drop => (
+                <Link key={drop.id} href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${drop.slug}`}
+                  className="flex items-center gap-4 p-4 rounded-xl border border-foreground/[0.06] hover:border-foreground/[0.12] hover:bg-foreground/[0.02] transition-all group">
+                  {/* Thumbnail or status icon */}
+                  <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-foreground/[0.04] flex items-center justify-center">
+                    {drop.video_url ? (() => {
+                      const vid = drop.video_url!.split('/embed/')[1]?.split('?')[0]
+                      return vid ? <img src={`https://img.youtube.com/vi/${vid}/default.jpg`} alt="" className="w-full h-full object-cover" />
+                        : <Play className="w-5 h-5 text-foreground/30" />
+                    })() : drop.status === 'live' ? (
+                      <Zap className="w-5 h-5 text-blue-500" />
+                    ) : (
+                      <Clock className="w-5 h-5 text-foreground/20" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="font-semibold text-sm truncate group-hover:text-blue-500 transition-colors">{drop.title}</h3>
+                      {drop.status === 'live' && (
+                        <span className="text-[10px] font-bold text-white bg-blue-500 px-2 py-0.5 rounded-full shrink-0">LIVE</span>
+                      )}
+                      {drop.status === 'upcoming' && (
+                        <span className="text-[10px] font-medium text-foreground/30 bg-foreground/[0.05] px-2 py-0.5 rounded-full shrink-0">SOON</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-foreground/40">{drop.creator_name && `${drop.creator_name} · `}{drop.difficulty} · {drop.duration_minutes}m{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
+                  </div>
+                  {drop.prize_amount > 0 && (
+                    <span className="text-sm font-bold text-amber-500 shrink-0">${drop.prize_amount}</span>
+                  )}
+                </Link>
               ))}
             </div>
+            <div className="text-center mt-8">
+              <button onClick={handleStart} className="h-11 px-6 text-sm font-semibold rounded-xl text-white bg-blue-500 hover:bg-blue-600 transition-colors inline-flex items-center gap-2">
+                Browse All Drops <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <div className="space-y-3">
-            {drops.map(drop => (
-              <Link key={drop.id} href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${drop.slug}`} className={`rounded-2xl p-5 flex items-center gap-4 group transition-all duration-300 block ${
-                drop.status === 'live'
-                  ? 'border border-blue-500/30'
-                  : 'bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]'
-              } ${drop.status === 'live' ? 'bg-gradient-brand-subtle glow-blue' : ''}`}>
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
-                  drop.status === 'live'
-                    ? ''
-                    : drop.status === 'completed'
-                    ? 'bg-white/[0.06]'
-                    : 'bg-white/[0.04] border border-white/[0.08]'
-                } ${drop.status === 'live' ? 'bg-gradient-brand glow-gradient' : ''}`}>
-                  {drop.status === 'live' ? (
-                    <Zap className="w-6 h-6 text-white" />
-                  ) : drop.status === 'completed' ? (
-                    <CheckCircle2 className="w-6 h-6 text-zinc-500" />
-                  ) : (
-                    <Clock className="w-5 h-5 text-zinc-600" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <h3 className={`font-bold text-sm truncate transition-colors ${drop.status === 'live' ? 'text-white' : 'text-zinc-200 group-hover:text-white'}`}>{drop.title}</h3>
-                    {drop.status === 'live' && (
-                      <span className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full text-white font-bold shrink-0 bg-gradient-brand glow-gradient">
-                        <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" /></span>
-                        LIVE
-                      </span>
-                    )}
-                    {drop.status === 'upcoming' && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-white/[0.06] text-zinc-500 font-medium shrink-0">SOON</span>
-                    )}
-                    {drop.status === 'completed' && (
-                      <CheckCircle2 className="w-4 h-4 text-zinc-600 shrink-0" />
-                    )}
-                    {drop.sponsor_name && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold shrink-0">
-                        {drop.sponsor_name}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-zinc-500">{drop.creator_name && <><span className="text-zinc-400">{drop.creator_name}</span> · </>}{drop.difficulty} · {drop.duration_minutes} min{drop.submissions_count > 0 ? ` · ${drop.submissions_count} builds` : ''}</p>
-                </div>
-                {(drop.prize_amount > 0 || drop.prize_per_entrant > 0) && (
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Trophy className="w-4 h-4 text-amber-400" />
-                    <span className="text-[14px] text-amber-400 font-bold">${drop.prize_amount > 0 ? drop.prize_amount : drop.prize_per_entrant * 5}</span>
-                  </div>
-                )}
-                <ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-white shrink-0 transition-colors group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ── Why This Works ────────────────────────────────────── */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">Why this works</h2>
-          </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { icon: <Clock className="w-5 h-5" />, title: 'Ship weekly', desc: 'One focused project per week. Not a 40-hour course.', gradient: 'from-blue-500/20 to-cyan-500/20' },
-              { icon: <Trophy className="w-5 h-5" />, title: 'Real money', desc: 'Cash prizes for the best builds. Every. Single. Week.', gradient: 'from-amber-500/20 to-orange-500/20' },
-              { icon: <Sparkles className="w-5 h-5" />, title: 'Portfolio', desc: 'Every submission is a real project you can show off.', gradient: 'from-violet-500/20 to-fuchsia-500/20' },
-              { icon: <Zap className="w-5 h-5" />, title: 'Stay current', desc: 'New AI tools and techniques every week.', gradient: 'from-cyan-500/20 to-blue-500/20' },
-              { icon: <Users className="w-5 h-5" />, title: 'Community', desc: 'Share builds, get feedback, find collaborators.', gradient: 'from-pink-500/20 to-rose-500/20' },
-              { icon: <Code2 className="w-5 h-5" />, title: 'Production-grade', desc: 'Real APIs, real auth, real deploys. No toy apps.', gradient: 'from-indigo-500/20 to-violet-500/20' },
-            ].map((item, i) => (
-              <div key={i} className={`rounded-2xl p-6 bg-gradient-to-br ${item.gradient} border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300`}>
-                <div className="text-white mb-3">{item.icon}</div>
-                <h3 className="font-bold text-sm text-white mb-1.5">{item.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── Sponsors ──────────────────────────────────────────── */}
+      <section className="py-20 px-6 border-t border-foreground/[0.06]">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">Backed by sponsors</h2>
+          <p className="text-foreground/50 text-sm mb-12">Sponsors fund the prizes. Builders keep 100% of winnings.</p>
 
-      {/* ── For Sponsors ─────────────────────────────────────── */}
-      <section id="sponsors" className="py-24 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-amber-600/[0.04] via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-4xl mx-auto relative">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">For Sponsors</h2>
-            <p className="text-zinc-400 mt-4 text-base max-w-lg mx-auto">Put your brand in front of active AI builders. Fund challenges. Get first look at top talent.</p>
+          <div className="rounded-2xl p-8 border border-amber-500/20 bg-amber-500/[0.03] mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Building2 className="w-8 h-8 text-amber-500" />
+              <h3 className="text-xl font-black">AITIM HOLDING</h3>
+            </div>
+            <p className="text-sm text-foreground/50 mb-4">Title sponsor — funding <span className="text-amber-500 font-bold">$500 weekly prizes</span> for AI builders worldwide.</p>
+            <div className="flex items-center justify-center gap-4 text-xs text-foreground/40">
+              <span>5 sponsored drops</span>
+              <span>$2,500+ awarded</span>
+              <span>Active since 2026</span>
+            </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-5 mb-12">
-            {[
-              { icon: <Trophy className="w-7 h-7" />, title: 'Fund a Challenge', desc: 'Your brand sponsors a weekly AI challenge. Prize pool starts at $500. Your logo on every submission.', bg: 'linear-gradient(135deg, #f59e0b, #f97316)' },
-              { icon: <Users className="w-7 h-7" />, title: 'Access Talent', desc: 'Browse submissions from builders who ship. Hire the best directly. Skip the resume pile.', bg: 'linear-gradient(135deg, #3b82f6, #22d3ee)' },
-              { icon: <Sparkles className="w-7 h-7" />, title: 'Build Your Brand', desc: 'Every sponsored challenge gets your name in front of thousands of AI builders, creators, and founders.', bg: 'linear-gradient(135deg, #8b5cf6, #e879f9)' },
-            ].map((item, i) => (
-              <div key={i} className="rounded-3xl p-8 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg" style={{ background: item.bg }}>{item.icon}</div>
-                <h3 className="font-bold text-lg text-white mb-3">{item.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 h-14 px-8 text-sm font-bold rounded-2xl text-white transition-all duration-300 hover:scale-[1.02]" style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', boxShadow: '0 0 30px rgba(245,158,11,0.2)' }}>
-              <Building2 className="w-5 h-5" /> Become a Sponsor <ArrowRight className="w-4 h-4" />
-            </a>
-            <p className="text-zinc-600 text-sm mt-4">Starting at $500/week. Custom packages available.</p>
-          </div>
+
+          <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors">
+            <Building2 className="w-4 h-4" /> Want to sponsor a challenge? Get in touch →
+          </a>
         </div>
       </section>
 
       {/* ── Final CTA ─────────────────────────────────────────── */}
-      <section className="py-24 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-600/[0.06] via-violet-600/[0.03] to-transparent pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-blue-500/[0.08] to-transparent rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-3xl mx-auto text-center relative">
-          <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-5 tracking-tight leading-[0.95]">
-            <span className="text-white">Stop watching.</span><br />
-            <span className="text-gradient-brand">Start building.</span>
+      <section className="py-24 px-6">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4">
+            Ready to build?
           </h2>
-          <p className="text-zinc-400 mb-10 text-base max-w-lg mx-auto leading-relaxed">New challenges drop every week. Join free. Build something real. Win cash.</p>
+          <p className="text-foreground/50 mb-8 text-sm">Join free. Pick a challenge. Ship something real.</p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-            <button onClick={() => handleExplore('final_cta')} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+            <button onClick={handleStart} className="w-full sm:w-auto h-12 px-8 text-sm font-bold rounded-xl text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-500/20 transition-all inline-flex items-center justify-center gap-2">
               Start Building <ArrowRight className="w-4 h-4" />
             </button>
-            <WaitlistForm cta="Get Notified" location="final_cta" />
+            <WaitlistForm location="footer" />
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm text-zinc-500">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> Free to join</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> No credit card</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500/60" /> New challenge every week</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Sponsors & Partners ──────────────────────────────── */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">Sponsors & Partners</h2>
-            <p className="text-zinc-400 mt-4 text-base">Our sponsors fund weekly prize pools so builders get paid to learn.</p>
-          </div>
-          <div className="grid sm:grid-cols-1 md:grid-cols-1 gap-6 max-w-xl mx-auto">
-            {/* AITIM HOLDING */}
-            <div className="rounded-3xl p-8 bg-gradient-to-br from-amber-950/40 to-orange-950/30 border border-amber-500/20 relative overflow-hidden group hover:border-amber-500/40 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.04] to-orange-500/[0.02] pointer-events-none" />
-              <div className="relative">
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-amber-500/10 border border-amber-500/20" style={{ boxShadow: '0 0 30px rgba(245,158,11,0.15)' }}>
-                    <Building2 className="w-8 h-8 text-amber-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-black text-white">AITIM HOLDING</h3>
-                    <p className="text-sm text-amber-400 font-semibold">Title Sponsor</p>
-                  </div>
-                </div>
-                <p className="text-sm text-zinc-300 leading-relaxed mb-5">Sponsoring weekly AI challenges with <span className="text-amber-400 font-bold">$500 prize pools</span>. Building the next generation of AI builders through hands-on competition.</p>
-                <div className="flex flex-wrap gap-3">
-                  <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Trophy className="w-4 h-4 text-amber-400" /> $500/week prizes</span>
-                  <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Zap className="w-4 h-4 text-blue-400" /> AI Sales Agents</span>
-                  <span className="flex items-center gap-2 text-sm text-zinc-300 bg-white/[0.06] px-3.5 py-2 rounded-xl"><Rocket className="w-4 h-4 text-violet-400" /> Content AI</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="text-center mt-10">
-            <p className="text-zinc-500 text-[14px] mb-4">Want to sponsor a challenge and reach AI builders?</p>
-            <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 text-[14px] font-bold text-white h-11 px-6 rounded-xl bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
-              <Building2 className="w-4 h-4" /> Become a Sponsor
-            </a>
+          <div className="flex items-center justify-center gap-6 text-xs text-foreground/30">
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Free</span>
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> No credit card</span>
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> New drops weekly</span>
           </div>
         </div>
       </section>
 
       {/* ── Footer ────────────────────────────────────────────── */}
-      <footer className="border-t border-white/[0.06] py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-10">
-            <div className="md:col-span-2">
-              <Link href="/" className="flex items-center gap-2.5 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-gradient-brand flex items-center justify-center">
-                  <span className="text-xs font-black text-white">AI</span>
-                </div>
-                <span className="font-bold text-[14px] tracking-tight text-white">Alt AI Labs</span>
-              </Link>
-              <p className="text-sm text-zinc-600 max-w-xs leading-relaxed">AI tournament for future founders. Learn, build, compete, get hired.</p>
+      <footer className="border-t border-foreground/[0.06] py-10 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
+              <span className="text-[8px] font-black text-white">AI</span>
             </div>
-            <div>
-              <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">Product</h4>
-              <ul className="space-y-2">
-                <li><a href="#how-it-works" className="text-sm text-zinc-600 hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#challenges" className="text-sm text-zinc-600 hover:text-white transition-colors">Challenges</a></li>
-                <li><a href="#sponsors" className="text-sm text-zinc-600 hover:text-white transition-colors">For Sponsors</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">Account</h4>
-              <ul className="space-y-2">
-                <li><Link href="/login" className="text-sm text-zinc-600 hover:text-white transition-colors">Sign In</Link></li>
-                <li><Link href="/signup" className="text-sm text-zinc-600 hover:text-white transition-colors">Join Waitlist</Link></li>
-                <li><Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`} className="text-sm text-zinc-600 hover:text-white transition-colors">Explore</Link></li>
-              </ul>
-            </div>
+            <span className="text-xs text-foreground/30">&copy; {new Date().getFullYear()} Alt AI Labs. AI tournament for future founders.</span>
           </div>
-          <div className="h-px bg-white/[0.06] mb-6" />
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-zinc-600">
-            <span>&copy; {new Date().getFullYear()} Alt AI Labs. All rights reserved.</span>
-            <div className="flex gap-6">
-              <a href="mailto:hello@altailabs.com" className="hover:text-zinc-400 transition-colors">Contact</a>
-            </div>
+          <div className="flex gap-5 text-xs text-foreground/30">
+            <Link href="/login" className="hover:text-foreground/60 transition-colors">Sign In</Link>
+            <a href="mailto:hello@altailabs.com" className="hover:text-foreground/60 transition-colors">Contact</a>
+            <a href="https://altailabs.ai" className="hover:text-foreground/60 transition-colors">altailabs.ai</a>
           </div>
         </div>
       </footer>
