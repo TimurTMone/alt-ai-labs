@@ -523,6 +523,115 @@ app.post('/api/webhooks/revenuecat', async (req, res) => {
 })
 
 // ═══════════════════════════════════════════════════════════════
+// ADMIN: CREATE / UPDATE / DELETE DROPS
+// ═══════════════════════════════════════════════════════════════
+
+app.post('/api/challenges', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  // Check admin
+  const admin = await pool.query('SELECT is_admin FROM profiles WHERE id = $1', [decoded.sub])
+  if (!admin.rows[0]?.is_admin) return res.status(403).json({ error: 'Admin only' })
+
+  try {
+    const { community_id, drop_type, title, slug, description, video_url, content_body, resource_urls,
+      duration_minutes, difficulty, is_free, challenge_brief, challenge_deliverables, challenge_rules,
+      challenge_deadline, prize_description, prize_amount, prize_per_entrant, min_entrants_for_prize,
+      creator_name, creator_url, sponsor_name, sponsor_url, status } = req.body
+
+    if (!title || !community_id) return res.status(400).json({ error: 'title and community_id required' })
+
+    const id = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
+    const result = await pool.query(
+      `INSERT INTO drops (id, community_id, drop_type, title, slug, description, video_url, content_body, resource_urls,
+        duration_minutes, difficulty, is_free, challenge_brief, challenge_deliverables, challenge_rules,
+        challenge_deadline, prize_description, prize_amount, prize_per_entrant, min_entrants_for_prize,
+        creator_name, creator_url, sponsor_name, sponsor_url, status, created_at, updated_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,NOW(),NOW())
+       RETURNING *`,
+      [id, community_id, drop_type || 'video', title, id, description || '',
+        video_url || null, content_body || null, JSON.stringify(resource_urls || []),
+        duration_minutes || 0, difficulty || 'beginner', is_free !== false,
+        challenge_brief || '', JSON.stringify(challenge_deliverables || []),
+        JSON.stringify(challenge_rules || []), challenge_deadline || null,
+        prize_description || null, prize_amount || 0, prize_per_entrant || 0, min_entrants_for_prize || 0,
+        creator_name || null, creator_url || null, sponsor_name || null, sponsor_url || null, status || 'upcoming']
+    )
+
+    // Email all users about new drop if status is live
+    if (status === 'live') {
+      const users = await pool.query('SELECT email, full_name FROM profiles WHERE email IS NOT NULL')
+      for (const u of users.rows) {
+        emailNewDrop(u.email, u.full_name, title, id)
+      }
+    }
+
+    res.json({ challenge: result.rows[0] })
+  } catch (err) {
+    console.error('Create drop error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.patch('/api/challenges/:id', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  const admin = await pool.query('SELECT is_admin FROM profiles WHERE id = $1', [decoded.sub])
+  if (!admin.rows[0]?.is_admin) return res.status(403).json({ error: 'Admin only' })
+
+  try {
+    const fields = ['drop_type','title','slug','description','video_url','content_body','resource_urls',
+      'duration_minutes','difficulty','is_free','challenge_brief','challenge_deliverables','challenge_rules',
+      'challenge_deadline','prize_description','prize_amount','prize_per_entrant','min_entrants_for_prize',
+      'creator_name','creator_url','sponsor_name','sponsor_url','status']
+
+    const updates = []
+    const params = []
+    for (const f of fields) {
+      if (req.body[f] !== undefined) {
+        params.push(['resource_urls','challenge_deliverables','challenge_rules'].includes(f)
+          ? JSON.stringify(req.body[f]) : req.body[f])
+        updates.push(`${f} = $${params.length}`)
+      }
+    }
+    if (updates.length === 0) return res.status(400).json({ error: 'Nothing to update' })
+
+    params.push(req.params.id)
+    updates.push('updated_at = NOW()')
+
+    const result = await pool.query(
+      `UPDATE drops SET ${updates.join(', ')} WHERE id = $${params.length} RETURNING *`, params
+    )
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' })
+    res.json({ challenge: result.rows[0] })
+  } catch (err) {
+    console.error('Update drop error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+app.delete('/api/challenges/:id', async (req, res) => {
+  const decoded = verifyToken(req)
+  if (!decoded) return res.status(401).json({ error: 'Unauthorized' })
+
+  const admin = await pool.query('SELECT is_admin FROM profiles WHERE id = $1', [decoded.sub])
+  if (!admin.rows[0]?.is_admin) return res.status(403).json({ error: 'Admin only' })
+
+  try {
+    await pool.query('DELETE FROM submissions WHERE drop_id = $1', [req.params.id])
+    await pool.query('DELETE FROM drop_progress WHERE drop_id = $1', [req.params.id])
+    await pool.query('DELETE FROM drops WHERE id = $1', [req.params.id])
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Delete drop error:', err)
+    res.status(500).json({ error: 'Something went wrong' })
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════
 // SUBMISSIONS
 // ═══════════════════════════════════════════════════════════════
 
