@@ -1,0 +1,40 @@
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-altailabs-club
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: SSH → Pull → Build → Reload
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Trigger deploy on server
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=no \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+
+      - name: Verify site is up
+        run: |
+          sleep 3
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://altailabs.club/)
+          echo "altailabs.club returned HTTP $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "::error::Frontend is not responding with 200 after deploy"
+            exit 1
+          fi
