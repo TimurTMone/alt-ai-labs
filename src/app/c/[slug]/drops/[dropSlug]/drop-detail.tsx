@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { AppLayout } from '@/components/layout/app-layout'
 import { DIFFICULTY_COLORS, calculatePrizePool } from '@/lib/constants'
+import { track } from '@/lib/analytics'
 import { formatDistanceToNow } from 'date-fns'
 import type { Community, Drop, DropProgress } from '@/types/database'
 
@@ -42,6 +43,7 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
 
   const handleMarkWatched = async () => {
     setWatched(true)
+    track('drop_watched', { drop_id: drop.id, title: drop.title, type: drop.drop_type })
     try {
       await fetch('/api/progress', {
         method: 'POST',
@@ -73,6 +75,7 @@ export function DropDetailClient({ community, drop, initialProgress }: DropDetai
         const data = await res.json()
         setSubmissionId(data.submission?.id || null)
         setSubmitted(true)
+        track('submission_created', { drop_id: drop.id, title: drop.title })
       }
     } catch {
       setSubmitted(true)

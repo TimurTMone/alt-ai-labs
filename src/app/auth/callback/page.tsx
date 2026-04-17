@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import { DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
+import { track } from '@/lib/analytics'
 
 function CallbackHandler() {
   const router = useRouter()
@@ -24,6 +25,7 @@ function CallbackHandler() {
       // Clear demo mode since user is now authenticated
       document.cookie = 'demo_mode=; path=/; max-age=0'
       document.cookie = `auth_token=${token}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`
+      track('login_complete', { method: 'google' })
       router.replace(`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`)
     } else {
       router.replace('/login')

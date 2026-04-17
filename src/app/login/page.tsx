@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowRight, Play } from 'lucide-react'
 import { DEFAULT_COMMUNITY_SLUG } from '@/lib/constants'
+import { track, identify } from '@/lib/analytics'
 import { useI18n } from '@/lib/i18n/context'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
@@ -45,6 +46,8 @@ function LoginForm() {
       localStorage.setItem('auth_token', data.token)
       document.cookie = `auth_token=${data.token}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`
       document.cookie = 'demo_mode=; path=/; max-age=0'
+      identify(data.user?.id, { email: data.user?.email, name: data.user?.full_name })
+      track('login_complete', { method: 'email' })
       router.push(`/c/${DEFAULT_COMMUNITY_SLUG}/dashboard`)
       router.refresh()
     } catch {
