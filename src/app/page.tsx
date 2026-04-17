@@ -93,35 +93,35 @@ export default function HomePage() {
       <section className="pt-28 pb-16 md:pt-36 md:pb-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm font-semibold mb-8">
-            <Trophy className="w-4 h-4" /> $500 prizes every week
+            <Trophy className="w-4 h-4" /> Sponsored challenges with real cash prizes
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight mb-6 leading-[0.95]">
-            Learn AI by building.<br />
-            <span className="text-blue-500">Compete for cash.</span>
+            The club where<br />
+            <span className="text-blue-500">AI builders are made.</span>
           </h1>
 
           <p className="text-lg text-foreground/60 mb-10 max-w-xl mx-auto leading-relaxed">
-            Watch a drop. Build the challenge. Submit your project. The best builders win prizes and get hired.
+            We drop AI challenges every week. You build real projects, compete against other builders, and win cash prizes. The best performers get hired by us and our partners.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
             <button onClick={handleStart} className="w-full sm:w-auto h-12 px-8 text-sm font-bold rounded-xl text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-500/20 transition-all inline-flex items-center justify-center gap-2">
-              Start Building — Free <ArrowRight className="w-4 h-4" />
+              Join the Club — It&apos;s Free <ArrowRight className="w-4 h-4" />
             </button>
             {liveDrops[0] && (
               <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrops[0].slug}`}
                 className="w-full sm:w-auto h-12 px-8 text-sm font-semibold rounded-xl text-foreground/70 border border-foreground/10 hover:border-foreground/20 hover:bg-foreground/[0.03] transition-all inline-flex items-center justify-center gap-2">
-                <Play className="w-4 h-4" /> Watch a Drop
+                <Play className="w-4 h-4" /> See This Week&apos;s Challenge
               </Link>
             )}
           </div>
 
           {/* Stats */}
           <div className="flex items-center justify-center gap-8 text-sm text-foreground/40">
-            <span><span className="text-foreground font-bold">{127}+</span> builders</span>
-            <span><span className="text-foreground font-bold">{totalSubmissions}+</span> projects shipped</span>
-            <span className="text-amber-500 font-bold">$7,500+ in prizes</span>
+            <span><span className="text-foreground font-bold">{127}+</span> members</span>
+            <span><span className="text-foreground font-bold">{totalSubmissions}+</span> projects built</span>
+            <span className="text-amber-500 font-bold">$7,500+ awarded</span>
           </div>
         </div>
       </section>
@@ -179,12 +179,13 @@ export default function HomePage() {
       {/* ── How It Works ──────────────────────────────────────── */}
       <section className="py-20 px-6 border-y border-foreground/[0.06]">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-16">Three steps. Every week.</h2>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-4">How the club works</h2>
+          <p className="text-foreground/50 text-sm text-center mb-16">Every week, a new AI challenge drops. You build it. The best win.</p>
           <div className="grid md:grid-cols-3 gap-10 text-center">
             {[
-              { num: '1', title: 'Watch', desc: 'A creator drops a video lesson. Follow along or riff on it.', icon: Play, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-              { num: '2', title: 'Build', desc: 'The challenge unlocks. Build your version. Any stack. 7 days.', icon: Zap, color: 'text-violet-500', bg: 'bg-violet-500/10' },
-              { num: '3', title: 'Win', desc: 'Submit. Community votes. Top builders win cash prizes.', icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+              { num: '1', title: 'Learn', desc: 'A creator drops a lesson — video, tutorial, or code walkthrough. Real skills, not theory.', icon: Play, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+              { num: '2', title: 'Build', desc: 'The challenge unlocks. You have 7 days to build your own version. Any tools. Any approach.', icon: Zap, color: 'text-violet-500', bg: 'bg-violet-500/10' },
+              { num: '3', title: 'Compete', desc: 'Submit your project. The community votes. Top builders win cash prizes and get noticed by employers.', icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
             ].map((step, i) => (
               <div key={i}>
                 <div className={`w-16 h-16 rounded-2xl ${step.bg} flex items-center justify-center mx-auto mb-5`}>
@@ -204,8 +205,8 @@ export default function HomePage() {
         <section className="py-20 px-6">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">Challenges</h2>
-              <p className="text-foreground/50 text-sm">From creators like Nate Herk, Dan Martell, and Timur M.</p>
+              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">This week&apos;s challenges</h2>
+              <p className="text-foreground/50 text-sm">Created by top AI builders — Nate Herk, Dan Martell, Timur M., and more.</p>
             </div>
             <div className="space-y-2">
               {drops.map(drop => (
@@ -243,7 +244,7 @@ export default function HomePage() {
             </div>
             <div className="text-center mt-8">
               <button onClick={handleStart} className="h-11 px-6 text-sm font-semibold rounded-xl text-white bg-blue-500 hover:bg-blue-600 transition-colors inline-flex items-center gap-2">
-                Browse All Drops <ArrowRight className="w-4 h-4" />
+                See All Challenges <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -253,24 +254,24 @@ export default function HomePage() {
       {/* ── Sponsors ──────────────────────────────────────────── */}
       <section className="py-20 px-6 border-t border-foreground/[0.06]">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">Backed by sponsors</h2>
-          <p className="text-foreground/50 text-sm mb-12">Sponsors fund the prizes. Builders keep 100% of winnings.</p>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">Our sponsors fund the prizes</h2>
+          <p className="text-foreground/50 text-sm mb-12">Companies sponsor challenges to discover and hire the best AI talent. Builders keep 100% of prize money.</p>
 
           <div className="rounded-2xl p-8 border border-amber-500/20 bg-amber-500/[0.03] mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Building2 className="w-8 h-8 text-amber-500" />
               <h3 className="text-xl font-black">AITIM HOLDING</h3>
             </div>
-            <p className="text-sm text-foreground/50 mb-4">Title sponsor — funding <span className="text-amber-500 font-bold">$500 weekly prizes</span> for AI builders worldwide.</p>
+            <p className="text-sm text-foreground/50 mb-4">Title sponsor — investing in the next generation of AI builders with <span className="text-amber-500 font-bold">$500 weekly prize pools</span>.</p>
             <div className="flex items-center justify-center gap-4 text-xs text-foreground/40">
-              <span>5 sponsored drops</span>
+              <span>5 challenges funded</span>
               <span>$2,500+ awarded</span>
-              <span>Active since 2026</span>
+              <span>Hiring top performers</span>
             </div>
           </div>
 
           <a href="mailto:hello@altailabs.com" className="inline-flex items-center gap-2 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors">
-            <Building2 className="w-4 h-4" /> Want to sponsor a challenge? Get in touch →
+            <Building2 className="w-4 h-4" /> Sponsor a challenge and find your next AI hire →
           </a>
         </div>
       </section>
@@ -279,13 +280,13 @@ export default function HomePage() {
       <section className="py-24 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4">
-            Ready to build?
+            Your future starts with what you build today.
           </h2>
-          <p className="text-foreground/50 mb-8 text-sm">Join free. Pick a challenge. Ship something real.</p>
+          <p className="text-foreground/50 mb-8 text-sm">Join the club. Pick a challenge. Build something real. The best get hired.</p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
             <button onClick={handleStart} className="w-full sm:w-auto h-12 px-8 text-sm font-bold rounded-xl text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-500/20 transition-all inline-flex items-center justify-center gap-2">
-              Start Building <ArrowRight className="w-4 h-4" />
+              Join the Club <ArrowRight className="w-4 h-4" />
             </button>
             <WaitlistForm location="footer" />
           </div>
@@ -300,17 +301,22 @@ export default function HomePage() {
 
       {/* ── Footer ────────────────────────────────────────────── */}
       <footer className="border-t border-foreground/[0.06] py-10 px-6">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
-              <span className="text-[8px] font-black text-white">AI</span>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
+                <span className="text-[8px] font-black text-white">AI</span>
+              </div>
+              <span className="text-xs text-foreground/30">&copy; {new Date().getFullYear()} Alt AI Labs Club</span>
             </div>
-            <span className="text-xs text-foreground/30">&copy; {new Date().getFullYear()} Alt AI Labs. AI tournament for future founders.</span>
+            <div className="flex gap-5 text-xs text-foreground/30">
+              <Link href="/login" className="hover:text-foreground/60 transition-colors">Sign In</Link>
+              <a href="mailto:hello@altailabs.com" className="hover:text-foreground/60 transition-colors">Contact</a>
+            </div>
           </div>
-          <div className="flex gap-5 text-xs text-foreground/30">
-            <Link href="/login" className="hover:text-foreground/60 transition-colors">Sign In</Link>
-            <a href="mailto:hello@altailabs.com" className="hover:text-foreground/60 transition-colors">Contact</a>
-            <a href="https://altailabs.ai" className="hover:text-foreground/60 transition-colors">altailabs.ai</a>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-6 border-t border-foreground/[0.04]">
+            <p className="text-xs text-foreground/25">A product of <a href="https://altailabs.ai" className="text-foreground/40 hover:text-foreground/60 underline underline-offset-2 transition-colors">Alt AI Labs</a> — building the future of AI education.</p>
+            <a href="https://altailabs.ai" className="text-xs font-semibold text-blue-500 hover:text-blue-400 transition-colors">altailabs.ai →</a>
           </div>
         </div>
       </footer>
