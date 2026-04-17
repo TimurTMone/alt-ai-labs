@@ -136,13 +136,17 @@ export default function HomePage() {
         <div className="absolute top-40 right-[20%] w-[350px] h-[350px] bg-violet-500/[0.06] rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center relative">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-6">
+            <Trophy className="w-4 h-4" /> $500 prizes every week
+          </div>
+
           <h1 className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-[0.95]">
-            <span className="text-white">Build AI.</span><br />
-            <span className="text-gradient-brand">Get paid.</span>
+            <span className="text-white">AI Tournament</span><br />
+            <span className="text-gradient-brand">for Future Founders</span>
           </h1>
 
           <p className="text-lg md:text-xl text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-            A new AI challenge drops every week. Sponsors fund the prizes. The best builders <span className="text-amber-400 font-semibold">win cash</span> and get hired.
+            Watch a drop. Build the challenge. Win cash. <span className="text-white font-semibold">Top performers get hired</span> by Alt AI Labs and partners.
           </p>
 
           {/* Dual CTA */}
@@ -150,9 +154,11 @@ export default function HomePage() {
             <button onClick={() => handleExplore('hero')} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 btn-primary transition-all duration-300 hover:scale-[1.02]">
               Start Building <ArrowRight className="w-4 h-4" />
             </button>
-            <Link href="/signup" onClick={() => track('cta_click', { cta: 'join_waitlist', location: 'hero' })} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
-              Join Waitlist
-            </Link>
+            {liveDrop && (
+              <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrop.slug}`} onClick={() => track('cta_click', { cta: 'watch_drop', location: 'hero' })} className="w-full sm:w-auto h-13 px-8 text-sm font-semibold rounded-xl text-white inline-flex items-center justify-center gap-2 bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200">
+                <Play className="w-4 h-4" /> Watch a Drop
+              </Link>
+            )}
           </div>
 
           {/* Social proof */}
@@ -176,6 +182,7 @@ export default function HomePage() {
               <span className="text-zinc-400"><span className="text-amber-400 font-bold">$<AnimatedCounter target={7500} /></span> in prizes</span>
             </div>
           </div>
+          <p className="text-xs text-zinc-600 mt-4">Builders from Kyrgyzstan, Russia, USA, and 10+ countries</p>
         </div>
       </section>
 
@@ -199,9 +206,16 @@ export default function HomePage() {
             <Link href={`/c/${DEFAULT_COMMUNITY_SLUG}/drops/${liveDrop.slug}`} className="block group">
               <div className="relative rounded-3xl overflow-hidden border border-blue-500/30 bg-gradient-to-br from-blue-950/80 via-[#09090b] to-violet-950/60 p-1 shadow-[0_0_60px_rgba(59,130,246,0.15),0_0_120px_rgba(139,92,246,0.08)]">
                 <div className="rounded-[calc(1.5rem-4px)] bg-[#0c0c10]/90 p-8 md:p-10 relative overflow-hidden">
-                  {/* Background glow */}
-                  <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/[0.08] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-                  <div className="absolute bottom-0 left-0 w-60 h-60 bg-violet-500/[0.06] rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none" />
+                  {/* YouTube Thumbnail */}
+                  {liveDrop.video_url && (() => {
+                    const videoId = liveDrop.video_url!.split('/embed/')[1]?.split('?')[0]
+                    return videoId ? (
+                      <div className="absolute inset-0 opacity-20">
+                        <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#0c0c10] via-[#0c0c10]/80 to-transparent" />
+                      </div>
+                    ) : null
+                  })()}
 
                   <div className="relative">
                     {/* Live badge + Sponsor */}
@@ -585,7 +599,7 @@ export default function HomePage() {
                 </div>
                 <span className="font-bold text-[14px] tracking-tight text-white">Alt AI Labs</span>
               </Link>
-              <p className="text-sm text-zinc-600 max-w-xs leading-relaxed">Learn AI by building real products. New drop every week. Ship or get shipped.</p>
+              <p className="text-sm text-zinc-600 max-w-xs leading-relaxed">AI tournament for future founders. Learn, build, compete, get hired.</p>
             </div>
             <div>
               <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">Product</h4>
